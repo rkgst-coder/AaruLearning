@@ -3,117 +3,210 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#1b1f5e">
+<meta name="theme-color" content="#0b1030">
 <meta name="mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <title>Hero Academy</title>
 <style>
+:root{--gold:#ffc83d;--gold2:#ff9f1c;--ink:#241f4a;--glass:rgba(255,255,255,.11)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-html,body{margin:0;height:100%;font-family:system-ui,'Segoe UI',Roboto,'Noto Sans Devanagari',sans-serif;background:#1b1f5e;color:#fff;overflow:hidden}
-#app{height:100dvh;display:flex;flex-direction:column;background:radial-gradient(circle at 20% 0%,#3b3fb5,#1b1f5e 62%)}
-#top{display:flex;align-items:center;gap:8px;padding:8px 12px}
-#journey{flex:1;display:flex;gap:5px;justify-content:center;flex-wrap:wrap}
-.dot{width:32px;height:32px;border-radius:50%;background:#ffffff22;display:grid;place-items:center;font-size:17px;opacity:.55}
-.dot.done{background:#ffd93b;opacity:1}
-.dot.cur{background:#fff;opacity:1;transform:scale(1.25)}
-#stars{font-size:22px;font-weight:700;color:#ffd93b;white-space:nowrap}
+html,body{margin:0;height:100%;font-family:ui-rounded,'SF Pro Rounded','Nunito','Segoe UI',system-ui,Roboto,'Noto Sans Devanagari',sans-serif;background:#0b1030;color:#fff;overflow:hidden}
+/* ---------- living background ---------- */
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:linear-gradient(180deg,#0a0e2e 0%,#1b2268 42%,#47298c 78%,#8a3ea6 100%)}
+#bg .st{position:absolute;inset:0;background-repeat:repeat;animation:tw 5s ease-in-out infinite alternate;opacity:.85;
+ background-image:radial-gradient(2px 2px at 20px 30px,#fff,transparent),radial-gradient(1.5px 1.5px at 90px 80px,#fff,transparent),radial-gradient(2px 2px at 150px 20px,#ffe9a8,transparent),radial-gradient(1.5px 1.5px at 210px 120px,#fff,transparent),radial-gradient(2px 2px at 60px 150px,#cfe,transparent);background-size:240px 190px}
+#bg .st.b{animation-delay:2.4s;background-size:310px 250px;opacity:.55;transform:translate(40px,30px)}
+@keyframes tw{from{opacity:.35}to{opacity:.95}}
+#bg .moon{position:absolute;right:5%;top:7%;width:74px;height:74px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fffbe0,#ffe58a 60%,#f2c94c);box-shadow:0 0 60px #ffe58a88}
+#bg .city{position:absolute;left:0;right:0;bottom:0;height:24%;opacity:.42;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='150' viewBox='0 0 640 150'%3E%3Cg fill='%2308092a'%3E%3Crect x='0' y='70' width='46' height='80'/%3E%3Crect x='50' y='40' width='38' height='110'/%3E%3Crect x='92' y='85' width='52' height='65'/%3E%3Crect x='150' y='20' width='34' height='130'/%3E%3Crect x='188' y='60' width='60' height='90'/%3E%3Crect x='254' y='95' width='40' height='55'/%3E%3Crect x='300' y='35' width='44' height='115'/%3E%3Crect x='350' y='75' width='50' height='75'/%3E%3Crect x='406' y='15' width='30' height='135'/%3E%3Crect x='440' y='65' width='56' height='85'/%3E%3Crect x='502' y='90' width='44' height='60'/%3E%3Crect x='552' y='45' width='40' height='105'/%3E%3Crect x='596' y='80' width='44' height='70'/%3E%3C/g%3E%3Cg fill='%23ffd86b'%3E%3Crect x='58' y='55' width='5' height='7'/%3E%3Crect x='70' y='80' width='5' height='7'/%3E%3Crect x='158' y='40' width='5' height='7'/%3E%3Crect x='200' y='85' width='5' height='7'/%3E%3Crect x='310' y='60' width='5' height='7'/%3E%3Crect x='412' y='40' width='5' height='7'/%3E%3Crect x='452' y='90' width='5' height='7'/%3E%3Crect x='560' y='70' width='5' height='7'/%3E%3C/g%3E%3C/svg%3E") repeat-x bottom/auto 100%}
+#app{position:relative;z-index:1;height:100dvh;display:flex;flex-direction:column}
+/* ---------- top bar ---------- */
+#top{display:flex;align-items:center;gap:10px;padding:10px 14px 2px}
+#journey{flex:1;display:flex;gap:7px;align-items:center;overflow-x:auto;padding:7px 12px;background:var(--glass);border:1px solid #ffffff22;border-radius:24px;backdrop-filter:blur(8px);justify-content:center;scrollbar-width:none;min-height:50px}
+#journey::-webkit-scrollbar{display:none}
+.dot{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:18px;background:#ffffff22;opacity:.65;position:relative;transition:.3s}
+.dot.done{background:linear-gradient(#ffe45c,#ffb300);opacity:1}
+.dot.done::after{content:'✔';position:absolute;right:-4px;bottom:-5px;font-size:10px;background:#22c55e;border-radius:50%;width:16px;height:16px;display:grid;place-items:center;color:#fff;border:2px solid #1b2268}
+.dot.cur{background:#fff;opacity:1;transform:scale(1.28);box-shadow:0 0 0 4px #ffc83d88,0 0 22px #ffc83d}
+.chip{background:var(--glass);border:1px solid #ffffff22;border-radius:20px;padding:7px 14px;font-weight:900;backdrop-filter:blur(8px);white-space:nowrap;font-size:20px;color:var(--gold)}
 #gear{background:none;border:0;font-size:24px;opacity:.35;color:#fff;padding:6px}
-#testChip{display:none;background:#ff5252;color:#fff;border-radius:10px;padding:3px 8px;font-weight:800;font-size:13px}
-#skipBtn{display:none;background:#ff5252;color:#fff;border:0;border-radius:10px;padding:5px 10px;font-weight:700}
+#testChip{display:none;background:#ff5252;color:#fff;border-radius:12px;padding:4px 10px;font-weight:900;font-size:13px}
+#skipBtn{display:none;background:#ff5252;color:#fff;border:0;border-radius:12px;padding:6px 12px;font-weight:800}
 body.test #testChip,body.test #skipBtn{display:inline-block}
-#heroRow{display:flex;align-items:center;gap:10px;padding:2px 14px}
-#heroFace{width:62px;height:74px;display:grid;place-items:center}
-#bubble{background:#fff;color:#222;border-radius:18px;padding:10px 14px;font-size:clamp(17px,2.4vw,24px);line-height:1.35;flex:1;min-height:52px}
-#again{background:#ffd93b;border:0;border-radius:50%;width:54px;height:54px;font-size:26px;flex:none}
-#stage{flex:1;position:relative;padding:8px 14px 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-height:0;overflow:auto}
-.btn{background:#ffd93b;color:#2b2b2b;border:0;border-radius:22px;padding:14px 30px;font-size:26px;font-weight:700;box-shadow:0 5px 0 #c9a700;font-family:inherit}
-.btn:active{transform:translateY(3px);box-shadow:0 2px 0 #c9a700}
-.btn.small{font-size:18px;padding:8px 16px;border-radius:14px}
-.choices{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
-.choice{background:#fff;color:#222;border:0;border-radius:24px;padding:10px 18px;font-size:48px;min-width:110px;min-height:110px;box-shadow:0 6px 0 #0003;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit}
-.choice small{font-size:20px;font-weight:700;color:#444}
-.choice .ltr{font-size:64px;font-weight:800}
-.choice.txt{font-size:22px;max-width:340px;text-align:left;flex-direction:row;gap:12px;font-weight:600}
-.choice.txt span:first-child{font-size:44px}
-.choice.wide{font-size:30px;max-width:320px;word-break:break-all}
-.choice.ok{background:#6ee7a0}
-.choice.hint{outline:6px solid #ffd93b}
+/* ---------- hero + bubble ---------- */
+#heroRow{display:flex;align-items:flex-end;gap:4px;padding:2px 14px 0}
+#heroWrap{position:relative;width:clamp(110px,17vw,170px);flex:none;margin-bottom:14px}
+#heroWrap::before{content:'';position:absolute;left:8%;right:8%;bottom:-2px;height:20px;background:radial-gradient(ellipse,#ffc83dcc,transparent 70%)}
+#heroFace{position:relative;animation:bob 2.6s ease-in-out infinite}
+#heroFace .hp{filter:drop-shadow(0 10px 10px #0008)}
+#heroFace svg{width:100%;height:auto;display:block}
+@keyframes bob{50%{transform:translateY(-7px)}}
+.cheer{animation:cheer .9s ease}
+.oops{animation:oops .5s ease}
+@keyframes cheer{0%{transform:none}30%{transform:translateY(-30px) rotate(-6deg) scale(1.08)}60%{transform:translateY(0) rotate(5deg)}100%{transform:none}}
+@keyframes oops{25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+#heroName{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);background:linear-gradient(#ffe45c,#ffb300);color:#3b2a00;font-weight:900;font-size:14px;padding:3px 12px;border-radius:14px;white-space:nowrap;box-shadow:0 3px 0 #b27d00}
+#bubble{position:relative;margin:0 0 22px 14px;background:#fff;color:var(--ink);border-radius:26px;padding:15px 20px;font-size:clamp(18px,2.5vw,28px);font-weight:800;line-height:1.35;flex:1;box-shadow:0 8px 0 #0003,0 14px 26px #0004;min-height:58px}
+#bubble::before{content:'';position:absolute;left:-13px;bottom:24px;border:13px solid transparent;border-right-color:#fff;border-left:0}
+#again{flex:none;margin:0 0 24px 8px;width:62px;height:62px;border-radius:50%;border:0;font-size:28px;background:linear-gradient(#ffe45c,#ffb300);box-shadow:0 5px 0 #b27d00}
+#again:active{transform:translateY(3px);box-shadow:0 2px 0 #b27d00}
+#stage{flex:1;position:relative;padding:6px 16px 16px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:14px;min-height:0;overflow:auto;animation:rise .45s ease}
+#stage>:first-child{margin-top:auto}
+#stage>:last-child{margin-bottom:auto}
+#stage>*{animation:rise .45s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+/* ---------- buttons & choices ---------- */
+.btn{background:linear-gradient(#ffe45c,#ffb300);color:#3b2a00;border:0;border-radius:28px;padding:15px 38px;font-size:clamp(20px,3vw,28px);font-weight:900;box-shadow:0 8px 0 #b27d00,0 14px 24px #0005;font-family:inherit;letter-spacing:.3px}
+.btn:active{transform:translateY(5px);box-shadow:0 3px 0 #b27d00}
+.btn:disabled{background:#8d93b8;color:#e5e7f5;box-shadow:0 6px 0 #5b6088;opacity:.9}
+.btn.small{font-size:17px;padding:9px 20px;border-radius:16px;box-shadow:0 5px 0 #b27d00}
+.btn.glow{animation:glow 1.8s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 8px 0 #b27d00,0 0 40px #ffc83d}}
+.link{background:none;border:0;color:#cdd2ff;text-decoration:underline;font-size:14px;font-family:inherit}
+.choices{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.choice{background:linear-gradient(#ffffff,#e9edff);color:var(--ink);border:0;border-radius:28px;padding:12px 20px;font-size:clamp(46px,7vw,64px);min-width:120px;min-height:120px;box-shadow:0 8px 0 #9aa3d8,0 14px 22px #0004;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-family:inherit;transition:transform .12s}
+.choice:active{transform:translateY(5px);box-shadow:0 3px 0 #9aa3d8}
+.choice small{font-size:21px;font-weight:900;color:#4b4f86}
+.choice .ltr{font-size:68px;font-weight:900}
+.choice.txt{font-size:23px;max-width:380px;text-align:left;flex-direction:row;gap:14px;font-weight:800;min-height:96px}
+.choice.txt span:first-child{font-size:46px}
+.choice.wide{font-size:32px;max-width:340px;word-break:break-all}
+.choice.ok{background:linear-gradient(#b9f6ca,#69f0ae);box-shadow:0 8px 0 #2e9d63,0 0 36px #69f0ae;animation:bounce .6s}
+.choice.hint{outline:6px solid var(--gold);outline-offset:3px}
+@keyframes bounce{40%{transform:scale(1.12)}70%{transform:scale(.97)}}
 .shake{animation:shake .4s}
-@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
-.card{background:#ffffff18;border-radius:28px;padding:16px 30px;text-align:center}
-.bigL{font-size:clamp(80px,16vw,150px);font-weight:800;line-height:1.05}
-.pic{font-size:clamp(70px,14vw,120px);line-height:1.1}
-.cap{font-size:clamp(20px,3vw,28px);font-weight:700;text-align:center}
-.field{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:720px}
-.item{background:#ffffff1f;border:0;border-radius:18px;font-size:44px;width:76px;height:76px;position:relative;color:#fff}
-.item i{position:absolute;right:-4px;bottom:-6px;background:#ffd93b;color:#222;border-radius:12px;font-size:20px;font-style:normal;font-weight:800;padding:0 7px}
-.item.counted{background:#6ee7a044}
-.plate{min-height:120px;width:min(720px,94%);background:#ffffff22;border:4px dashed #fff8;border-radius:24px;display:flex;flex-wrap:wrap;gap:8px;padding:10px;justify-content:center;align-items:center}
-.slots{display:flex;gap:12px}
-.slot{width:96px;height:110px;border:5px dashed #fff9;border-radius:20px;display:grid;place-items:center;font-size:64px;font-weight:800}
-.slot.full{border-style:solid;background:#6ee7a0;color:#222}
-.tiles{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;min-height:110px}
-.tile{width:92px;height:100px;background:#ffd93b;color:#222;border-radius:20px;display:grid;place-items:center;font-size:62px;font-weight:800;box-shadow:0 6px 0 #c9a700;touch-action:none;position:relative}
+@keyframes shake{25%{transform:translateX(-12px)}75%{transform:translateX(12px)}}
+.card{background:linear-gradient(160deg,#ffffff26,#ffffff0c);border:1px solid #ffffff33;border-radius:32px;padding:18px 34px;text-align:center;backdrop-filter:blur(8px);box-shadow:0 14px 30px #0004}
+.card .sub{font-size:18px;opacity:.85;margin-top:4px;max-width:520px}
+.bigL{font-size:clamp(84px,16vw,150px);font-weight:900;line-height:1.05;text-shadow:0 6px 0 #0004}
+.pic{font-size:clamp(72px,14vw,124px);line-height:1.1;filter:drop-shadow(0 8px 8px #0005)}
+.cap{font-size:clamp(20px,3vw,29px);font-weight:900;text-align:center}
+.scene{display:flex;flex-direction:column;align-items:center;gap:8px;max-width:640px;text-align:center}
+.field{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:760px}
+.item{background:linear-gradient(#ffffff2b,#ffffff12);border:1px solid #ffffff33;border-radius:20px;font-size:46px;width:80px;height:80px;position:relative;color:#fff;box-shadow:0 5px 0 #0003;transition:.15s}
+.item i{position:absolute;right:-6px;bottom:-8px;background:var(--gold);color:#3b2a00;border-radius:13px;font-size:21px;font-style:normal;font-weight:900;padding:0 8px;box-shadow:0 2px 0 #b27d00}
+.item.counted{background:#69f0ae55;transform:scale(.94)}
+.plate{min-height:122px;width:min(740px,94%);background:#ffffff1c;border:4px dashed #ffffff88;border-radius:28px;display:flex;flex-wrap:wrap;gap:8px;padding:10px;justify-content:center;align-items:center}
+.slots{display:flex;gap:14px}
+.slot{width:100px;height:116px;border:5px dashed #ffffffaa;border-radius:24px;display:grid;place-items:center;font-size:68px;font-weight:900;background:#ffffff14}
+.slot.full{border-style:solid;border-color:#69f0ae;background:linear-gradient(#b9f6ca,#69f0ae);color:var(--ink)}
+.tiles{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;min-height:116px}
+.tile{width:96px;height:106px;background:linear-gradient(#ffe45c,#ffb300);color:#3b2a00;border-radius:24px;display:grid;place-items:center;font-size:66px;font-weight:900;box-shadow:0 8px 0 #b27d00,0 12px 20px #0004;touch-action:none;position:relative}
 .tile.used{visibility:hidden}
-.prow{display:flex;gap:8px;font-size:clamp(34px,6vw,54px);align-items:center;flex-wrap:wrap;justify-content:center}
-.prow .q{background:#fff3;border-radius:14px;padding:0 10px}
-.grid{display:grid;gap:4px;background:#ffffff18;padding:6px;border-radius:16px}
-.cell{display:grid;place-items:center;background:#ffffff1c;border-radius:10px}
-.prog{display:flex;gap:6px;min-height:58px;flex-wrap:wrap;justify-content:center}
-.pslot{width:50px;height:50px;border:3px dashed #fff8;border-radius:12px;display:grid;place-items:center;font-size:28px}
-.arrows{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.arr{background:#fff;border:0;border-radius:16px;width:68px;height:68px;font-size:34px}
-.tracebox{flex:1;width:100%;max-width:760px;min-height:240px;background:#ffffff14;border-radius:24px;position:relative}
-.tracebox canvas{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;border-radius:24px}
-.off{text-align:center;max-width:680px;display:flex;flex-direction:column;gap:10px;align-items:center}
-.off .ic{font-size:84px}
-.off .st{font-size:clamp(22px,3.2vw,32px);font-weight:700;line-height:1.4}
-.off .pr{font-size:16px;opacity:.8;background:#0003;border-radius:12px;padding:6px 12px}
-.off .tm{font-size:34px;font-weight:800;color:#ffd93b;font-variant-numeric:tabular-nums}
-.plan{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;width:min(880px,96%)}
-.plan div,.plan button{background:#ffffff18;border-radius:14px;padding:8px 10px;font-size:15px;display:flex;gap:8px;align-items:center;color:#fff;border:0;text-align:left;font-family:inherit}
-.plan b{font-size:24px}
-.team{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
-.team .m{display:flex;flex-direction:column;align-items:center;font-size:13px;font-weight:700;width:96px;text-align:center}
-.team .m small{font-weight:400;opacity:.8;font-size:11px}
-.float{animation:bob 2.2s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-6px)}}
+.prow{display:flex;gap:10px;font-size:clamp(36px,6vw,56px);align-items:center;flex-wrap:wrap;justify-content:center}
+.prow .q{background:#ffffff33;border-radius:16px;padding:0 12px}
+.grid{display:grid;gap:5px;background:#ffffff1c;padding:8px;border-radius:20px;border:1px solid #ffffff33}
+.cell{display:grid;place-items:center;background:#ffffff22;border-radius:12px}
+.prog{display:flex;gap:7px;min-height:60px;flex-wrap:wrap;justify-content:center}
+.pslot{width:52px;height:52px;border:3px dashed #ffffff88;border-radius:14px;display:grid;place-items:center;font-size:28px;background:#ffffff12}
+.arrows{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.arr{background:linear-gradient(#fff,#e9edff);border:0;border-radius:20px;width:72px;height:72px;font-size:34px;box-shadow:0 6px 0 #9aa3d8}
+.arr:active{transform:translateY(4px);box-shadow:0 2px 0 #9aa3d8}
+.tracebox{flex:1;width:100%;max-width:780px;min-height:240px;background:#ffffff18;border:1px solid #ffffff33;border-radius:30px;position:relative}
+.tracebox canvas{position:absolute;left:0;top:0;width:100%;height:100%;touch-action:none;border-radius:30px}
+/* ---------- real-world (offline) activity ---------- */
+.off{text-align:center;max-width:720px;display:flex;flex-direction:column;gap:10px;align-items:center}
+.off .ic{font-size:76px;filter:drop-shadow(0 6px 6px #0005)}
+.off .st{font-size:clamp(22px,3.2vw,32px);font-weight:900;line-height:1.35}
+.off .mat{background:#ffffff1e;border-radius:16px;padding:6px 14px;font-size:17px;font-weight:700}
+.off .pr{font-size:15px;opacity:.85;background:#0004;border-radius:14px;padding:6px 14px}
+.ring{position:relative;width:132px;height:132px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:11;stroke-linecap:round}
+.ring .rbg{stroke:#ffffff2a}.ring .rfg{stroke:var(--gold);transition:stroke-dashoffset 1s linear}
+.ring .tm{position:absolute;inset:0;display:grid;place-items:center;font-size:30px;font-weight:900;font-variant-numeric:tabular-nums}
+/* ---------- home ---------- */
+.title{font-size:clamp(30px,5vw,48px);font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,#ffe45c,#ff9f1c,#ffe45c);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 4px 0 #0004)}
+.team{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:min(1100px,100%)}
+.hcard{--c:#e53935;width:clamp(136px,17vw,188px);border-radius:26px;padding:8px 8px 10px;text-align:center;background:linear-gradient(170deg,color-mix(in srgb,var(--c) 55%,#fff 0%),#ffffff10 85%);border:2px solid #ffffff44;box-shadow:0 10px 0 #0003,0 18px 30px #0004;transition:.2s}
+.hcard:active{transform:scale(.96)}
+.hcard .hs{animation:bob 3s ease-in-out infinite}
+.hcard .hs svg{width:auto;height:clamp(120px,21vh,200px);display:block;margin:0 auto}
+.hcard .hn{font-size:21px;font-weight:900;margin-top:2px;text-shadow:0 2px 0 #0004}
+.hcard .hw{font-size:12.5px;font-weight:700;opacity:.92;min-height:30px}
+.map{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;width:min(980px,98%)}
+.node{display:flex;align-items:center;gap:9px;background:var(--glass);border:1px solid #ffffff2a;border-left:6px solid var(--c,#ffc83d);border-radius:16px;padding:8px 13px;font-size:15px;font-weight:800;backdrop-filter:blur(6px);min-width:160px}
+.node b{font-size:25px}.node small{opacity:.75;font-weight:700}
+button.node{color:#fff;font-family:inherit;text-align:left}
+.streak{background:linear-gradient(#ff8a3d,#ff5a1f);padding:5px 14px;border-radius:18px;font-weight:900;font-size:17px;box-shadow:0 4px 0 #a33}
+.rays{position:relative;width:220px;height:220px;display:grid;place-items:center}
+.rays::before{content:'';position:absolute;inset:-30px;border-radius:50%;background:conic-gradient(from 0deg,#ffe45c55 0 10deg,transparent 10deg 30deg,#ffe45c55 30deg 40deg,transparent 40deg 60deg,#ffe45c55 60deg 70deg,transparent 70deg 90deg,#ffe45c55 90deg 100deg,transparent 100deg 120deg,#ffe45c55 120deg 130deg,transparent 130deg 150deg,#ffe45c55 150deg 160deg,transparent 160deg 180deg,#ffe45c55 180deg 190deg,transparent 190deg 210deg,#ffe45c55 210deg 220deg,transparent 220deg 240deg,#ffe45c55 240deg 250deg,transparent 250deg 270deg,#ffe45c55 270deg 280deg,transparent 280deg 300deg,#ffe45c55 300deg 310deg,transparent 310deg 330deg,#ffe45c55 330deg 340deg,transparent 340deg 360deg);animation:spin 14s linear infinite;-webkit-mask:radial-gradient(circle,#000 30%,transparent 70%);mask:radial-gradient(circle,#000 30%,transparent 70%)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.rays .bigL{position:relative;font-size:120px}
+.family{background:linear-gradient(160deg,#ffffff2e,#ffffff10);border:1px solid #ffffff44;border-radius:22px;padding:12px 18px;max-width:640px;text-align:left;font-size:17px;font-weight:700}
+.family b{color:var(--gold)}
+.ov{position:fixed;inset:0;z-index:55;display:none;place-items:center;text-align:center;background:radial-gradient(circle at 50% 30%,#3a2f9f,#0b1030)}
+.ov .ovc{display:flex;flex-direction:column;align-items:center;gap:12px;max-width:620px;padding:20px}
+.ov .sub{font-size:22px;font-weight:800;opacity:.92}
+.ov .dots{font-size:20px;font-weight:700;opacity:.85}
+.ov .dd{animation:blink 1.2s infinite}.ov .dd:nth-child(2){animation-delay:.2s}.ov .dd:nth-child(3){animation-delay:.4s}
+@keyframes blink{50%{opacity:.15}}
+.ov .row{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center}
+#toast{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:58;background:#fff;color:var(--ink);border-radius:22px;padding:12px 20px;font-weight:900;font-size:20px;box-shadow:0 10px 30px #0008;max-width:min(92vw,620px);text-align:center;animation:rise .35s ease}
+#toast.big{font-size:26px;border:4px solid var(--gold)}
 #fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
-#fx span{position:absolute;top:-40px;font-size:30px;animation:fall 1.8s ease-in forwards}
+#fx span{position:absolute;top:-40px;font-size:30px;animation:fall 1.9s ease-in forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2}}
 .pop{animation:pop .9s ease-out}
-@keyframes pop{0%{transform:scale(.2);opacity:0}50%{transform:scale(1.4);opacity:1}100%{transform:scale(1)}}
-#modal{position:fixed;inset:0;background:#000c;z-index:60;display:grid;place-items:center;overflow:auto}
+@keyframes pop{0%{transform:scale(.2);opacity:0}50%{transform:scale(1.35);opacity:1}100%{transform:scale(1)}}
+/* ---------- modal (parent area / PIN) ---------- */
+#modal{position:fixed;inset:0;background:#000d;z-index:60;display:grid;place-items:center;overflow:auto}
 #modal[hidden]{display:none}
-.panel{background:#fff;color:#222;border-radius:20px;padding:18px;width:min(620px,95%);max-height:94vh;overflow:auto;font-size:16px;-webkit-user-select:text;user-select:text}
+.panel{background:#fff;color:#222;border-radius:22px;padding:18px;width:min(660px,95%);max-height:94vh;overflow:auto;font-size:16px;-webkit-user-select:text;user-select:text;font-family:system-ui,Roboto,'Noto Sans Devanagari',sans-serif}
 .panel h2{margin:0 0 8px}
-.panel details{border:1px solid #ddd;border-radius:12px;margin:8px 0;padding:6px 12px}
+.panel details{border:1px solid #ddd;border-radius:14px;margin:8px 0;padding:6px 12px}
 .panel summary{font-weight:800;font-size:17px;padding:6px 0;cursor:pointer}
 .panel label{display:block;margin:10px 0 2px;font-weight:700}
 .panel label.inl{display:flex;gap:8px;align-items:center;font-weight:600}
-.panel input[type=text],.panel input[type=number],.panel input[type=password],.panel input[type=url],.panel input[type=time],.panel select{width:100%;font-size:17px;padding:8px;border:2px solid #bbb;border-radius:10px}
-.panel .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.panel input[type=text],.panel input[type=number],.panel input[type=password],.panel input[type=url],.panel input[type=time],.panel select{width:100%;font-size:17px;padding:8px;border:2px solid #bbb;border-radius:10px;background:#fff;color:#222}
+.panel .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
 .panel button{font-size:15px;padding:8px 14px;border-radius:10px;border:0;background:#3b3fb5;color:#fff;font-family:inherit}
-.panel button.red{background:#c0392b}
-.panel button.grey{background:#777}
+.panel button.red{background:#c0392b}.panel button.grey{background:#777}.panel button.green{background:#1f9d55}
 .panel pre{background:#f1f1f1;padding:8px;border-radius:8px;white-space:pre-wrap;font-size:12px;max-height:140px;overflow:auto}
 .panel table{border-collapse:collapse;width:100%;font-size:13px}
-.panel td,.panel th{border:1px solid #ddd;padding:4px 6px;text-align:left}
+.panel td,.panel th{border:1px solid #ddd;padding:4px 6px;text-align:left;vertical-align:top}
 .panel .note{font-size:13px;color:#666}
-.pinpad{display:grid;grid-template-columns:repeat(3,72px);gap:10px;justify-content:center;margin:12px 0}
-.pinpad button{height:64px;font-size:26px;border-radius:16px;background:#eef;color:#222}
+.panel .hn2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.panel .recrow{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;border-bottom:1px solid #eee;padding:5px 0}
+.panel .recrow small{color:#777;display:block}
+.pinpad{display:grid;grid-template-columns:repeat(3,76px);gap:10px;justify-content:center;margin:12px 0}
+.pinpad button{height:66px;font-size:27px;border-radius:18px;background:#eef;color:#222}
 .pindots{text-align:center;font-size:30px;letter-spacing:10px;min-height:40px}
+/* ---------- printable sheets ---------- */
+#printArea{display:none}
+.pg{width:190mm;margin:0 auto;font-family:Arial,'Noto Sans Devanagari',sans-serif;color:#111;font-size:11.5pt;page-break-after:always;break-after:page}
+.pg header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #1e3a8a;padding-bottom:4px;margin-bottom:6px;font-size:11pt}
+.pg .logo{font-weight:900;font-size:17pt;color:#1e3a8a}
+.pg .who{margin:4px 0 4px;font-size:11pt}
+.pg h3{margin:7px 0 2px;font-size:12.5pt;background:#e8eefc;padding:3px 8px;border-radius:6px}
+.pg h3 small{font-weight:400;color:#555}
+.pg p{margin:2px 0 2px 8px;line-height:1.3}
+.pg .hi{color:#222;font-size:11pt}
+.pg .ask{font-style:italic;color:#444;font-size:10.5pt}
+.pg .mat{font-size:10.5pt;color:#333}
+.pg .box{border:1.5px solid #888;border-radius:8px;padding:5px 9px;margin-top:7px;font-size:10.5pt}
+.pg .box li{margin:1px 0;list-style:none}
+.pg svg{width:100%;height:auto;display:block;margin-top:2px}
+.pg .stars{letter-spacing:5px;font-size:15pt}
+@page{size:A4;margin:9mm}
+@media print{
+  html,body{overflow:visible!important;height:auto!important;background:#fff!important;color:#000!important}
+  #bg,#app,#modal,#fx{display:none!important}
+  #printArea{display:block!important}
+}
 </style>
 </head>
 <body>
+<div id="bg"><div class="st"></div><div class="st b"></div><div class="moon"></div><div class="city"></div></div>
 <div id="app">
-  <div id="top"><span id="testChip">TEST</span><button id="skipBtn">Skip ⏭</button><div id="journey"></div><div id="stars">⭐ 0</div><button id="gear" aria-label="parent">⚙️</button></div>
-  <div id="heroRow"><div id="heroFace" class="float"></div><div id="bubble"></div><button id="again" aria-label="repeat">🔊</button></div>
+  <div id="top"><span id="testChip">TEST</span><button id="skipBtn">Skip ⏭</button><div id="journey"></div><div id="stars" class="chip">⭐ 0</div><button id="gear" aria-label="parent">⚙️</button></div>
+  <div id="heroRow"><div id="heroWrap"><div id="heroFace"><div class="hp"></div></div><div id="heroName"></div></div><div id="bubble"></div><button id="again" aria-label="repeat">🔊</button></div>
   <div id="stage"></div>
 </div>
 <div id="modal" hidden></div>
 <div id="fx"></div>
+<div id="printArea"></div>
 
 <script>
 /* ---------- logging first (visible in Parent area → Data) ---------- */
@@ -124,7 +217,7 @@ body.test #testChip,body.test #skipBtn{display:inline-block}
   window.addEventListener('unhandledrejection',function(e){window.L('REJ '+(e.reason&&e.reason.message||e.reason))});
   window.L('boot');
 })();
-const APPV='2.0.1';
+const APPV='3.1.0';
 
 /* ---------- helpers ---------- */
 const $=(s,r=document)=>r.querySelector(s);
@@ -141,15 +234,24 @@ const unb64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 
 /* ---------- storage: IndexedDB (main) + localStorage mirror ---------- */
 const DB={db:null,
-  open(){return new Promise(res=>{try{const r=indexedDB.open('heroAcademy',1);r.onupgradeneeded=()=>{r.result.createObjectStore('kv')};r.onsuccess=()=>{this.db=r.result;res(true)};r.onerror=()=>{L('idb open fail');res(false)}}catch(e){L('idb missing');res(false)}})},
+  open(){return new Promise(res=>{try{const r=indexedDB.open('heroAcademy',1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains('kv'))r.result.createObjectStore('kv')};r.onsuccess=()=>{this.db=r.result;res(true)};r.onerror=()=>{L('idb open fail');res(false)}}catch(e){L('idb missing');res(false)}})},
   get(k){return new Promise(res=>{const fb=()=>{try{res(JSON.parse(localStorage.getItem('ha_'+k)))}catch(e){res(null)}};if(!this.db)return fb();try{const q=this.db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>q.result==null?fb():res(q.result);q.onerror=fb}catch(e){fb()}})},
-  set(k,v){return new Promise(res=>{try{localStorage.setItem('ha_'+k,JSON.stringify(v))}catch(e){}if(!this.db)return res();try{const t=this.db.transaction('kv','readwrite');t.objectStore('kv').put(JSON.parse(JSON.stringify(v)),k);t.oncomplete=()=>res();t.onerror=()=>{L('idb write fail');res()}}catch(e){L('idb put err '+e.message);res()}})}
+  set(k,v){return new Promise(res=>{try{localStorage.setItem('ha_'+k,JSON.stringify(v))}catch(e){}if(!this.db)return res();try{const t=this.db.transaction('kv','readwrite');t.objectStore('kv').put(JSON.parse(JSON.stringify(v)),k);t.oncomplete=()=>res();t.onerror=()=>{L('idb write fail');res()}}catch(e){L('idb put err '+e.message);res()}})},
+  getBlob(k){return new Promise(res=>{if(!this.db)return res(null);try{const q=this.db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null)}catch(e){res(null)}})},
+  setBlob(k,b){return new Promise(res=>{if(!this.db)return res(false);try{const t=this.db.transaction('kv','readwrite');t.objectStore('kv').put(b,k);t.oncomplete=()=>res(true);t.onerror=()=>res(false)}catch(e){res(false)}})},
+  del(k){return new Promise(res=>{if(!this.db)return res();try{const t=this.db.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=()=>res();t.onerror=()=>res()}catch(e){res()}})}
 };
-const DEF={v:2,name:'',day:1,stars:0,badges:[],history:[],reward:'',rewardEvery:5,oncePerDay:true,
+/* ---------- the Hero Team (editable names) ---------- */
+const HERO_DEF={shivansh:{n:'Shivansh',h:'शिवांश'},aarav:{n:'Aarav',h:'आरव'},chiku:{n:'Chiku',h:'चीकू'},vidu:{n:'Vid-du',h:'विद्दू'},snaya:{n:'Snaya',h:'स्नाया'}};
+const DEF={v:3,name:'',day:1,stars:0,badges:[],history:[],reward:'',rewardEvery:5,oncePerDay:true,
   win:{on:false,from:'15:00',to:'17:00'},content:{off:[],maxCount:0},
-  voice:{on:true,mode:'single',rate:0.9},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false},test:false};
+  lock:{on:true,confirm:false},sfx:true,ask:{n:'Mummy',h:'मम्मी'},grant:{date:'',extra:0,open:''},heroes:JSON.parse(JSON.stringify(HERO_DEF)),
+  voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false};
 let S=JSON.parse(JSON.stringify(DEF));
-let LOCAL={bioId:''}; /* device-only, never synced */
+let LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0}; /* device-only, never synced */
+const HN=k=>(S.heroes[k]&&S.heroes[k].n)||HERO_DEF[k].n;
+const HH=k=>(S.heroes[k]&&S.heroes[k].h)||HERO_DEF[k].h;
+const fillN=(s,sp)=>String(s).replace(/\[(\w+)\]/g,(m,k)=>HERO_DEF[k]?(sp?HH(k):HN(k)):m);
 function merge(base,over){for(const k in over){if(over[k]&&typeof over[k]==='object'&&!Array.isArray(over[k])&&base[k]&&typeof base[k]==='object')merge(base[k],over[k]);else base[k]=over[k]}return base}
 let pushTimer=null;
 async function save(){
@@ -160,7 +262,7 @@ async function save(){
 const saveLocal=()=>DB.set('local',LOCAL);
 
 /* ---------- cloud sync (Apps Script + Google Sheet) ---------- */
-function exportable(){const o=JSON.parse(JSON.stringify(S));delete o.sync;o.test=false;return o}
+function exportable(){const o=JSON.parse(JSON.stringify(S));delete o.sync;delete o.sec;o.test=false;return o}
 async function callSync(action,data){
   const r=await fetch(S.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:S.sync.token,action,data})});
   const j=await r.json();if(!j.ok)throw new Error(j.error||'sync error');return j;
@@ -176,86 +278,217 @@ async function syncPush(){
 async function syncPull(){
   const j=await callSync('pull');
   if(!j.data)throw new Error('No saved data in the Sheet yet');
-  const keep={sync:S.sync};
-  S=merge(JSON.parse(JSON.stringify(DEF)),j.data);S.sync=keep.sync;S.test=false;
+  const keep={sync:S.sync,sec:S.sec};
+  S=merge(JSON.parse(JSON.stringify(DEF)),j.data);S.sync=keep.sync;S.sec=keep.sec;S.test=false;
   await DB.set('state',S);
 }
 window.addEventListener('online',()=>{if(S.sync.dirty)syncPush()});
 
-/* ---------- voice: Hindi teacher, English target words ---------- */
+/* ---------- sound effects (tiny WebAudio beeps) ---------- */
+let AC=null;
+function tone(f,d,type='sine',v=.12,t0=0){
+  if(!S.sfx)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+    const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;const t=AC.currentTime+t0;
+    g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.02);g.gain.exponentialRampToValueAtTime(0.0001,t+d);
+    o.connect(g).connect(AC.destination);o.start(t);o.stop(t+d+.05)}catch(e){}
+}
+const SFX={tap(){tone(520,.06,'triangle',.08)},ok(){tone(660,.12);tone(880,.2,'sine',.12,.1)},no(){tone(200,.22,'triangle',.1)},
+  star(){[784,988,1175,1568].forEach((f,i)=>tone(f,.18,'sine',.11,i*.09))},win(){[523,659,784,1047,784,1047,1319].forEach((f,i)=>tone(f,.2,'sine',.12,i*.11))}};
+document.addEventListener('pointerdown',()=>{try{if(AC&&AC.state==='suspended')AC.resume()}catch(e){}},{passive:true});
+
+/* ---------- voice: Hindi teacher, English words, own recordings ---------- */
 let VOICES=[];
 function refreshVoices(){try{VOICES=speechSynthesis.getVoices()||[]}catch(e){VOICES=[]}}
 if('speechSynthesis' in window){refreshVoices();speechSynthesis.onvoiceschanged=refreshVoices}
-const hasHi=()=>VOICES.some(v=>/^hi/i.test(v.lang));
-function pick(lang){const l=lang.toLowerCase().replace('_','-');return VOICES.find(v=>v.lang.toLowerCase().replace('_','-')===l)||VOICES.find(v=>v.lang.toLowerCase().startsWith(l.slice(0,2)))}
+const nl=l=>(l||'').toLowerCase().replace('_','-');
+function bestVoice(prefix,pref){
+  const c=VOICES.filter(v=>nl(v.lang).startsWith(prefix));if(!c.length)return null;
+  const sc=v=>{let s=0;const n=(v.name+' '+v.voiceURI).toLowerCase();if(nl(v.lang)===pref)s+=5;if(/google/.test(n))s+=3;if(/network|online/.test(n))s+=2;if(!v.localService)s+=1;if(/compact|espeak/.test(n))s-=3;return s};
+  return c.slice().sort((a,b)=>sc(b)-sc(a))[0];
+}
+function voiceFor(l){
+  const uri=l==='hi'?LOCAL.hiVoice:LOCAL.enVoice;
+  if(uri){const v=VOICES.find(x=>x.voiceURI===uri);if(v)return v}
+  return l==='hi'?bestVoice('hi','hi-in'):bestVoice('en','en-in');
+}
+const hasHi=()=>VOICES.some(v=>nl(v.lang).startsWith('hi'));
+/* simple Devanagari → Roman (Hinglish) so an English voice can read Hindi when no Hindi voice exists */
+function deva2rom(str){
+  const IV={'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au','ऑ':'o','ऍ':'e'};
+  const MV={'ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au','ॉ':'o','ॅ':'e'};
+  const CN={'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'ng','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'ny','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l'};
+  const NUK={'क':'q','ख':'kh','ग':'g','ज':'z','ड':'r','ढ':'rh','फ':'f'};
+  return String(str).replace(/[ऀ-ॿ]+/g,w=>{
+    const u=[];let i=0;
+    while(i<w.length){
+      const ch=w[i];
+      if(IV[ch]){u.push({r:IV[ch],v:true});i++;continue}
+      if(CN[ch]){let r=CN[ch];i++;if(w[i]==='़'){r=NUK[ch]||r;i++}
+        const nx=w[i];
+        if(nx==='्'){u.push({r,v:false});i++}
+        else if(MV[nx]){u.push({r:r+MV[nx],v:true});i++}
+        else u.push({r:r+'a',v:true,s:true});
+        continue}
+      if(ch==='ं'||ch==='ँ'){u.push({r:'n',v:false});i++;continue}
+      if(ch==='ः'){u.push({r:'h',v:false});i++;continue}
+      if(ch==='।'){u.push({r:'.',v:false});i++;continue}
+      i++;
+    }
+    const n=u.length;
+    if(n>1&&u[n-1].s)u[n-1]={r:u[n-1].r.slice(0,-1),v:false};
+    for(let k=n-2;k>0;k--)if(u[k].s&&u[k-1].v&&u[k+1]&&u[k+1].v)u[k]={r:u[k].r.slice(0,-1),v:false};
+    return u.map(x=>x.r).join('');
+  });
+}
+/* the child's teacher's own recordings (stored on this tablet) */
+const RECS=new Set();const recURL={};
+async function recAudio(k){
+  if(recURL[k])return new Audio(recURL[k]);
+  const b=await DB.getBlob('rec_'+k);if(!b){RECS.delete(k);return null}
+  recURL[k]=URL.createObjectURL(b);return new Audio(recURL[k]);
+}
+let curAudio=null;
+function stopAudio(){try{if(curAudio){curAudio.pause();curAudio=null}}catch(e){}}
+function playRec(k,id){return new Promise(async res=>{
+  const a=await recAudio(k);if(!a||!S.voice.on)return res(false);
+  curAudio=a;let done=false;const fin=()=>{if(!done){done=true;res(true)}};
+  a.onended=fin;a.onerror=fin;setTimeout(fin,15000);
+  try{await a.play()}catch(e){fin()}
+  const iv=setInterval(()=>{if(id!==speakId||done){clearInterval(iv);if(id!==speakId){try{a.pause()}catch(e){}fin()}}},120);
+})}
+const PH={shabash:'शाबाश!',wah:'वाह! बहुत बढ़िया!',again:'कोई बात नहीं, फिर से try करो!',star:'एक और star!',listen:'ध्यान से सुनो।',count:'हर एक को touch करो और गिनो!',howmany:'Total कितने हैं?',hello:'नमस्ते! चलो mission शुरू करते हैं!',timeup:'Time पूरा हुआ!',complete:'आज का पूरा mission complete! शाबाश!',trace:'अपनी उंगली से trace करो।',next:'चलो, अगला!',great:'बहुत अच्छे!'};
+const P=k=>({rec:'ph_'+k,t:PH[k]});
+const SND={s:'स्स्स',a:'ऍ',t:'ट',p:'प',i:'इ',n:'न्न',m:'म्म्म',d:'ड',g:'ग',o:'ऑ',c:'क',k:'क',e:'एह',u:'अ',r:'र्र',h:'ह',b:'ब',l:'ल्ल',f:'फ़्फ़',j:'ज'};
+const SNDEN={s:'/s/',a:'/a/',t:'/t/',p:'/p/',i:'/i/',n:'/n/',m:'/m/',d:'/d/',g:'/g/',o:'/o/',c:'/k/',k:'/k/',e:'/e/',u:'/u/',r:'/r/',h:'/h/',b:'/b/',l:'/l/',f:'/f/',j:'/j/'};
+const sndP=c=>({rec:'snd_'+c,t:SND[c]});
 let speakId=0,LAST=[];
-function say1(text,lang,rate){return new Promise(res=>{
+function chunks(text){
+  const out=[];
+  String(text).split(/(?<=[।.!?])\s+/).forEach(s=>{s=s.trim();if(!s)return;
+    while(s.length>170){let cut=s.lastIndexOf(',',170);if(cut<40)cut=s.lastIndexOf(' ',170);if(cut<40)cut=170;out.push(s.slice(0,cut));s=s.slice(cut+1)}
+    out.push(s)});
+  return out;
+}
+function say1(text,lang){return new Promise(res=>{
   if(!S.voice.on||!('speechSynthesis' in window)||!text){res();return}
-  const u=new SpeechSynthesisUtterance(text);u.lang=lang;const v=pick(lang);if(v)u.voice=v;u.rate=rate||0.9;u.pitch=1.05;
+  const u=new SpeechSynthesisUtterance(text);u.lang=lang==='hi'?'hi-IN':'en-IN';
+  const v=voiceFor(lang);if(v){u.voice=v;u.lang=v.lang}
+  u.rate=lang==='hi'?S.voice.rate:Math.min(S.voice.rate,.9);u.pitch=S.voice.pitch;
   let done=false;const fin=()=>{if(!done){done=true;res()}};
-  u.onend=fin;u.onerror=fin;setTimeout(fin,12000);
+  u.onend=fin;u.onerror=fin;setTimeout(fin,14000);
   try{speechSynthesis.speak(u)}catch(e){fin()}})}
-/* parts: 'हिंदी text' or ['English word','en'] */
-function toUtter(parts){
-  if(S.voice.mode==='single')return [[parts.map(p=>typeof p==='string'?p:p[0]).join(' '),'hi-IN']];
-  return parts.map(p=>typeof p==='string'?[p,'hi-IN']:[p[0],p[1]==='en'?'en-IN':'hi-IN']);
+function segsOf(parts){
+  const out=[];
+  const push=(t,l)=>{if(!t)return;const last=out[out.length-1];if(last&&last.l===l&&!last.rec)last.t+=' '+t;else out.push({t,l})};
+  for(const p of parts){
+    if(typeof p==='string')push(p,'hi');
+    else if(Array.isArray(p))push(p[0],p[1]==='en'&&S.voice.mode!=='single'?'en':'hi');
+    else if(p&&p.rec){if(RECS.has(p.rec))out.push({rec:p.rec});else push(p.t,'hi')}
+  }
+  return out;
 }
 async function say(...parts){
   const id=++speakId;
   try{speechSynthesis.cancel()}catch(e){}
-  await sleep(80);
-  for(const [t,l] of toUtter(parts)){if(id!==speakId)return;await say1(t,l,S.voice.rate)}
+  stopAudio();
+  await sleep(70);
+  const romanAll=S.voice.hinglish||(!voiceFor('hi')&&'speechSynthesis' in window);
+  for(const sg of segsOf(parts)){
+    if(id!==speakId)return;
+    if(sg.rec){if(await playRec(sg.rec,id))continue}
+    const roman=sg.l==='hi'&&romanAll;
+    const text=roman?deva2rom(sg.t):sg.t,lang=(sg.l==='en'||roman)?'en':'hi';
+    for(const c of chunks(text)){if(id!==speakId)return;await say1(c,lang);await sleep(90)}
+  }
 }
-function stopVoice(){speakId++;try{speechSynthesis.cancel()}catch(e){}}
-/* show English on screen, speak Hinglish */
+function stopVoice(){speakId++;try{speechSynthesis.cancel()}catch(e){}stopAudio()}
 function hero(display,parts){$('#bubble').textContent=display;LAST=parts||[display];return say(...LAST)}
-$('#again').onclick=()=>say(...LAST);
+$('#again').onclick=()=>{SFX.tap();say(...LAST)};
+function react(c){const hp=$('#heroFace .hp');if(!hp)return;hp.classList.remove('cheer','oops');void hp.offsetWidth;hp.classList.add(c)}
 
 /* ---------- the Hero Team (original characters, drawn in SVG) ---------- */
 const TEAM={
-  blaze:{name:'Blaze',suit:'#e53935',dark:'#a31515',mask:'#ff9800',belt:'#ffd54f',power:'Super-fast flyer',extra:'cape',ini:'B'},
-  jet:{name:'Jet',suit:'#1e88e5',dark:'#0d47a1',mask:'#90caf9',belt:'#cfd8dc',power:'Flying suit with wings',extra:'wings',ini:'J'},
-  vine:{name:'Vine',suit:'#43a047',dark:'#1b5e20',mask:'#2e7d32',belt:'#8d6e63',power:'Vine swing & rescue nets',extra:'vine',ini:'V'},
-  echo:{name:'Echo',suit:'#8e24aa',dark:'#4a148c',mask:'#ce93d8',belt:'#ffd54f',power:'Super hearing',extra:'waves',ini:'E'},
-  heart:{name:'Heart',suit:'#f9a825',dark:'#e65100',mask:'#ec407a',belt:'#ffffff',power:'Kindness power',extra:'sparkle',ini:'H'}
+  shivansh:{col:'#e53935',lite:'#ff7a70',dark:'#9b1111',acc:'#ffb300',power:'Super-fast flyer',hp:'मैं बहुत तेज़ उड़ता हूँ!',ini:'S',lead:'numbers'},
+  aarav:{col:'#1e88e5',lite:'#6ab7ff',dark:'#0d47a1',acc:'#cfd8dc',power:'Flying-suit pilot',hp:'मैं flying suit पहनकर उड़ता हूँ!',ini:'A',lead:'logic'},
+  chiku:{col:'#43a047',lite:'#8bd78f',dark:'#1b5e20',acc:'#8d6e63',power:'Vine swinger & rescue nets',hp:'मैं vines से झूलता हूँ और सबको बचाता हूँ!',ini:'C',lead:'nature'},
+  vidu:{col:'#8e24aa',lite:'#d17be6',dark:'#4a148c',acc:'#ffca28',power:'Super hearing',hp:'मैं बहुत दूर की आवाज़ें सुन लेता हूँ!',ini:'V',lead:'letters'},
+  snaya:{col:'#f9a825',lite:'#ffd966',dark:'#e65100',acc:'#ec407a',power:'Kindness power',hp:'मेरी power है kindness — मैं सबकी help करती हूँ!',ini:'S',lead:'values'}
 };
-function heroSVG(k,size=64){
-  const h=TEAM[k];let back='',head='',boots='';
-  if(h.extra==='cape')back=`<path d="M34 50 Q18 95 26 114 L74 114 Q82 95 66 50 Z" fill="${h.dark}"/>`;
-  if(h.extra==='wings')back=`<path d="M36 56 L3 42 L13 64 L1 74 L36 72 Z" fill="#b0bec5"/><path d="M64 56 L97 42 L87 64 L99 74 L64 72 Z" fill="#b0bec5"/>`;
-  if(h.extra==='vine')back=`<path d="M66 46 C92 30 98 72 78 74 C62 76 66 54 84 58" stroke="#6d4c41" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="90" cy="42" rx="5" ry="3" fill="#7cb342"/><ellipse cx="82" cy="64" rx="4" ry="2.6" fill="#7cb342"/><path d="M8 84 l12 0 l-6 10 z M6 84 l16 10 M22 84 l-16 10" stroke="#a1887f" stroke-width="1.5" fill="none"/>`;
-  if(h.extra==='waves')back=`<path d="M22 28 Q14 38 22 48 M13 22 Q1 38 13 54 M78 28 Q86 38 78 48 M87 22 Q99 38 87 54" stroke="${h.mask}" stroke-width="3.5" fill="none" stroke-linecap="round"/>`;
-  if(h.extra==='sparkle')back=`<path d="M14 26 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#fff59d"/><path d="M84 40 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" fill="#fff59d"/>`;
-  if(k==='jet'||k==='blaze')boots=`<path d="M39 108 L43 119 L47 108Z M53 108 L57 119 L61 108Z" fill="#ff9800"/>`;
-  if(k==='jet'){
-    head=`<circle cx="50" cy="32" r="16" fill="#f2c9a0"/><path d="M32 34 A18 18 0 0 1 68 34 L68 30 A18 18 0 0 0 32 30 Z" fill="${h.suit}"/><path d="M32 33 A18 18 0 0 1 68 33 Z" fill="${h.suit}"/><rect x="35" y="26" width="30" height="10" rx="5" fill="#e3f2fd" stroke="${h.dark}" stroke-width="1.5"/><path d="M44 41 Q50 45 56 41" stroke="#6d4c41" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-  }else{
-    head=`<circle cx="50" cy="32" r="16" fill="#f2c9a0"/><path d="M34 30 Q35 13 50 14 Q65 13 66 30 Q58 21 50 23 Q42 21 34 30Z" fill="#3e2723"/><rect x="35" y="27" width="30" height="9" rx="4.5" fill="${h.mask}"/><ellipse cx="44" cy="31.5" rx="3.6" ry="2.6" fill="#fff"/><ellipse cx="56" cy="31.5" rx="3.6" ry="2.6" fill="#fff"/><circle cx="44.5" cy="31.8" r="1.3" fill="#222"/><circle cx="55.5" cy="31.8" r="1.3" fill="#222"/><path d="M44 39 Q50 44 56 39" stroke="#6d4c41" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-    if(k==='echo')head+=`<circle cx="34" cy="33" r="4.5" fill="${h.dark}"/><circle cx="66" cy="33" r="4.5" fill="${h.dark}"/>`;
+function heroSVG(k,size){
+  const T=TEAM[k],id='g'+Math.random().toString(36).slice(2,8);
+  const skin='#f4c99a',skinD='#dfa673';
+  const defs=`<defs><linearGradient id="${id}a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${T.lite}"/><stop offset=".55" stop-color="${T.col}"/><stop offset="1" stop-color="${T.dark}"/></linearGradient><radialGradient id="${id}h" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#fff9ee"/><stop offset="1" stop-color="${skin}"/></radialGradient></defs>`;
+  const fill=`url(#${id}a)`;
+  let back='',hairBack='',skirt='',mask='',hairFront='',gear='',emblem='';
+  const hair='#2a1a10';
+  if(k==='shivansh'){
+    back=`<path d="M33 52 Q8 100 18 126 L82 126 Q92 100 67 52Z" fill="${T.dark}"/><path d="M33 52 Q18 98 28 124 L50 126 L50 56Z" fill="#000" opacity=".14"/>`;
+    mask=`<rect x="32" y="25" width="36" height="12" rx="6" fill="${T.acc}"/>`;
+    hairFront=`<path d="M31 31 Q29 11 50 12 Q71 11 69 31 Q62 20 50 22 Q38 20 31 31Z" fill="${hair}"/>`;
+    gear=`<path d="M38 116 L43 130 L48 116Z M52 116 L57 130 L62 116Z" fill="#ff7a00"/><path d="M41 116 L43 125 L45 116Z M55 116 L57 125 L59 116Z" fill="#ffe082"/>`;
+    emblem=`<path d="M52 55 L45 65 L50 65 L47 73 L56 61 L51 61Z" fill="${T.col}"/>`;
   }
-  const body=`<rect x="38" y="80" width="10" height="26" rx="4" fill="${h.dark}"/><rect x="52" y="80" width="10" height="26" rx="4" fill="${h.dark}"/><rect x="36" y="102" width="14" height="7" rx="3" fill="${h.belt}"/><rect x="50" y="102" width="14" height="7" rx="3" fill="${h.belt}"/>${boots}
-  <rect x="34" y="47" width="32" height="36" rx="10" fill="${h.suit}"/><rect x="34" y="74" width="32" height="5" fill="${h.belt}"/>
-  <path d="M37 52 L22 36" stroke="${h.suit}" stroke-width="8" stroke-linecap="round"/><circle cx="21" cy="34" r="5" fill="${h.dark}"/>
-  <path d="M63 52 L74 66" stroke="${h.suit}" stroke-width="8" stroke-linecap="round"/><circle cx="75" cy="68" r="5" fill="${h.dark}"/>
-  <circle cx="50" cy="61" r="8.5" fill="#fff"/>`+
-  (k==='heart'?`<path d="M50 66 C42 60 44 54 47.5 55 C49 55.4 50 57 50 57 C50 57 51 55.4 52.5 55 C56 54 58 60 50 66Z" fill="#ec407a"/>`
-   :`<text x="50" y="65.6" text-anchor="middle" font-size="12" font-weight="900" fill="${h.suit}" font-family="Arial,sans-serif">${h.ini}</text>`);
-  return `<svg viewBox="0 0 100 120" width="${Math.round(size*100/120)}" height="${size}" aria-label="${h.name}">${back}${body}${head}</svg>`;
+  if(k==='aarav'){
+    back=`<path d="M35 56 L2 40 L10 64 L0 78 L36 74Z" fill="#cfd8dc"/><path d="M35 56 L10 46 L16 64 L8 74" stroke="#90a4ae" stroke-width="1.6" fill="none"/><path d="M65 56 L98 40 L90 64 L100 78 L64 74Z" fill="#cfd8dc"/><path d="M65 56 L90 46 L84 64 L92 74" stroke="#90a4ae" stroke-width="1.6" fill="none"/>`;
+    hairFront=`<path d="M31 33 Q30 11 50 11 Q70 11 69 33 Q68 20 50 19 Q32 20 31 33Z" fill="${T.col}"/><path d="M36 14 Q50 6 64 14" stroke="${T.lite}" stroke-width="3" fill="none" stroke-linecap="round"/><rect x="34" y="25" width="32" height="13" rx="6.5" fill="#bbdefb" opacity=".5" stroke="${T.dark}" stroke-width="1.6"/>`;
+    gear=`<path d="M38 116 L43 130 L48 116Z M52 116 L57 130 L62 116Z" fill="#29b6f6"/><path d="M41 116 L43 125 L45 116Z M55 116 L57 125 L59 116Z" fill="#e1f5fe"/>`;
+    emblem=`<path d="M50 56 L56 70 L50 66 L44 70Z" fill="${T.col}"/>`;
+  }
+  if(k==='chiku'){
+    back=`<path d="M70 52 C98 46 100 74 80 76 C64 78 68 58 86 60" stroke="#6d4c41" stroke-width="3.6" fill="none" stroke-linecap="round"/><ellipse cx="92" cy="50" rx="5.5" ry="3" fill="#7cb342" transform="rotate(-30 92 50)"/><ellipse cx="85" cy="72" rx="5" ry="2.8" fill="#7cb342" transform="rotate(30 85 72)"/>`;
+    mask=`<rect x="33" y="26" width="34" height="11" rx="5.5" fill="${T.col}"/><path d="M30 30 L24 34 L31 36Z M70 30 L76 34 L69 36Z" fill="${T.col}"/>`;
+    hairFront=`<path d="M31 29 L33 12 L40 21 L46 8 L52 21 L59 9 L64 22 L69 29 Q60 21 50 23 Q40 21 31 29Z" fill="#3b2a1a"/>`;
+    gear=`<path d="M36 112 q-2 6 2 8 M64 112 q2 6 -2 8" stroke="#7cb342" stroke-width="2.4" fill="none"/>`;
+    emblem=`<path d="M50 71 C41 65 43 56 50 54 C57 56 59 65 50 71Z" fill="${T.col}"/><path d="M50 71 L50 57" stroke="#fff" stroke-width="1.4"/>`;
+  }
+  if(k==='vidu'){
+    mask='';
+    hairFront=`<g fill="${hair}"><circle cx="38" cy="19" r="7"/><circle cx="50" cy="14" r="8.5"/><circle cx="62" cy="19" r="7"/><circle cx="33" cy="27" r="5.5"/><circle cx="67" cy="27" r="5.5"/></g><path d="M30 33 Q29 8 50 8 Q71 8 70 33" stroke="${T.acc}" stroke-width="4.5" fill="none" stroke-linecap="round"/><rect x="25" y="28" width="9" height="16" rx="4.5" fill="${T.acc}"/><rect x="66" y="28" width="9" height="16" rx="4.5" fill="${T.acc}"/><path d="M20 30 Q15 36 20 42 M14 26 Q6 36 14 46 M80 30 Q85 36 80 42 M86 26 Q94 36 86 46" stroke="${T.lite}" stroke-width="2.6" fill="none" stroke-linecap="round"/>`;
+    back=`<path d="M34 52 Q16 92 24 118 L76 118 Q84 92 66 52Z" fill="${T.dark}" opacity=".9"/>`;
+    emblem=`<path d="M44 60 Q50 53 56 60 M41 64 Q50 53 59 64" stroke="${T.col}" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="50" cy="68" r="2.6" fill="${T.col}"/>`;
+  }
+  if(k==='snaya'){
+    hairBack=`<path d="M29 34 Q26 62 34 76 L66 76 Q74 62 71 34 Q62 10 50 10 Q38 10 29 34Z" fill="#2a1408"/>`;
+    back=`<path d="M34 52 Q12 96 22 122 L78 122 Q88 96 66 52Z" fill="${T.acc}" opacity=".7"/><path d="M10 70 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z M88 60 l1.6 4 4 1.6 -4 1.6 -1.6 4 -1.6 -4 -4 -1.6 4 -1.6z" fill="#fff59d"/>`;
+    skirt=`<path d="M33 80 Q50 88 67 80 L76 104 Q50 114 24 104Z" fill="${T.acc}"/><path d="M33 80 Q50 88 67 80" stroke="#fff" stroke-width="1.5" fill="none" opacity=".6"/>`;
+    mask=`<rect x="32" y="25" width="36" height="12" rx="6" fill="${T.acc}"/>`;
+    hairFront=`<path d="M31 29 Q35 12 50 12 Q65 12 69 29 Q60 21 50 23 Q40 21 31 29Z" fill="#2a1408"/><path d="M50 15 L37 7 L39 21Z M50 15 L63 7 L61 21Z" fill="${T.acc}"/><circle cx="50" cy="15" r="3.4" fill="#fff"/>`;
+    emblem=`<path d="M50 55 L52.5 60.5 L58.5 61 L54 65 L55.6 71 L50 67.8 L44.4 71 L46 65 L41.5 61 L47.5 60.5Z" fill="${T.col}"/>`;
+  }
+  const legs=k==='snaya'?`<rect x="39" y="96" width="8" height="16" rx="4" fill="${T.dark}"/><rect x="53" y="96" width="8" height="16" rx="4" fill="${T.dark}"/>`:`<rect x="38" y="84" width="10" height="28" rx="5" fill="${T.dark}"/><rect x="52" y="84" width="10" height="28" rx="5" fill="${T.dark}"/>`;
+  const lashes=k==='snaya'?`<path d="M38.4 30.5 l-2.6 -2 M41 28.6 l-1.2 -3 M61.6 30.5 l2.6 -2 M59 28.6 l1.2 -3" stroke="#2a1408" stroke-width="1.3" stroke-linecap="round"/>`:'';
+  const body=`${legs}
+  <rect x="35" y="108" width="14" height="10" rx="5" fill="${T.acc}"/><rect x="51" y="108" width="14" height="10" rx="5" fill="${T.acc}"/>
+  ${skirt}
+  <rect x="33" y="50" width="34" height="38" rx="12" fill="${fill}"/>
+  <rect x="33" y="78" width="34" height="6" rx="3" fill="${T.acc}"/>
+  <circle cx="50" cy="63" r="10.5" fill="#fff" stroke="${T.acc}" stroke-width="2.2"/>${emblem}
+  <path d="M36 55 L17 37" stroke="${T.col}" stroke-width="9.5" stroke-linecap="round"/><circle cx="16" cy="35" r="6" fill="${T.acc}"/>
+  <path d="M64 55 L81 69" stroke="${T.col}" stroke-width="9.5" stroke-linecap="round"/><circle cx="82" cy="71" r="6" fill="${T.acc}"/>
+  <circle cx="50" cy="32" r="18.5" fill="url(#${id}h)"/><circle cx="31.8" cy="34" r="3.8" fill="${skinD}"/><circle cx="68.2" cy="34" r="3.8" fill="${skinD}"/>
+  ${mask}
+  <ellipse cx="43" cy="32" rx="4.6" ry="5.2" fill="#fff"/><ellipse cx="57" cy="32" rx="4.6" ry="5.2" fill="#fff"/>
+  <circle cx="43.6" cy="32.6" r="2.7" fill="#2a1a10"/><circle cx="56.4" cy="32.6" r="2.7" fill="#2a1a10"/><circle cx="44.4" cy="31.4" r="1" fill="#fff"/><circle cx="57.2" cy="31.4" r="1" fill="#fff"/>
+  ${lashes}
+  <circle cx="38.5" cy="41" r="3.2" fill="#ff8a80" opacity=".55"/><circle cx="61.5" cy="41" r="3.2" fill="#ff8a80" opacity=".55"/>
+  <path d="M44 41 Q50 47.5 56 41" stroke="#8a3f1f" stroke-width="2.3" fill="none" stroke-linecap="round"/>
+  ${hairFront}${gear}`;
+  const dim=size?` width="${Math.round(size*100/130)}" height="${size}"`:'';
+  return `<svg viewBox="0 0 100 130"${dim} role="img" aria-label="${esc(HN(k))}">${defs}${back}${hairBack}${body}</svg>`;
 }
-function setLead(k){$('#heroFace').innerHTML=heroSVG(k||'blaze',70)}
-
-/* ---------- fx ---------- */
-function confetti(n=24){const fx=$('#fx');for(let i=0;i<n;i++){const s=el('span','',rnd(['⭐','✨','🎉','💫','🌟']));s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.5+'s';fx.appendChild(s);setTimeout(()=>s.remove(),2600)}}
+function setLead(k){
+  $('#heroFace .hp').innerHTML=heroSVG(k);
+  $('#heroName').textContent=HN(k);
+}
+function confetti(n=24){const fx=$('#fx');for(let i=0;i<n;i++){const s=el('span','',rnd(['⭐','✨','🎉','💫','🌟']));s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.5+'s';fx.appendChild(s);setTimeout(()=>s.remove(),2700)}}
 
 /* ---------- curriculum data ---------- */
 const SEQ='satpinmdgockeurhblfj'.split('');
 const LW={s:['Sun','☀️'],a:['Apple','🍎'],t:['Tiger','🐯'],p:['Pizza','🍕'],i:['Ice-cream','🍦'],n:['Nose','👃'],m:['Moon','🌙'],d:['Dog','🐶'],g:['Goat','🐐'],o:['Octopus','🐙'],c:['Cat','🐱'],k:['Kite','🪁'],e:['Egg','🥚'],u:['Umbrella','☂️'],r:['Rocket','🚀'],h:['Hat','🎩'],b:['Ball','⚽'],l:['Lion','🦁'],f:['Fish','🐟'],j:['Juice','🧃']};
-/* pure sounds written for the Hindi voice (recordings will replace these later) */
-const SND={s:'स्स्स',a:'ऍ',t:'ट',p:'प',i:'इ',n:'न्न',m:'म्म्म',d:'ड',g:'ग',o:'ऑ',c:'क',k:'क',e:'एह',u:'अ',r:'र्र',h:'ह',b:'ब',l:'ल्ल',f:'फ़्फ़',j:'ज'};
-const SNDEN={s:'/s/',a:'/a/',t:'/t/',p:'/p/',i:'/i/',n:'/n/',m:'/m/',d:'/d/',g:'/g/',o:'/o/',c:'/k/',k:'/k/',e:'/e/',u:'/u/',r:'/r/',h:'/h/',b:'/b/',l:'/l/',f:'/f/',j:'/j/'};
 const WORDS=[['tap','🚰','नल'],['pin','📌','पिन'],['pan','🍳','कड़ाही'],['tin','🥫','डिब्बा'],['nap','😴','झपकी'],['man','👨','आदमी'],['map','🗺️','नक्शा'],['pig','🐷','सूअर'],['dog','🐶','कुत्ता'],['cat','🐱','बिल्ली'],['pot','🍲','बर्तन'],['sun','☀️','सूरज'],['hat','🎩','टोपी'],['pen','🖊️','पेन'],['hen','🐔','मुर्गी'],['bat','🦇','चमगादड़'],['bus','🚌','बस'],['cup','🥤','कप'],['bed','🛏️','बिस्तर'],['bag','👜','बैग'],['net','🥅','जाल'],['nut','🥜','मेवा'],['van','🚐','वैन'],['rat','🐀','चूहा']];
 const BADGES=['⚡','🛡️','🔥','🦅','🚀','💎','🌟','🦁','🐺','🏹','🔱','🌪️','🧲','🪐','👑','⚔️','🌈','🧿','🥇','🏆'];
-let DAYV=1; /* day used by the running session (real day, or test day) */
+let DAYV=1;
 const letterOf=day=>day<=20?SEQ[day-1]:SEQ[(day*7)%20];
 const learned=day=>SEQ.slice(0,Math.min(20,day));
 const wordsFor=day=>{const k=learned(day);return WORDS.filter(w=>[...w[0]].every(c=>k.includes(c)))};
@@ -275,10 +508,10 @@ function ask(stage,{q,sp,opts,correct,cls,head,wrongMsg}){
       const b=el('button','choice'+(cls?' '+cls:''),o);wrap.appendChild(b);
       b.onclick=()=>{
         if(locked)return;
-        if(correct==null||i===correct){locked=true;b.classList.add('ok');confetti(10);res({i,wrong})}
+        if(correct==null||i===correct){locked=true;b.classList.add('ok');SFX.ok();react('cheer');confetti(10);res({i,wrong})}
         else{
-          wrong++;noteWrong();b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),500);
-          if(wrongMsg)hero(wrongMsg[0],wrongMsg[1]);else hero('Try again! 💪',['कोई बात नहीं, फिर से try करो!']);
+          wrong++;noteWrong();SFX.no();react('oops');b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),500);
+          if(wrongMsg)hero(wrongMsg[0],wrongMsg[1]);else hero('Try again! 💪',[P('again')]);
           if(wrong>=2&&wrap.children[correct])wrap.children[correct].classList.add('hint');
         }
       };
@@ -286,14 +519,14 @@ function ask(stage,{q,sp,opts,correct,cls,head,wrongMsg}){
     stage.appendChild(wrap);hero(q,sp);
   });
 }
-const waitBtn=(stage,label)=>new Promise(r=>{const b=el('button','btn',label);b.onclick=()=>r();stage.appendChild(b)});
+const waitBtn=(stage,label)=>new Promise(r=>{const b=el('button','btn glow',label);b.onclick=()=>{SFX.tap();r()};stage.appendChild(b)});
 
 /* ===== Feelings check ===== */
 const MOODS=[['😀','Happy','खुश'],['😢','Sad','उदास'],['😠','Angry','गुस्सा'],['🤩','Excited','बहुत excited'],['😴','Tired','थका हुआ'],['😨','Scared','डरा हुआ']];
 async function blkMood(stage,done){
   const r=await ask(stage,{q:`Hi ${kidName()}! How are you feeling today? Pick a face.`,sp:[`नमस्ते ${kidName()}! आज आप कैसा feel कर रहे हो? एक face चुनो।`],opts:MOODS.map(m=>`<span>${m[0]}</span><small>${m[1]}</small>`),correct:null});
   const m=MOODS[r.i];if(SESS)SESS.mood=m[1];
-  await hero(`${m[1]}! Every feeling is okay. Let's start the mission!`,['अच्छा, आप',[m[1],'en'],`हो — यानी ${m[2]}। हर feeling ठीक होती है। चलो mission शुरू करते हैं!`]);
+  await hero(`${m[1]}! Every feeling is okay. Let's start the mission!`,['अच्छा, आप',[m[1],'en'],`हो — यानी ${m[2]}। हर feeling ठीक होती है।`,P('hello')]);
   done();
 }
 
@@ -302,7 +535,7 @@ async function blkLetter(stage,done){
   const t=letterOf(DAYV),pool=learned(DAYV),[w,e]=LW[t],T=t.toUpperCase();
   const card=el('div','card',`<div class="bigL">${T} ${t}</div><div class="pic">${e}</div><div class="cap">${T} for ${w}</div>`);
   stage.appendChild(card);
-  const play=()=>hero(`Today's letter is ${T}. It says ${SNDEN[t]}. ${T} for ${w}!`,['आज का letter है',[T,'en'],'। इसकी आवाज़ है —',SND[t],'।',[`${T} for ${w}!`,'en']]);
+  const play=()=>hero(`Today's letter is ${T}. It says ${SNDEN[t]}. ${T} for ${w}!`,['आज का letter है',[T,'en'],'। इसकी आवाज़ है —',sndP(t),'।',[`${T} for ${w}!`,'en']]);
   card.onclick=play;await play();
   await waitBtn(stage,"Let's play ▶");
   for(let k=0;k<3;k++){
@@ -310,8 +543,8 @@ async function blkLetter(stage,done){
     const target=k===0?t:rnd(pool);
     const others=shuffle(SEQ.filter(x=>x!==target&&!conflict(x,target))).slice(0,2);
     const letters=shuffle([target,...others]);
-    await ask(stage,{q:`Which one starts with the ${SNDEN[target]} sound?`,sp:[SND[target],'की आवाज़ से कौन सी चीज़ शुरू होती है?'],opts:letters.map(x=>`<span>${LW[x][1]}</span>`),correct:letters.indexOf(target),head:`<span class="bigL" style="font-size:80px">${target.toUpperCase()}</span>`});
-    await hero(`Great! ${target.toUpperCase()} for ${LW[target][0]}`,['शाबाश!',[`${target.toUpperCase()} for ${LW[target][0]}`,'en']]);
+    await ask(stage,{q:`Which one starts with the ${SNDEN[target]} sound?`,sp:[sndP(target),'की आवाज़ से कौन सी चीज़ शुरू होती है?'],opts:letters.map(x=>`<span>${LW[x][1]}</span>`),correct:letters.indexOf(target),head:`<span class="bigL" style="font-size:80px">${target.toUpperCase()}</span>`});
+    await hero(`Great! ${target.toUpperCase()} for ${LW[target][0]}`,[P('shabash'),[`${target.toUpperCase()} for ${LW[target][0]}`,'en']]);
   }
   done();
 }
@@ -330,16 +563,16 @@ function buildWord(stage,[word,emoji,hi]){
     hero('What is this? Put the letters in the boxes — drag or tap.',['यह क्या है? Letters को सही box में रखो — खींचो या touch करो।']);
     let filled=0;
     async function finishWord(){
-      confetti(14);await sleep(300);
-      await hero(`${word.toUpperCase()} — ${word}!`,[...letters.map(c=>SND[c]),'…',[word,'en'],`! ${word} मतलब ${hi}।`]);
+      SFX.ok();react('cheer');confetti(14);await sleep(300);
+      await hero(`${word.toUpperCase()} — ${word}!`,[...letters.map(c=>sndP(c)),[word,'en'],`। ${word} मतलब ${hi}।`]);
       res();
     }
     function attempt(t,idx){
       const c=t.dataset.c;
       if(idx!=null&&idx>=0&&letters[idx]===c&&!sl[idx].classList.contains('full')){
-        sl[idx].textContent=c;sl[idx].classList.add('full');t.classList.add('used');filled++;
-        if(filled===letters.length)finishWord();else say(SND[c]);
-      }else{noteWrong();t.classList.add('shake');setTimeout(()=>t.classList.remove('shake'),500);hero('Not here — try another letter!',['यह letter यहाँ नहीं आएगा, दूसरा try करो!'])}
+        sl[idx].textContent=c;sl[idx].classList.add('full');t.classList.add('used');filled++;SFX.tap();
+        if(filled===letters.length)finishWord();else say(sndP(c));
+      }else{noteWrong();SFX.no();t.classList.add('shake');setTimeout(()=>t.classList.remove('shake'),500);hero('Not here — try another letter!',['यह letter यहाँ नहीं आएगा, दूसरा try करो!'])}
     }
     tl.forEach(t=>{
       let drag=false,sx=0,sy=0,moved=false;
@@ -369,14 +602,14 @@ async function blkWord(stage,done){
       const target=rnd(pool);
       const others=shuffle(SEQ.filter(x=>x!==target&&!conflict(x,target))).slice(0,2);
       const letters=shuffle([target,...others]);
-      await ask(stage,{q:'Listen! Which letter makes this sound?',sp:['ध्यान से सुनो…',SND[target],'। यह कौन से letter की आवाज़ है?'],opts:letters.map(x=>`<span class="ltr">${x.toUpperCase()}</span>`),correct:letters.indexOf(target)});
+      await ask(stage,{q:'Listen! Which letter makes this sound?',sp:[P('listen'),sndP(target),'। यह कौन से letter की आवाज़ है?'],opts:letters.map(x=>`<span class="ltr">${x.toUpperCase()}</span>`),correct:letters.indexOf(target)});
       await hero(`Yes! ${target.toUpperCase()}`,['वाह!',[target.toUpperCase(),'en'],'!']);
     }
   }
   done();
 }
 
-/* ===== Offline (real-world) blocks ===== */
+/* ===== real-world (offline) tasks — shared by the app AND the printable sheets ===== */
 const OFF={
   move(day){
     const L=[
@@ -385,51 +618,81 @@ const OFF={
       ['Freeze dance! Dance when the music plays, freeze when it stops.','Freeze dance! Music बजे तो नाचो, music रुके तो statue बन जाओ!'],
       ['Stand on one leg and count to 10. Now the other leg!','एक पैर पर खड़े होकर ten तक गिनो। फिर दूसरे पैर पर!'],
       ['Hands up, hands down, turn around, clap — 5 times!','Hands up, hands down, घूमो, ताली बजाओ — five बार!'],
-      ['Fly like Blaze! Arms out and zoom around the room 3 times.','Blaze की तरह उड़ो! हाथ फैलाओ और कमरे के three चक्कर लगाओ!']];
+      [`Fly like ${HN('shivansh')}! Arms out and zoom around the room 3 times.`,`${HH('shivansh')} की तरह उड़ो! हाथ फैलाओ और कमरे के three चक्कर लगाओ!`]];
     const x=L[(day-1)%L.length];
-    return {icon:'🏃',lead:'blaze',text:x[0],sp:x[1],parent:'Join in — it is more fun together.',min:3};
+    return {icon:'🏃',lead:'shivansh',title:'Move break',text:x[0],sp:x[1],parent:'Join in — it is more fun together.',mat:'Open floor space (and music for freeze dance).',ask:'Can he count out loud while moving?',min:3};
   },
   hands(day){
     const N=Math.min(20,5+day);
     const L=[
-      [`Bring ${N} small things (blocks, spoons, pencils). Touch each one and count. How many?`,`घर से ${NUM[N]} छोटी चीज़ें लाओ — blocks, spoons, pencils। हर चीज़ को छूकर गिनो। Total कितनी हुईं?`,'One touch per object. If he skips one, count again together.'],
-      ['Make two piles — one with MORE, one with LESS. Which is more? Which is less?','दो ढेर बनाओ — एक में ज़्यादा, एक में कम। बताओ, कौन सा more है? कौन सा less?','Match items one-to-one between piles; the leftover pile has more.'],
-      ['Make a pattern with blocks: red, blue, red, blue… What comes next?','Blocks से pattern बनाओ — red, blue, red, blue… अब next क्या आएगा?','Start with AB, then try AABB.'],
-      ['From fruits and vegetables, find the things that are RED and ROUND.','फल और सब्ज़ियों में से वो चीज़ें ढूँढो जो red भी हों और round भी!','Two rules at the same time — colour AND shape.'],
-      ['Hold two things. Which is HEAVY? Which is LIGHT? Then find something BIG and something SMALL.','दोनों हाथों में एक-एक चीज़ उठाओ। कौन सी heavy है? कौन सी light?','Ask him to guess first, then check by lifting.'],
-      ['Build a tower of 5 blocks. Add 2 more. How many now?','Five blocks का tower बनाओ। अब two blocks और जोड़ो। अब कितने हुए? गिनकर देखो!','This is early addition — always with real objects.'],
-      ['Take 6 things. Take away 2. How many are left?','Six चीज़ें लो, two हटा दो। कितनी बचीं? गिनकर check करो!','Subtraction = taking away. Recount to check.']];
+      [`Bring ${N} small things (blocks, spoons, pencils). Touch each one and count. How many?`,`घर से ${NUM[N]} छोटी चीज़ें लाओ — blocks, spoons, pencils। हर चीज़ को छूकर गिनो। Total कितनी हुईं?`,'One touch per object. If he skips one, count again together.',`${N} small objects — blocks, spoons, pencils, bottle caps`,'How many in all? Touch each one as you count.'],
+      ['Make two piles — one with MORE, one with LESS. Which is more? Which is less?','दो ढेर बनाओ — एक में ज़्यादा, एक में कम। बताओ, कौन सा more है? कौन सा less?','Match items one-to-one between piles; the leftover pile has more.','Any small objects — buttons, beans, toy cars','Which pile has MORE? How do you know?'],
+      ['Make a pattern with blocks: red, blue, red, blue… What comes next?','Blocks से pattern बनाओ — red, blue, red, blue… अब next क्या आएगा?','Start with AB, then try AABB.','Coloured blocks, clips or bottle caps (2–3 colours)','What comes next? Which colour?'],
+      ['From fruits and vegetables, find the things that are RED and ROUND.','फल और सब्ज़ियों में से वो चीज़ें ढूँढो जो red भी हों और round भी!','Two rules at the same time — colour AND shape.','A few fruits and vegetables, two baskets','Which ones are red AND round?'],
+      ['Hold two things. Which is HEAVY? Which is LIGHT? Then find something BIG and something SMALL.','दोनों हाथों में एक-एक चीज़ उठाओ। कौन सी heavy है? कौन सी light?','Ask him to guess first, then check by lifting.','Two household items (e.g. a book and a pencil)','Which is heavier? Which is lighter?'],
+      ['Build a tower of 5 blocks. Add 2 more. How many now?','Five blocks का tower बनाओ। अब two blocks और जोड़ो। अब कितने हुए? गिनकर देखो!','This is early addition — always with real objects.','7 blocks or small cups','5 and 2 more — how many in all?'],
+      ['Take 6 things. Take away 2. How many are left?','Six चीज़ें लो, two हटा दो। कितनी बचीं? गिनकर check करो!','Subtraction = taking away. Recount to check.','6 small objects and a bowl','6, take away 2 — how many are left?']];
     const x=L[(day-1)%L.length];
-    return {icon:'🧱',lead:'blaze',text:x[0],sp:x[1],parent:x[2],min:7};
+    return {icon:'🧱',lead:'shivansh',title:'Hands-on maths',text:x[0],sp:x[1],parent:x[2],mat:x[3],ask:x[4],min:7};
   },
   paper(day){
     const t=letterOf(day),T=t.toUpperCase(),nm=S.name?S.name.toUpperCase():'your name';
     const L=[
-      [`Write ${T} and ${t} three times each in your notebook.`,`Copy में आज का letter ${T} और छोटा ${t} three-three बार लिखो।`,'Check the pencil grip; no need to press hard.'],
-      [`Trace your name ${nm} on dotted lines.`,`बड़ों से copy में dotted line से अपना नाम लिखवाओ और उस पर pencil चलाओ।`,'Write the name in CAPITALS with dots; let him go over it.'],
-      ['Draw standing lines and sleeping lines: | — | — then make a ladder!','Standing line और sleeping line बनाओ, फिर उनसे ladder बनाओ!','Standing = vertical, sleeping = horizontal.'],
-      [`Write ${T} and draw something that starts with ${T}.`,`${T} लिखो, और ${T} से शुरू होने वाली किसी चीज़ की drawing बनाओ।`,'Praise the effort, not how the drawing looks.'],
-      ['Draw a triangle, a square and a circle — then make a rocket with them!','Triangle, square और circle बनाओ — फिर उनसे rocket बनाओ!','Combining shapes prepares for tangram puzzles.'],
-      [`Try writing ${nm} — follow the dots a grown-up makes.`,`अपना नाम लिखने की कोशिश करो — बड़ों के बनाए dots पर चलो।`,'Reduce the dots a little every week.']];
+      [`Write ${T} and ${t} three times each in your notebook.`,`Copy में आज का letter ${T} और छोटा ${t} three-three बार लिखो।`,'Check the pencil grip; no need to press hard.','What sound does this letter make?'],
+      [`Trace your name ${nm} on dotted lines.`,`बड़ों से copy में dotted line से अपना नाम लिखवाओ और उस पर pencil चलाओ।`,'Write the name in CAPITALS with dots; let him go over it.','Can you read the first letter of your name?'],
+      ['Draw standing lines and sleeping lines: | — | — then make a ladder!','Standing line और sleeping line बनाओ, फिर उनसे ladder बनाओ!','Standing = vertical, sleeping = horizontal.','Which lines are standing? Which are sleeping?'],
+      [`Write ${T} and draw something that starts with ${T}.`,`${T} लिखो, और ${T} से शुरू होने वाली किसी चीज़ की drawing बनाओ।`,'Praise the effort, not how the drawing looks.','What did you draw? What sound does it start with?'],
+      ['Draw a triangle, a square and a circle — then make a rocket with them!','Triangle, square और circle बनाओ — फिर उनसे rocket बनाओ!','Combining shapes prepares for tangram puzzles.','Which shapes did you use?'],
+      [`Try writing ${nm} — follow the dots a grown-up makes.`,`अपना नाम लिखने की कोशिश करो — बड़ों के बनाए dots पर चलो।`,'Reduce the dots a little every week.','Can you point to each letter of your name?']];
     const x=L[(day-1)%L.length];
-    return {icon:'📒',lead:'vine',text:x[0],sp:x[1],parent:x[2],min:6};
+    return {icon:'📒',lead:'chiku',title:'Notebook time',text:x[0],sp:x[1],parent:x[2],mat:'Notebook, pencil and eraser',ask:x[3],min:6};
   }
 };
+/* grown-up verification (PIN or the tablet's fingerprint/face) */
+function parentConfirm(onOk,title){
+  pinPad(title||'Grown-up check',async(pin,err)=>{
+    const r=await verifyPin(pin);
+    if(r===true){$('#modal').hidden=true;onOk()}else err(r==='locked'?'Too many tries. Wait 30 seconds.':'Wrong PIN');
+  },{note:'A grown-up confirms the activity was really done.',bio:bioAvail()&&!!LOCAL.bioId,onBio:()=>{$('#modal').hidden=true;onOk()}});
+}
 async function offline(stage,done,o){
-  const wrap=el('div','off',`<div class="ic">${o.icon}</div><div class="st">${esc(o.text)}</div><div class="pr">For grown-ups: ${esc(o.parent)}</div><div class="tm">⏳ ${o.min}:00</div>`);
+  const locked=S.lock.on&&!S.test,remote=liveOn();
+  setLead(o.lead);
+  const wrap=el('div','off');
+  wrap.innerHTML=`<div class="ic">${o.icon}</div><div class="st">${esc(o.text)}</div>${o.mat?`<div class="mat">🧰 You need: ${esc(o.mat)}</div>`:''}<div class="pr">For grown-ups: ${esc(o.parent)}</div><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="rbg"/><circle cx="60" cy="60" r="52" class="rfg" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><div class="tm">${o.min}:00</div></div>`;
   stage.appendChild(wrap);
-  let secs=o.min*60,fin=false;
-  const tm=$('.tm',wrap);
-  const iv=setInterval(()=>{
-    if(!document.body.contains(wrap)){clearInterval(iv);return}
-    secs=Math.max(0,secs-1);
-    tm.textContent='⏳ '+Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
-    if(secs===0&&!fin){fin=true;clearInterval(iv);hero('Time is up! Press "Done".',['Time पूरा हुआ! अब Done दबाओ।'])}
-  },1000);
-  hero(o.text,[o.sp]);
-  const b=el('button','btn','Done ✔');
-  b.onclick=()=>{clearInterval(iv);done()};
+  const total=o.min*60000,endAt=Date.now()+total;let fin=false,half=false,finished=false;
+  const tm=$('.tm',wrap),rf=$('.rfg',wrap);
+  const needConfirm=locked&&S.lock.confirm;
+  const b=el('button','btn',locked?'🔒 Done unlocks when the timer ends':'Done ✔');
+  b.disabled=locked;
+  const complete=()=>{if(finished)return;finished=true;clearInterval(iv);SFX.win();done()};
+  async function askCheck(){
+    const r=await askMummy('check',`${o.title} finished`,o.text,()=>parentConfirm(complete));
+    if(r.status==='approved')complete();
+    else if(r.status==='offline')parentConfirm(complete);
+    else if(r.status==='denied')hero(`${AW().n} says: ${r.note||'Please do it once more!'}`,[`${AW().h} कहती हैं —`,r.note||'एक बार फिर से करो!']);
+    else if(r.status==='expired')hero(`${AW().n} did not answer yet. Try again!`,[`${AW().h} ने अभी जवाब नहीं दिया। फिर से पूछो!`]);
+  }
+  b.onclick=()=>{if(b.disabled)return;if(needConfirm){if(remote)askCheck();else parentConfirm(complete)}else complete()};
   stage.appendChild(b);
+  if(locked){
+    const lk=el('div','row');lk.style.cssText='display:flex;gap:16px;flex-wrap:wrap;justify-content:center';
+    if(remote){const a=el('button','link',`Ask ${esc(AW().n)} to skip`);a.onclick=async()=>{const r=await askMummy('skip',`${o.title}: wants to skip`,o.text,()=>parentConfirm(complete,'Grown-up skip'));if(r.status==='approved')complete();else if(r.status==='denied')hero(`${AW().n} says: ${r.note||'Not now — do it first!'}`,[`${AW().h} कहती हैं —`,r.note||'पहले यह करो!'])};lk.appendChild(a)}
+    const g=el('button','link','Grown-up: skip with PIN');g.onclick=()=>parentConfirm(complete,'Grown-up skip');lk.appendChild(g);
+    stage.appendChild(lk);
+  }
+  const tick=()=>{
+    if(!document.body.contains(wrap)){clearInterval(iv);return}
+    if(LIVE.paused)return;
+    const left=Math.max(0,endAt-Date.now()),secs=Math.ceil(left/1000);
+    tm.textContent=Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
+    rf.style.strokeDashoffset=String(326.7*(1-left/total));
+    if(!half&&left<total/2&&left>3000){half=true;hero('Keep going — you are doing great!',['बहुत बढ़िया! करते रहो, आप बहुत अच्छा कर रहे हो!'])}
+    if(left===0&&!fin){fin=true;SFX.star();b.disabled=false;b.textContent=needConfirm?(remote?`Ask your ${AW().n} to check ✔`:'Grown-up: check & confirm ✔'):'I did it! ✔';b.classList.add('glow');hero('Time is up! Press the button.',[P('timeup'),needConfirm?(remote?`अब अपनी ${AW().h} से check करवाओ।`:'अब बड़ों को check करने के लिए बुलाओ।'):'अब बटन दबाओ।'])}
+  };
+  const iv=setInterval(tick,500);tick();
+  hero(o.text,[o.sp]);
 }
 
 /* ===== Counting ===== */
@@ -443,14 +706,14 @@ function tapCount(stage,N,emo){
       const b=el('button','item',emo);
       b.onclick=()=>{
         if(b.classList.contains('counted'))return;
-        c++;b.classList.add('counted');b.innerHTML=`${emo}<i>${c}</i>`;
+        c++;b.classList.add('counted');b.innerHTML=`${emo}<i>${c}</i>`;SFX.tap();
         say([NUM[c],'en']);
         if(c===N)setTimeout(res,900);
       };
       f.appendChild(b);
     }
     stage.appendChild(f);
-    hero('Touch each one and count!',['हर एक को touch करो और गिनो!']);
+    hero('Touch each one and count!',[P('count')]);
   });
 }
 function feed(stage,N,emo){
@@ -458,13 +721,13 @@ function feed(stage,N,emo){
     stage.innerHTML='';
     const plate=el('div','plate'),tray=el('div','field');let cnt=0;
     const info=el('div','cap','');
-    const upd=()=>{info.innerHTML=`Feed Blaze ${N} ${emo} &nbsp; (now: ${cnt})`};upd();
+    const upd=()=>{info.innerHTML=`Feed ${esc(HN('shivansh'))} ${N} ${emo} &nbsp; (now: ${cnt})`};upd();
     for(let i=0;i<N+4;i++){
       const b=el('button','item',emo);
       b.onclick=()=>{
         if(b.dataset.in)return;
-        b.dataset.in=1;b.style.visibility='hidden';cnt++;
-        const p=el('button','item',emo);p.style.width=p.style.height='60px';p.style.fontSize='34px';
+        b.dataset.in=1;b.style.visibility='hidden';cnt++;SFX.tap();
+        const p=el('button','item',emo);p.style.width=p.style.height='62px';p.style.fontSize='34px';
         p.onclick=()=>{p.remove();b.style.visibility='visible';delete b.dataset.in;cnt--;upd()};
         plate.appendChild(p);upd();say([NUM[Math.min(cnt,20)],'en']);
       };
@@ -472,11 +735,11 @@ function feed(stage,N,emo){
     }
     const ok=el('button','btn','Done ✔');
     ok.onclick=async()=>{
-      if(cnt===N){confetti(20);await hero('Yummy! Blaze is full!',['वाह! Blaze का पेट भर गया!']);res()}
-      else{noteWrong();if(cnt<N)hero(`Now ${cnt}. Blaze needs more!`,['अभी',[NUM[Math.min(cnt,20)],'en'],'हैं। और चाहिए!']);else hero(`Now ${cnt}. Too many — Blaze needs only ${N}.`,['अभी',[NUM[Math.min(cnt,20)],'en'],'हैं। थोड़े कम करो — सिर्फ़',[NUM[N],'en'],'चाहिए।'])}
+      if(cnt===N){SFX.ok();react('cheer');confetti(20);await hero(`Yummy! ${HN('shivansh')} is full!`,[`वाह! ${HH('shivansh')} का पेट भर गया!`]);res()}
+      else{noteWrong();SFX.no();if(cnt<N)hero(`Now ${cnt}. ${HN('shivansh')} needs more!`,['अभी',[NUM[Math.min(cnt,20)],'en'],'हैं। और चाहिए!']);else hero(`Now ${cnt}. Too many — only ${N} please.`,['अभी',[NUM[Math.min(cnt,20)],'en'],'हैं। थोड़े कम करो — सिर्फ़',[NUM[N],'en'],'चाहिए।'])}
     };
     stage.append(info,plate,tray,ok);
-    hero(`Feed Blaze ${N}. Touch a fruit to put it on the plate.`,['Blaze को',[NUM[N],'en'],'fruits खिलाओ। Fruit को touch करो, वो plate में जाएगा।']);
+    hero(`Feed ${HN('shivansh')} ${N}. Touch a fruit to put it on the plate.`,[`${HH('shivansh')} को`,[NUM[N],'en'],'fruits खिलाओ। Fruit को touch करो, वो plate में जाएगा।']);
   });
 }
 async function blkCount(stage,done){
@@ -486,7 +749,7 @@ async function blkCount(stage,done){
     await tapCount(stage,N,emo);
     let nums=[...new Set([N,N+1,Math.max(1,N-1),N+2])].filter(x=>x!==N);
     const opts=shuffle([N,...shuffle(nums).slice(0,2)]);
-    await ask(stage,{q:'How many are there?',sp:['Total कितने हैं?'],opts:opts.map(x=>`<span class="ltr">${x}</span>`),correct:opts.indexOf(N)});
+    await ask(stage,{q:'How many are there?',sp:[P('howmany')],opts:opts.map(x=>`<span class="ltr">${x}</span>`),correct:opts.indexOf(N)});
     await hero(`Yes! ${N}`,['बिल्कुल सही!',[NUM[N],'en'],'!']);
   }
   await feed(stage,ri(lo,Math.min(mx,12)),rnd(FRUIT));
@@ -495,8 +758,8 @@ async function blkCount(stage,done){
     const a=ri(2,9);let b=ri(2,9);if(b===a)b=a+1;
     const ea=rnd(FRUIT);let eb=rnd(FRUIT);if(eb===ea)eb=FRUIT[(FRUIT.indexOf(ea)+1)%FRUIT.length];
     const more=Math.random()<.5,correct=more?(a>b?0:1):(a<b?0:1);
-    await ask(stage,{q:more?'Which group has MORE?':'Which group has LESS?',sp:[more?'किस group में':'किस group में',[more?'more':'less','en'],'है?'],opts:[ea.repeat(a),eb.repeat(b)],correct,cls:'wide'});
-    await hero('Well done!',['शाबाश!']);
+    await ask(stage,{q:more?'Which group has MORE?':'Which group has LESS?',sp:['किस group में',[more?'more':'less','en'],'है?'],opts:[ea.repeat(a),eb.repeat(b)],correct,cls:'wide'});
+    await hero('Well done!',[P('shabash')]);
   }
   done();
 }
@@ -513,7 +776,7 @@ async function blkPattern(stage,done){
     stage.appendChild(el('div','prow',full.slice(0,L-1).map(x=>`<span>${x}</span>`).join('')+'<span class="q">❓</span>'));
     const opts=shuffle([ans,...pool.filter(x=>x!==ans).slice(0,2)]);
     await ask(stage,{q:'Finish the pattern — what comes next?',sp:['Pattern पूरा करो — next कौन सा आएगा?'],opts:opts.map(x=>`<span>${x}</span>`),correct:opts.indexOf(ans)});
-    await hero('Super pattern!',['वाह! सही pattern!']);
+    await hero('Super pattern!',[P('wah')]);
   }
   done();
 }
@@ -531,10 +794,10 @@ const DIR={u:[0,-1,'⬆️','up'],d:[0,1,'⬇️','down'],l:[-1,0,'⬅️','left
 function mazeOne(stage,mz){
   return new Promise(res=>{
     stage.innerHTML='';
-    const cs=Math.max(44,Math.min(72,Math.floor(Math.min(innerWidth*.9/mz.w,300/mz.h))));
+    const cs=Math.max(48,Math.min(78,Math.floor(Math.min(innerWidth*.9/mz.w,300/mz.h))));
     const grid=el('div','grid');grid.style.gridTemplateColumns=`repeat(${mz.w},${cs}px)`;
     const isWall=(x,y)=>mz.walls.some(w=>w[0]===x&&w[1]===y);
-    const jet=heroSVG('jet',Math.floor(cs*.9));
+    const jet=heroSVG('aarav',Math.floor(cs*.95));
     function draw(p){
       grid.innerHTML='';
       for(let y=0;y<mz.h;y++)for(let x=0;x<mz.w;x++){
@@ -551,12 +814,13 @@ function mazeOne(stage,mz){
     const renderProg=()=>{pr.innerHTML='';for(let i=0;i<Math.max(6,prog.length);i++)pr.appendChild(el('div','pslot',prog[i]?DIR[prog[i]][2]:''))};
     renderProg();
     const arrows=el('div','arrows');
-    Object.keys(DIR).forEach(k=>{const b=el('button','arr',DIR[k][2]);b.onclick=()=>{if(running||prog.length>=12)return;prog.push(k);renderProg();say([DIR[k][3],'en'])};arrows.appendChild(b)});
+    Object.keys(DIR).forEach(k=>{const b=el('button','arr',DIR[k][2]);b.onclick=()=>{if(running||prog.length>=12)return;prog.push(k);SFX.tap();renderProg();say([DIR[k][3],'en'])};arrows.appendChild(b)});
     const back=el('button','arr','⌫');back.onclick=()=>{if(running)return;prog.pop();renderProg()};
-    const go=el('button','arr','▶️');go.style.background='#6ee7a0';
+    const go=el('button','arr','▶️');go.style.background='linear-gradient(#b9f6ca,#69f0ae)';
     arrows.append(back,go);
     stage.append(grid,pr,arrows);
-    hero('Help Jet fly to the star ⭐. Tap arrows to plan the path, then press ▶.',['Jet को star तक पहुँचाओ! Arrows दबाकर रास्ता बनाओ, फिर play दबाओ।']);
+    setLead('aarav');
+    hero(`Help ${HN('aarav')} fly to the star ⭐. Tap arrows to plan the path, then press ▶.`,[`${HH('aarav')} को star तक पहुँचाओ! Arrows दबाकर रास्ता बनाओ, फिर play दबाओ।`]);
     go.onclick=async()=>{
       if(running||!prog.length)return;running=true;
       let p=[...mz.s];draw(p);
@@ -564,12 +828,12 @@ function mazeOne(stage,mz){
         await sleep(450);
         const n=[p[0]+DIR[d][0],p[1]+DIR[d][1]];
         if(n[0]<0||n[1]<0||n[0]>=mz.w||n[1]>=mz.h||isWall(n[0],n[1])){
-          noteWrong();await hero('Oops! The path is blocked. Think again.',['अरे! रास्ता बंद है। फिर से सोचो।']);draw(mz.s);running=false;return;
+          noteWrong();SFX.no();await hero('Oops! The path is blocked. Think again.',['अरे! रास्ता बंद है। फिर से सोचो।']);draw(mz.s);running=false;return;
         }
-        p=n;draw(p);
-        if(p[0]===mz.g[0]&&p[1]===mz.g[1]){confetti(24);await hero('Jet reached the star!',['वाह! Jet star तक पहुँच गया!']);res();return}
+        p=n;draw(p);SFX.tap();
+        if(p[0]===mz.g[0]&&p[1]===mz.g[1]){SFX.ok();react('cheer');confetti(24);await hero(`${HN('aarav')} reached the star!`,[`वाह! ${HH('aarav')} star तक पहुँच गया!`]);res();return}
       }
-      noteWrong();await hero('Not there yet — change or add arrows.',['अभी star दूर है। Arrows बदलो या और जोड़ो।']);draw(mz.s);running=false;
+      noteWrong();SFX.no();await hero('Not there yet — change or add arrows.',['अभी star दूर है। Arrows बदलो या और जोड़ो।']);draw(mz.s);running=false;
     };
   });
 }
@@ -611,7 +875,7 @@ function drawGlyph(g,item,W,H,mode){
   }else{
     g.font=fontFor(item.t,W,H);g.textAlign='center';g.textBaseline='middle';
     if(mode==='mask'){g.fillStyle='#000';g.fillText(item.t,W/2,H/2)}
-    else{g.fillStyle='rgba(255,255,255,.18)';g.fillText(item.t,W/2,H/2);g.lineWidth=3;g.strokeStyle='#fff';g.setLineDash([2,10]);g.lineCap='round';g.strokeText(item.t,W/2,H/2)}
+    else{g.fillStyle='rgba(255,255,255,.2)';g.fillText(item.t,W/2,H/2);g.lineWidth=3;g.strokeStyle='#fff';g.setLineDash([2,10]);g.lineCap='round';g.strokeText(item.t,W/2,H/2)}
   }
   g.restore();
 }
@@ -645,8 +909,8 @@ function traceOne(stage,item){
       if(!drawing)return;drawing=false;
       if(finished)return;
       const s=score();
-      if(s.cov>=0.5&&s.out<=0.6){finished=true;clearTimeout(skipTimer);confetti(24);await hero('Beautiful tracing!',['वाह! कितना सुंदर trace किया!']);res()}
-      else if(s.out>0.6){noteWrong();hero('Try to stay inside the lines.',['थोड़ा line के अंदर रहो। फिर से try करो!'])}
+      if(s.cov>=0.5&&s.out<=0.6){finished=true;clearTimeout(skipTimer);SFX.ok();react('cheer');confetti(24);await hero('Beautiful tracing!',['वाह! कितना सुंदर trace किया!']);res()}
+      else if(s.out>0.6){noteWrong();SFX.no();hero('Try to stay inside the lines.',['थोड़ा line के अंदर रहो। फिर से try करो!'])}
       else hero('Good! Colour a little more.',['बहुत अच्छे! थोड़ा और रंग भरो।']);
     });
     cv.addEventListener('pointercancel',()=>{drawing=false});
@@ -655,7 +919,7 @@ function traceOne(stage,item){
 async function blkTrace(stage,done){
   const t=letterOf(DAYV),T=t.toUpperCase();
   const shapes=['circle','triangle','square','star'];
-  const items=[{t:T,d:`Trace ${T} with your finger.`,sp:['अपनी उंगली से',[T,'en'],'पर चलो।']},{t:t,d:`Now small ${t}.`,sp:['अब छोटा',[t,'en'],'।']}];
+  const items=[{t:T,d:`Trace ${T} with your finger.`,sp:[P('trace'),[T,'en']]},{t:t,d:`Now small ${t}.`,sp:['अब छोटा',[t,'en'],'।']}];
   if(S.name)items.push({t:S.name.toUpperCase(),d:`Now your name: ${S.name.toUpperCase()}`,sp:['अब अपना नाम —',[S.name,'en']]});
   else{const sh=shapes[DAYV%4];items.push({shape:sh,d:`Trace the ${sh}.`,sp:['अब इस',[sh,'en'],'पर चलो।']})}
   for(const it of items){stage.innerHTML='';hero(it.d,it.sp);await traceOne(stage,it)}
@@ -681,7 +945,7 @@ const DISC={
     {e:'🚒',n:'Fire truck',f:'The fire truck puts out fires.',hf:'यह है Fire truck। Fire truck आग बुझाती है।',q:'Who comes when there is a fire?',hq:'आग लगे तो कौन आता है?',o:[['🚜','Tractor'],['🚒','Fire truck'],['🚌','Bus']],a:1},
     {e:'🚑',n:'Ambulance',f:'The ambulance takes sick people to the hospital.',hf:'यह है Ambulance। Ambulance बीमार लोगों को hospital ले जाती है।',q:'Who takes sick people to the hospital?',hq:'बीमार लोगों को hospital कौन ले जाता है?',o:[['🚑','Ambulance'],['🚜','Tractor'],['✈️','Aeroplane']],a:0},
     {e:'🚜',n:'Tractor',f:'The tractor works on the farm.',hf:'यह है Tractor। Tractor farm में, यानी खेत में काम करता है।',q:'Who works on the farm?',hq:'Farm में कौन काम करता है?',o:[['🚒','Fire truck'],['🚜','Tractor'],['🚑','Ambulance']],a:1},
-    {e:'✈️',n:'Aeroplane',f:'The aeroplane flies in the sky.',hf:'यह है Aeroplane। Aeroplane sky में उड़ता है — Jet की तरह!',q:'What flies in the sky?',hq:'Sky में कौन उड़ता है?',o:[['🚌','Bus'],['🚜','Tractor'],['✈️','Aeroplane']],a:2},
+    {e:'✈️',n:'Aeroplane',f:'The aeroplane flies in the sky.',hf:`यह है Aeroplane। Aeroplane sky में उड़ता है — बिल्कुल हमारे heroes की तरह!`,q:'What flies in the sky?',hq:'Sky में कौन उड़ता है?',o:[['🚌','Bus'],['🚜','Tractor'],['✈️','Aeroplane']],a:2},
     {e:'🧑‍⚕️',n:'Doctor',f:'The doctor helps us when we are sick.',hf:'यह हैं Doctor। जब हम बीमार होते हैं, Doctor दवाई देकर ठीक करते हैं।',q:'Who helps us when we are sick?',hq:'बीमार होने पर कौन help करता है?',o:[['🧑‍⚕️','Doctor'],['🧑‍🌾','Farmer'],['🧑‍🍳','Chef']],a:0}]
 };
 async function blkDiscover(stage,done){
@@ -701,7 +965,7 @@ async function blkDiscover(stage,done){
   done();
 }
 
-/* ===== Friends & habits ===== */
+/* ===== Feelings & habits ===== */
 const FEEL=[['😀','Happy','खुश'],['😢','Sad','उदास'],['😠','Angry','गुस्सा'],['😨','Scared','डरा हुआ'],['😴','Sleepy','नींद में']];
 const SCEN=[
   {q:'Your friend fell down and is crying. What will you do?',hq:'आपका friend खेलते हुए गिर गया और रो रहा है। आप क्या करोगे — उसकी help करोगे, हँसोगे, या चले जाओगे?',o:[['🤗','Help him up and ask "Are you okay?"'],['😂','Laugh'],['🚶','Walk away']],a:0},
@@ -724,32 +988,152 @@ async function blkStory(stage,done){
   done();
 }
 
+/* ===== Family values (10-value cycle) — also feeds the printable "family time" task ===== */
+const VALUES=[
+ {e:'🙏',title:'Respect for elders',hi:'यानी बड़ों का सम्मान करना।',
+  story:[['👴👵','Grandpa and Grandma come to visit.','दादा-दादी घर आए हैं।'],['🙏','[chiku] folds his hands and says "Namaste!"','[chiku] हाथ जोड़कर कहता है — Namaste!'],['😊','Grandma smiles and blesses him.','दादी मुस्कुराकर उसे आशीर्वाद देती हैं।']],
+  q:'What do we do when elders come home?',hq:'घर में बड़े आएँ तो हम क्या करते हैं?',o:[['🙏','Say Namaste and greet them'],['📱','Keep playing on the phone'],['🙄','Ignore them']],
+  promise:'I greet my elders with Namaste.',hpromise:'मैं बड़ों को नमस्ते करूँगा।',
+  fam:{en:'Ask Dada or Dadi to tell a story from their childhood. Let him greet them with Namaste and thank them afterwards.',hi:'दादा या दादी से उनके बचपन की एक कहानी सुनवाएँ। बच्चा नमस्ते करे और बाद में thank you बोले।'}},
+ {e:'🌟',title:'Honesty',hi:'यानी हमेशा सच बोलना।',
+  story:[['🏺','A vase falls and breaks.','फूलदान गिरकर टूट गया।'],['😟','[aarav] feels scared, but he tells Mummy the truth.','[aarav] डर गया, पर उसने Mummy को सच बताया।'],['🤗','Mummy hugs him: "Thank you for telling the truth!"','Mummy ने गले लगाकर कहा — सच बोलने के लिए thank you!']],
+  q:'You broke a toy by mistake. What should you do?',hq:'आपसे गलती से toy टूट गया। आप क्या करोगे?',o:[['🌟','Tell the truth'],['🙈','Hide it'],['👉','Blame someone else']],
+  promise:'I always tell the truth.',hpromise:'मैं हमेशा सच बोलूँगा।',
+  fam:{en:'At dinner, each person shares a time they told the truth even when it was hard. Praise him whenever he is honest — even about a mistake.',hi:'खाने के समय हर कोई बताए कि कब उसने मुश्किल होने पर भी सच बोला। बच्चा गलती के बारे में भी सच बोले तो उसकी तारीफ़ करें।'}},
+ {e:'🤝',title:'Sharing',hi:'यानी अपनी चीज़ें दूसरों के साथ बाँटना।',
+  story:[['🍪','[vidu] has a big box of biscuits.','[vidu] के पास biscuits का बड़ा डिब्बा है।'],['🧒👧','His friends have none, so he shares with everyone.','उसके दोस्तों के पास कुछ नहीं था, इसलिए उसने सबके साथ share किया।'],['😄','Everyone is happy and they play together.','सब खुश हो गए और साथ में खेले।']],
+  q:'You have 2 chocolates and your friend has none. What will you do?',hq:'आपके पास दो chocolates हैं और दोस्त के पास एक भी नहीं। आप क्या करोगे?',o:[['🤝','Give him one'],['😋','Eat both'],['🙈','Hide them']],
+  promise:'I share with others.',hpromise:'मैं सबके साथ share करूँगा।',
+  fam:{en:'Share a snack together tonight. Let him serve everyone else first, then take his own.',hi:'आज रात कोई snack साथ में बाँटकर खाएँ। बच्चा पहले सबको दे, फिर अपना ले।'}},
+ {e:'🙌',title:'Gratitude — saying thank you',hi:'यानी किसी की मदद पर thank you बोलना।',
+  story:[['🍽️','Mummy cooks yummy food.','Mummy ने बहुत मज़ेदार खाना बनाया।'],['🙌','[snaya] says "Thank you, Mummy!"','[snaya] ने कहा — Thank you, Mummy!'],['💛','Mummy feels loved and happy.','Mummy को बहुत अच्छा लगा।']],
+  q:'Someone gives you a gift. What do you say?',hq:'कोई आपको gift देता है। आप क्या कहोगे?',o:[['🙌','Thank you!'],['😐','Nothing'],['😠','I want more']],
+  promise:'I say thank you.',hpromise:'मैं हमेशा thank you बोलूँगा।',
+  fam:{en:'Thank-you time at dinner: each person says one thing they are thankful for today.',hi:'खाने के समय हर कोई बोले कि आज वह किस बात के लिए thankful है।'}},
+ {e:'🧹',title:'Helping at home',hi:'यानी घर के कामों में मदद करना।',
+  story:[['🧸','Toys are lying all over the floor.','सारे toys फर्श पर बिखरे हैं।'],['📦','[shivansh] puts them back in the box.','[shivansh] ने सारे toys box में रख दिए।'],['👨‍👩‍👦','Papa and Mummy say: "You are our little helper!"','Papa और Mummy ने कहा — आप हमारे छोटे helper हो!']],
+  q:'Mummy is carrying many things. What can you do?',hq:'Mummy ने बहुत सारा सामान उठाया है। आप क्या कर सकते हो?',o:[['🧺','Help by carrying something small'],['📺','Keep watching TV'],['🏃','Run away']],
+  promise:'I help at home.',hpromise:'मैं घर के कामों में help करूँगा।',
+  fam:{en:'Give him one small daily job: watering a plant, putting shoes in the rack, or tidying toys. Say "Thank you, helper!"',hi:'उसे रोज़ एक छोटा काम दें — पौधे में पानी, जूते रैक में रखना या toys समेटना। और बोलें — Thank you, helper!'}},
+ {e:'💛',title:'Saying sorry',hi:'यानी गलती होने पर sorry बोलना।',
+  story:[['😬','[chiku] bumps into his friend by mistake and the friend falls.','[chiku] से गलती से दोस्त को धक्का लग गया और वह गिर गया।'],['🙏','[chiku] says "Sorry! Are you okay?"','[chiku] ने कहा — Sorry! आप ठीक हो?'],['🤝','They shake hands and play again.','उन्होंने हाथ मिलाया और फिर से खेलने लगे।']],
+  q:'You hurt your friend by mistake. What do you say?',hq:'आपसे गलती से दोस्त को चोट लग गई। आप क्या कहोगे?',o:[['💛','Sorry! Are you okay?'],['🙅','It is not my fault'],['🚶','Walk away']],
+  promise:'I say sorry when I make a mistake.',hpromise:'गलती होने पर मैं sorry बोलूँगा।',
+  fam:{en:'Talk about a time someone said sorry, and how it made the other person feel. A grown-up can say sorry to him too when needed.',hi:'कोई ऐसी बात याद करें जब किसी ने sorry बोला हो और सामने वाले को कैसा लगा। ज़रूरत हो तो बड़े भी बच्चे को sorry बोलें।'}},
+ {e:'👵',title:'Caring for grandparents',hi:'यानी दादा-दादी का ध्यान रखना।',
+  story:[['👓','Grandpa cannot find his glasses.','दादाजी का चश्मा नहीं मिल रहा।'],['🧒','[aarav] finds them and gives them with both hands.','[aarav] ने चश्मा ढूँढकर दोनों हाथों से दिया।'],['🥰','Grandpa says: "You are my star!"','दादाजी ने कहा — तुम मेरे star हो!']],
+  q:'How do we give something to elders?',hq:'बड़ों को कोई चीज़ कैसे देते हैं?',o:[['🤲','Politely, with both hands'],['🎯','Throw it to them'],['🙈','Drop it and go']],
+  promise:'I take care of my grandparents.',hpromise:'मैं अपने दादा-दादी का ध्यान रखूँगा।',
+  fam:{en:'Spend 10 minutes with grandparents (or call them). Ask what games they played as a child.',hi:'दादा-दादी के साथ 10 मिनट बिताएँ (या फ़ोन करें) और पूछें कि बचपन में वे कौन से खेल खेलते थे।'}},
+ {e:'🗣️',title:'Kind words, not hands',hi:'यानी गुस्से में मारना नहीं, प्यार से बोलना।',
+  story:[['🧸','Two friends want the same toy.','दो दोस्तों को एक ही toy चाहिए।'],['🗣️','[vidu] does not hit. He says, "Can we play together?"','[vidu] ने मारा नहीं। उसने कहा — क्या हम साथ खेलें?'],['😊','They take turns and smile.','उन्होंने बारी-बारी से खेला और मुस्कुराए।']],
+  q:'Your friend took your toy. What do you do?',hq:'आपके दोस्त ने आपका toy ले लिया। आप क्या करोगे?',o:[['🗣️','Use kind words and ask for it'],['👊','Hit him'],['😭','Scream loudly']],
+  promise:'I use kind words, not hands.',hpromise:'मैं प्यार से बोलूँगा, मारूँगा नहीं।',
+  fam:{en:'Practise the magic words — please, thank you, sorry, excuse me — in a small role-play.',hi:'Magic words — please, thank you, sorry, excuse me — का छोटा role-play करके practice करें।'}},
+ {e:'⏳',title:'Patience & listening',hi:'यानी इंतज़ार करना और बड़ों की बात सुनना।',
+  story:[['📞','Papa is talking on the phone.','Papa फ़ोन पर बात कर रहे हैं।'],['🤫','[snaya] waits quietly and does not shout.','[snaya] चुपचाप इंतज़ार करती रही, उसने शोर नहीं किया।'],['🥰','Papa finishes and says, "Thanks for waiting, beta!"','Papa ने बात पूरी करके कहा — इंतज़ार करने के लिए thank you, बेटा!']],
+  q:'Mummy is busy and you want something. What do you do?',hq:'Mummy busy हैं और आपको कुछ चाहिए। आप क्या करोगे?',o:[['⏳','Wait and say "Excuse me"'],['📢','Shout loudly'],['👉','Keep pulling her']],
+  promise:'I wait patiently.',hpromise:'मैं धैर्य से इंतज़ार करूँगा।',
+  fam:{en:'Play the Statue game: everyone stays quiet and still for one minute. Praise him for waiting.',hi:'Statue game खेलें — सब एक मिनट चुप और स्थिर रहें। इंतज़ार करने पर बच्चे की तारीफ़ करें।'}},
+ {e:'🍽️',title:'Family time together',hi:'यानी परिवार के साथ समय बिताना।',
+  story:[['👨‍👩‍👧‍👦','It is dinner time. The whole family sits together.','खाने का समय है। पूरा परिवार साथ बैठा है।'],['🍴','[shivansh] helps put the plates on the table.','[shivansh] ने table पर plates लगाने में मदद की।'],['😂','They eat together, laugh and share their day.','सबने साथ खाया, हँसे और अपने दिन की बातें बताईं।']],
+  q:'What is nice at dinner time?',hq:'खाने के समय क्या अच्छा लगता है?',o:[['👨‍👩‍👧','Eating together and talking'],['📱','Eating alone with a phone'],['🏃','Running around']],
+  promise:'I enjoy family time.',hpromise:'मुझे परिवार के साथ समय बिताना अच्छा लगता है।',
+  fam:{en:'Phone-free dinner tonight: everyone shares the best and the hardest part of their day.',hi:'आज रात phone-free dinner करें — सब अपने दिन की सबसे अच्छी और सबसे मुश्किल बात बताएँ।'}}
+];
+async function blkValues(stage,done){
+  const v=VALUES[(DAYV-1)%VALUES.length];
+  setLead('snaya');
+  const card=el('div','card',`<div class="pic">${v.e}</div><div class="cap">Family value: ${esc(v.title)}</div>`);
+  stage.appendChild(card);
+  const intro=()=>hero(`Today's family value: ${v.title}`,['आज की family value है —',[v.title,'en'],'। '+v.hi]);
+  card.onclick=intro;await intro();
+  await waitBtn(stage,'Story ▶');
+  for(let i=0;i<v.story.length;i++){
+    stage.innerHTML='';
+    const [em,en,hi]=v.story[i];
+    stage.appendChild(el('div','scene',`<div class="pic pop">${em}</div><div class="cap">${esc(fillN(en))}</div>`));
+    await hero(fillN(en),[fillN(hi,true)]);
+    await waitBtn(stage,i<v.story.length-1?'Next ▶':'Question ▶');
+  }
+  stage.innerHTML='';
+  const opts=shuffle(v.o.map((x,i)=>({x,ok:i===0})));
+  await ask(stage,{q:v.q,sp:[v.hq],opts:opts.map(o=>`<span>${o.x[0]}</span><span>${esc(o.x[1])}</span>`),correct:opts.findIndex(o=>o.ok),cls:'txt',wrongMsg:['Think about your family. What would make them happy?',['अपने परिवार के बारे में सोचो। किस बात से उन्हें खुशी होगी?']]});
+  await hero('Yes! That is what a good family member does.',['बिल्कुल सही! अच्छे बच्चे ऐसा ही करते हैं।']);
+  stage.innerHTML='';
+  stage.appendChild(el('div','card',`<div class="pic">✋</div><div class="cap">Hero promise</div><div class="sub" style="font-size:24px;font-weight:900">“${esc(v.promise)}”</div>`));
+  hero(`Hero promise: ${v.promise}`,['चलो, एक hero promise करते हैं —',v.hpromise]);
+  await waitBtn(stage,'I promise 🤝');
+  SFX.win();react('cheer');confetti(30);
+  await hero('The Hero Team is proud of you!',['Hero team को आप पर बहुत गर्व है!']);
+  done();
+}
+
 /* ---------- block list ---------- */
 function allBlocks(day){
   const mz=day%2===1;
   return [
-    {k:'mood',icon:'😊',title:'Feelings check',min:2,lead:'heart',run:blkMood},
-    {k:'letter',icon:'🔤',title:'Letter sound',min:7,lead:'echo',run:blkLetter},
-    {k:'word',icon:'🧩',title:'Build a word',min:5,lead:'echo',run:blkWord},
-    {k:'move',icon:'🏃',title:'Move break',min:3,lead:'blaze',run:(s,d)=>offline(s,d,OFF.move(day))},
-    {k:'count',icon:'🔢',title:'Counting',min:6,lead:'blaze',run:blkCount},
-    {k:'hands',icon:'🧱',title:'Hands-on maths',min:7,lead:'blaze',run:(s,d)=>offline(s,d,OFF.hands(day))},
-    {k:'pattern',icon:'🎨',title:'Patterns',min:3,lead:'jet',run:blkPattern},
-    {k:'logic',icon:mz?'🧭':'🎯',title:mz?'Maze coding':'Colour & shape',min:6,lead:'jet',run:mz?blkMaze:blkSort},
-    {k:'trace',icon:'✏️',title:'Finger tracing',min:5,lead:'vine',run:blkTrace},
-    {k:'paper',icon:'📒',title:'Notebook time',min:6,lead:'vine',run:(s,d)=>offline(s,d,OFF.paper(day))},
-    {k:'discover',icon:'🌍',title:'Discover the world',min:5,lead:'vine',run:blkDiscover},
-    {k:'story',icon:'💛',title:'Friends & habits',min:4,lead:'heart',run:blkStory}];
+    {k:'mood',icon:'😊',title:'Feelings check',min:2,lead:'snaya',run:blkMood},
+    {k:'letter',icon:'🔤',title:'Letter sound',min:6,lead:'vidu',run:blkLetter},
+    {k:'word',icon:'🧩',title:'Build a word',min:5,lead:'vidu',run:blkWord},
+    {k:'move',icon:'🏃',title:'Move break',min:3,lead:'shivansh',run:(s,d)=>offline(s,d,OFF.move(day))},
+    {k:'count',icon:'🔢',title:'Counting',min:6,lead:'shivansh',run:blkCount},
+    {k:'hands',icon:'🧱',title:'Hands-on maths',min:7,lead:'shivansh',run:(s,d)=>offline(s,d,OFF.hands(day))},
+    {k:'pattern',icon:'🎨',title:'Patterns',min:3,lead:'aarav',run:blkPattern},
+    {k:'logic',icon:mz?'🧭':'🎯',title:mz?'Maze coding':'Colour & shape',min:5,lead:'aarav',run:mz?blkMaze:blkSort},
+    {k:'trace',icon:'✏️',title:'Finger tracing',min:4,lead:'chiku',run:blkTrace},
+    {k:'paper',icon:'📒',title:'Notebook time',min:6,lead:'chiku',run:(s,d)=>offline(s,d,OFF.paper(day))},
+    {k:'discover',icon:'🌍',title:'Discover the world',min:4,lead:'chiku',run:blkDiscover},
+    {k:'story',icon:'💛',title:'Feelings & habits',min:3,lead:'snaya',run:blkStory},
+    {k:'values',icon:'🏡',title:'Family values',min:5,lead:'snaya',run:blkValues}];
 }
 const buildBlocks=day=>allBlocks(day).filter(b=>!S.content.off.includes(b.k));
 
+/* ---------- printable sheets (real-world tasks + hand-off notes) ---------- */
+function dotRow(txt){
+  const n=txt.length;let fs,gap;
+  if(n===1){fs=78;gap=100}else{fs=Math.min(78,Math.floor(660/(n*0.66)));gap=Math.ceil(n*fs*0.68+34)}
+  const cnt=Math.max(1,Math.floor(680/gap));let tx='';
+  for(let i=0;i<cnt;i++)tx+=`<text x="${10+i*gap}" y="80" font-size="${fs}" font-weight="700" font-family="Arial,Helvetica,sans-serif" fill="none" stroke="#555" stroke-width="1.8" stroke-dasharray="1.5 5" stroke-linecap="round">${esc(txt)}</text>`;
+  return `<svg viewBox="0 0 700 92"><line x1="0" y1="80" x2="700" y2="80" stroke="#444" stroke-width="1.5"/><line x1="0" y1="52" x2="700" y2="52" stroke="#e57373" stroke-dasharray="6 6"/><line x1="0" y1="22" x2="700" y2="22" stroke="#bbb"/>${tx}</svg>`;
+}
+function printPage(day){
+  const t=letterOf(day),T=t.toUpperCase(),mv=OFF.move(day),hd=OFF.hands(day),pp=OFF.paper(day),vl=VALUES[(day-1)%VALUES.length];
+  const task=(n,o)=>`<h3>☐ ${n}. ${esc(o.title)} <small>· ${o.min} min</small></h3><p>${esc(o.text)}</p><p class="hi">${esc(o.sp)}</p><p class="mat">🧰 ${esc(o.mat)}</p><p class="ask">Grown-up asks: ${esc(o.ask)}</p>`;
+  return `<section class="pg">
+  <header><div class="logo">🦸 Hero Academy</div><div>Mission <b>${day}</b> · Letter <b>${T} ${t}</b></div><div>Date: ____ / ____ / ______</div></header>
+  <div class="who">Name: ${S.name?`<b>${esc(S.name)}</b>`:'____________________'}</div>
+  ${task(1,mv)}${task(2,hd)}${task(3,pp)}
+  <div>${dotRow(T)}${dotRow(t)}${S.name?dotRow(S.name.toUpperCase()):''}</div>
+  <h3>☐ 4. Family time <small>· ${esc(vl.title)}</small></h3><p>${esc(vl.fam.en)}</p><p class="hi">${esc(vl.fam.hi)}</p>
+  <div class="box"><b>Grown-up hand-off</b> — tick when done:
+   <ul><li>☐ He touched each object once while counting &nbsp; ☐ He said the letter sound aloud</li>
+   <li>☐ He finished the activities himself &nbsp; ☐ We did the family talk</li></ul>
+   Notes: ______________________________________________ &nbsp; Stars: <span class="stars">☆☆☆☆☆</span></div>
+  </section>`;
+}
+function printMissions(from,to){
+  from=Math.max(1,from|0);to=Math.max(from,Math.min(from+13,to|0));
+  const days=[];for(let d=from;d<=to;d++)days.push(d);
+  $('#printArea').innerHTML=days.map(printPage).join('');
+  setTimeout(()=>{try{window.print()}catch(e){L('print '+e.message)}},350);
+}
+
 /* ---------- session engine ---------- */
 let TESTDAY=1;
+function streakDays(){
+  const set=new Set(S.history.map(h=>h.d));let n=0;const d=new Date();
+  const f=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
+  if(!set.has(f(d)))d.setDate(d.getDate()-1);
+  while(set.has(f(d))){n++;d.setDate(d.getDate()-1)}
+  return n;
+}
 function renderJourney(){
   const j=$('#journey');j.innerHTML='';
   if(SESS)SESS.blocks.forEach((b,i)=>j.appendChild(el('div','dot'+(i<SESS.i?' done':i===SESS.i?' cur':''),b.icon)));
   $('#stars').textContent='⭐ '+S.stars;
   document.body.classList.toggle('test',!!S.test);
+  const cur=$('.dot.cur',j);if(cur&&cur.scrollIntoView)try{cur.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}
 }
 function inWindow(){
   if(!S.win.on)return true;
@@ -759,7 +1143,8 @@ function inWindow(){
 }
 function startSession(day,blocks,single){
   RUNID++;DAYV=day;
-  SESS={blocks,i:0,stars:0,start:Date.now(),wrong:{},mood:'',single:!!single};
+  const last=S.history[S.history.length-1];
+  SESS={blocks,i:0,stars:0,start:Date.now(),wrong:{},mood:'',single:!!single,useGrant:!!(!single&&!S.test&&S.oncePerDay&&last&&last.d===today())};
   runBlock();
 }
 function runBlock(){
@@ -779,72 +1164,98 @@ function blockDone(){
   renderJourney();
   const stage=$('#stage');stage.innerHTML='';
   stage.appendChild(el('div','pic pop','⭐'));
-  confetti(12);
-  hero('Another star! ⭐',['एक और star!']);
+  SFX.star();react('cheer');confetti(12);
+  hero('Another star! ⭐',[P('star')]);
   setTimeout(()=>{if(myRun!==RUNID||!SESS)return;SESS.i++;if(SESS.i>=SESS.blocks.length)finishScreen();else runBlock()},1500);
 }
 async function finishScreen(){
-  const stage=$('#stage');stage.innerHTML='';setLead('heart');
+  const stage=$('#stage');stage.innerHTML='';setLead('snaya');
   const mins=Math.round((Date.now()-SESS.start)/60000);
   const titles=Object.fromEntries(allBlocks(DAYV).map(b=>[b.k,b.title]));
   const weak=Object.entries(SESS.wrong).filter(([k,v])=>v>=2).map(([k,v])=>`${titles[k]||k} (${v})`).join(', ');
   const badge=BADGES[(DAYV-1)%BADGES.length];
+  const vl=VALUES[(DAYV-1)%VALUES.length];
   let rewardNow='';
   if(!S.test&&!SESS.single){
     S.badges.push(badge);
     S.history.push({d:today(),day:DAYV,stars:SESS.stars,mins,mood:SESS.mood,weak});
     if(S.history.length>400)S.history=S.history.slice(-400);
     S.day=DAYV+1;
+    if(SESS.useGrant&&S.grant&&S.grant.date===today()&&S.grant.extra>0)S.grant.extra--;
     const n=S.history.length;
     if(S.reward&&S.rewardEvery>0&&n%S.rewardEvery===0)rewardNow=S.reward;
     await save();
   }
-  const team=el('div','team');Object.keys(TEAM).forEach(k=>{const m=el('div','m float',heroSVG(k,80)+TEAM[k].name);m.style.animationDelay=(Math.random()*1)+'s';team.appendChild(m)});
-  stage.append(team,el('div','bigL pop',badge),el('div','cap',`Mission ${DAYV} complete! ⭐ ${SESS.stars} stars${S.test?' (test — not saved)':''}`));
+  const team=el('div','team');Object.keys(TEAM).forEach(k=>{const m=el('div','hs',heroSVG(k,118));m.style.animation=`bob ${2+Math.random()}s ease-in-out infinite`;team.appendChild(m)});
+  stage.append(team,el('div','rays',`<div class="bigL pop">${badge}</div>`),el('div','cap',`Mission ${DAYV} complete! ⭐ ${SESS.stars} stars${S.test?' (test — not saved)':''}`));
   if(rewardNow)stage.appendChild(el('div','cap',`🎁 Reward: ${esc(rewardNow)}`));
-  confetti(50);
-  const b=el('button','btn','Home 🏠');b.onclick=home;stage.appendChild(b);
+  stage.appendChild(el('div','family',`🏡 <b>Tonight with the family — ${esc(vl.title)}:</b><br>${esc(vl.fam.en)}`));
+  confetti(60);SFX.win();
+  const b=el('button','btn glow','Home 🏠');b.onclick=home;stage.appendChild(b);
   SESS=null;RUNID++;$('#journey').innerHTML='';renderJourney();
-  const sp=[`शाबाश ${kidName()}! आज का पूरा mission complete! Hero team को आप पर proud है!`];
+  const sp=[`शाबाश ${kidName()}! `,P('complete')];
   if(rewardNow)sp.push('और आपका reward है —',rewardNow);
   hero(`Well done, ${kidName()}! The Hero Team is proud of you!`,sp);
 }
 function home(){
-  SESS=null;RUNID++;stopVoice();setLead('blaze');renderJourney();
+  SESS=null;RUNID++;stopVoice();setLead('shivansh');renderJourney();
   const stage=$('#stage');stage.innerHTML='';
+  stage.appendChild(el('div','title','HERO ACADEMY'));
   const team=el('div','team');
-  Object.keys(TEAM).forEach(k=>{const m=el('div','m',`<div class="float" style="animation-delay:${Math.random()}s">${heroSVG(k,78)}</div>${TEAM[k].name}<small>${TEAM[k].power}</small>`);m.onclick=()=>say([TEAM[k].name,'en']);team.appendChild(m)});
+  Object.keys(TEAM).forEach(k=>{
+    const c=el('div','hcard',`<div class="hs">${heroSVG(k)}</div><div class="hn">${esc(HN(k))}</div><div class="hw">${TEAM[k].power}</div>`);
+    c.style.setProperty('--c',TEAM[k].col);
+    c.onclick=()=>{SFX.tap();setLead(k);say(`मैं हूँ ${HH(k)}।`,TEAM[k].hp)};
+    team.appendChild(c);
+  });
   stage.appendChild(team);
   if(S.test){testHome(stage);return}
-  const bl=buildBlocks(S.day),nm=kidName();
+  const bl=buildBlocks(S.day),nm=kidName(),st=streakDays();
   $('#bubble').textContent=`Hi ${nm}! Mission ${S.day} is ready. Shall we start?`;
   LAST=[`नमस्ते ${nm}! आज का mission number ${S.day} ready है। चलो शुरू करें?`];
-  stage.appendChild(el('div','cap',`🏅 Mission ${S.day} · Badges: ${S.badges.length} ${S.badges.slice(-8).join(' ')}`));
-  const last=S.history[S.history.length-1];
-  if(S.oncePerDay&&last&&last.d===today()){
-    $('#bubble').textContent=`Mission done for today! See you tomorrow, ${nm}!`;LAST=[`आज का mission हो गया! कल फिर मिलेंगे, ${nm}!`];return;
+  stage.appendChild(el('div','cap',`🏅 Mission ${S.day} · Badges ${S.badges.length} ${S.badges.slice(-6).join(' ')} ${st>0?`<span class="streak">🔥 ${st}-day streak</span>`:''}`));
+  const last=S.history[S.history.length-1],g=S.grant||{},td=today();
+  const extraOK=g.date===td&&g.extra>0,openOK=g.open===td,doneToday=!!(last&&last.d===td);
+  const askBtn=(label,type,title,detail,grant)=>{
+    if(!liveOn())return;
+    const b=el('button','btn',label);
+    b.onclick=async()=>{
+      const r=await askMummy(type,title,detail,null);
+      if(r.status==='approved'){S.grant=Object.assign({date:'',extra:0,open:''},S.grant);grant();await save();home()}
+      else if(r.status==='denied')hero(`${AW().n} says: ${r.note||'Not now.'}`,[`${AW().h} कहती हैं —`,r.note||'अभी नहीं।']);
+      else if(r.status==='expired')hero(`${AW().n} did not answer yet.`,[`${AW().h} ने अभी जवाब नहीं दिया।`]);
+      else if(r.status==='offline')hero('No internet — ask a grown-up to help.',['Internet नहीं है — किसी बड़े से help माँगो।']);
+    };
+    stage.appendChild(b);
+  };
+  if(S.oncePerDay&&doneToday&&!extraOK){
+    $('#bubble').textContent=`Mission done for today! See you tomorrow, ${nm}!`;LAST=[`आज का mission हो गया! कल फिर मिलेंगे, ${nm}!`];
+    askBtn(`Ask your ${AW().n} for one more mission 🙋‍♀️`,'extra','wants one more mission today','Allow 1 extra mission today?',()=>{S.grant.date=td;S.grant.extra=(g.date===td?g.extra:0)+1});
+    return;
   }
-  if(!inWindow()){
-    $('#bubble').textContent=`The Hero Team is resting now. Come back at ${S.win.from}.`;LAST=['अभी Hero team आराम कर रही है। बाद में आना!'];return;
+  if(!inWindow()&&!openOK){
+    $('#bubble').textContent=`The Hero Team is resting now. Come back at ${S.win.from}.`;LAST=['अभी Hero team आराम कर रही है। बाद में आना!'];
+    askBtn(`Ask your ${AW().n} to open now 🙋‍♀️`,'open','wants to start a mission now','Allow starting outside the allowed time window today?',()=>{S.grant.open=td});
+    return;
   }
-  const plan=el('div','plan');bl.forEach(b=>plan.appendChild(el('div','',`<b>${b.icon}</b><span>${b.title}<br><small>${b.min} min</small></span>`)));
-  stage.appendChild(plan);
-  if(('speechSynthesis' in window)&&VOICES.length&&!hasHi())stage.appendChild(el('div','cap','⚠️ Hindi voice not found — ask a grown-up to check settings'));
-  const go=el('button','btn','Start Mission 🚀');
-  go.onclick=()=>startSession(S.day,bl,false);
+  const map=el('div','map');bl.forEach(b=>{const n=el('div','node',`<b>${b.icon}</b><span>${b.title}<br><small>${b.min} min</small></span>`);n.style.setProperty('--c',TEAM[b.lead].col);map.appendChild(n)});
+  stage.appendChild(map);
+  if(('speechSynthesis' in window)&&VOICES.length&&!hasHi()&&!S.voice.hinglish)stage.appendChild(el('div','cap','⚠️ Hindi voice not found — a grown-up can fix this in ⚙️ → Voice'));
+  const go=el('button','btn glow','Start Mission 🚀');
+  go.onclick=()=>{SFX.tap();startSession(S.day,bl,false)};
   stage.appendChild(go);
 }
 function testHome(stage){
   $('#bubble').textContent='TEST MODE — nothing is saved. Pick a day and any block.';LAST=['Test mode'];
   const row=el('div','cap',`Test day: <button class="btn small" id="tdm">−</button> <span id="tdv">${TESTDAY}</span> <button class="btn small" id="tdp">+</button>`);
   stage.appendChild(row);
-  const plan=el('div','plan');
+  const map=el('div','map');
   const draw=()=>{
     $('#tdv').textContent=TESTDAY+` (letter ${letterOf(TESTDAY).toUpperCase()})`;
-    plan.innerHTML='';
-    allBlocks(TESTDAY).forEach(b=>{const x=el('button','',`<b>${b.icon}</b><span>${b.title}</span>`);x.onclick=()=>startSession(TESTDAY,[b],true);plan.appendChild(x)});
+    map.innerHTML='';
+    allBlocks(TESTDAY).forEach(b=>{const x=el('button','node',`<b>${b.icon}</b><span>${b.title}</span>`);x.style.setProperty('--c',TEAM[b.lead].col);x.onclick=()=>startSession(TESTDAY,[b],true);map.appendChild(x)});
   };
-  stage.appendChild(plan);draw();
+  stage.appendChild(map);draw();
   $('#tdm').onclick=()=>{TESTDAY=Math.max(1,TESTDAY-1);draw()};
   $('#tdp').onclick=()=>{TESTDAY=Math.min(60,TESTDAY+1);draw()};
   const go=el('button','btn','Run full session ▶');go.onclick=()=>startSession(TESTDAY,buildBlocks(TESTDAY),false);stage.appendChild(go);
@@ -867,6 +1278,12 @@ async function bioCheck(){
   return !!a;
 }
 let failCount=0,lockUntil=0;
+async function verifyPin(pin){
+  if(Date.now()<lockUntil)return 'locked';
+  if(await hashPin(pin,S.sec.salt)===S.sec.hash){failCount=0;return true}
+  failCount++;if(failCount>=5){lockUntil=Date.now()+30000;failCount=0}
+  return false;
+}
 function pinPad(title,onDone,opts={}){
   const m=$('#modal');m.hidden=false;let pin='';
   m.innerHTML=`<div class="panel" style="max-width:360px"><h2>${title}</h2><div class="note">${opts.note||''}</div><div class="pindots" id="pd"></div><div class="pinpad">${[1,2,3,4,5,6,7,8,9,'✕',0,'✔'].map(x=>`<button data-k="${x}">${x}</button>`).join('')}</div><div class="row" style="justify-content:center">${opts.bio?'<button id="bioB">🔐 Fingerprint / Face</button>':''}<button class="grey" id="pcan">Cancel</button></div><div class="note" id="pmsg" style="text-align:center;color:#c0392b"></div></div>`;
@@ -879,14 +1296,13 @@ function pinPad(title,onDone,opts={}){
     pd.textContent='●'.repeat(pin.length);
   });
   $('#pcan').onclick=()=>{m.hidden=true;if(opts.onCancel)opts.onCancel()};
-  if(opts.bio)$('#bioB').onclick=async()=>{try{if(await bioCheck()){openParent()}}catch(e){$('#pmsg').textContent='Fingerprint/face not available — use PIN';L('bio '+e.message)}};
+  if(opts.bio)$('#bioB').onclick=async()=>{try{if(await bioCheck()){(opts.onBio||openParent)()}}catch(e){$('#pmsg').textContent='Fingerprint/face not available — use PIN';L('bio '+e.message)}};
 }
 function askUnlock(){
   if(!S.sec.hash){setupWizard();return}
   pinPad('Parent area',async(pin,err)=>{
-    if(Date.now()<lockUntil)return err('Too many tries. Wait 30 seconds.');
-    if(await hashPin(pin,S.sec.salt)===S.sec.hash){failCount=0;openParent()}
-    else{failCount++;if(failCount>=5){lockUntil=Date.now()+30000;failCount=0}err('Wrong PIN')}
+    const r=await verifyPin(pin);
+    if(r===true)openParent();else err(r==='locked'?'Too many tries. Wait 30 seconds.':'Wrong PIN');
   },{bio:bioAvail()&&!!LOCAL.bioId});
 }
 function setupWizard(){
@@ -900,8 +1316,7 @@ function setupWizard(){
     },{note:'Confirm your PIN',onCancel:setupWizard});
   },{note:'4–6 digits. Only grown-ups should know this. You can add fingerprint/face later.',onCancel:()=>{if(!S.sec.hash)setupWizard()}});
 }
-/* Parent entry: tap the gear 5 times quickly (works everywhere) OR hold it 1.5 s.
-   The long-press browser menu (reload/share/print) is blocked on the whole app. */
+/* Parent entry: tap the gear 5 times quickly OR hold it 1.5 s. Browser long-press menu is blocked. */
 document.addEventListener('contextmenu',e=>e.preventDefault());
 let pressT=null,taps=[];
 const gear=$('#gear');
@@ -913,45 +1328,94 @@ gear.addEventListener('click',()=>{
   if(taps.length>=5){taps=[];clearTimeout(pressT);openGate()}
 });
 
+/* ---------- voice recording (parent's own voice) ---------- */
+const REC_ITEMS=[
+  ...SEQ.map(c=>({k:'snd_'+c,label:`Sound of “${c.toUpperCase()}”`,hint:`Say only the sound (${SNDEN[c]}) — not the letter name. Keep it short and crisp.`})),
+  ...Object.keys(PH).map(k=>({k:'ph_'+k,label:PH[k],hint:'Say it warmly, like a teacher.'}))
+];
+let recorder=null,recKey=null,recStop=null;
+async function startRec(k,onState){
+  try{
+    const st=await navigator.mediaDevices.getUserMedia({audio:true});
+    const chunks=[];recorder=new MediaRecorder(st);recKey=k;
+    recorder.ondataavailable=e=>chunks.push(e.data);
+    recorder.onstop=async()=>{
+      clearTimeout(recStop);st.getTracks().forEach(t=>t.stop());
+      const blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'});
+      if(blob.size>800){await DB.setBlob('rec_'+k,blob);delete recURL[k];RECS.add(k);await DB.set('recIndex',[...RECS])}
+      recorder=null;recKey=null;onState('saved');
+    };
+    recorder.start();recStop=setTimeout(()=>{try{recorder&&recorder.state==='recording'&&recorder.stop()}catch(e){}},7000);
+    onState('recording');
+  }catch(e){L('rec '+e.message);alert('Microphone not available: '+e.message+'\n(Recording needs the app opened from its https website and microphone permission.)');onState('idle')}
+}
+async function delRec(k){await DB.del('rec_'+k);delete recURL[k];RECS.delete(k);await DB.set('recIndex',[...RECS])}
+
 /* ---------- parent area ---------- */
 function openParent(firstRun){
-  const m=$('#modal');m.hidden=false;
+  const m=$('#modal');m.hidden=false;refreshVoices();
   let logs='';try{logs=(JSON.parse(localStorage.getItem('ha_log')||'[]')).slice(-25).reverse().join('\n')}catch(e){}
   const hist=S.history.slice(-14).reverse().map(h=>`<tr><td>${h.d}</td><td>${h.day}</td><td>${h.stars}</td><td>${h.mins??''}</td><td>${esc(h.mood||'')}</td><td>${esc(h.weak||'—')}</td></tr>`).join('')||'<tr><td colspan="6">No missions yet</td></tr>';
   const blocks=allBlocks(1).map(b=>`<label class="inl"><input type="checkbox" data-blk="${b.k}" ${S.content.off.includes(b.k)?'':'checked'}> ${b.icon} ${b.title}</label>`).join('');
+  const vopt=(prefix,uri)=>VOICES.filter(v=>nl(v.lang).startsWith(prefix)).map(v=>`<option value="${esc(v.voiceURI)}" ${v.voiceURI===uri?'selected':''}>${esc(v.name)} (${esc(v.lang)})${v.localService?' · offline':' · online'}</option>`).join('');
+  const heroRows=Object.keys(HERO_DEF).map(k=>`<div class="hn2"><div><label>${TEAM[k].power}</label><input type="text" data-hn="${k}" value="${esc(HN(k))}"></div><div><label>Hindi spelling (for the voice)</label><input type="text" data-hh="${k}" value="${esc(HH(k))}"></div></div>`).join('');
+  const recRows=REC_ITEMS.map(it=>`<div class="recrow" data-rk="${it.k}"><div>${esc(it.label)}<small>${esc(it.hint)}</small></div><div class="row" style="margin:0"><button data-ra="rec">● Record</button><button data-ra="play" class="green">▶</button><button data-ra="del" class="grey">🗑</button><span data-rs>${RECS.has(it.k)?'✅':''}</span></div></div>`).join('');
   m.innerHTML=`<div class="panel"><h2>⚙️ Parent area <small style="font-size:12px;color:#888">v${APPV}</small></h2>
   ${firstRun?'<p class="note">PIN saved. Fill in the child\'s name, then press Save.</p>':''}
   <details open><summary>👦 Child & schedule</summary>
     <label>Child's name (used for tracing — English letters)</label><input type="text" id="pn" value="${esc(S.name)}">
     <label>Current mission (day)</label><input type="number" id="pd" min="1" value="${S.day}">
     <label class="inl"><input type="checkbox" id="pod" ${S.oncePerDay?'checked':''}> Only one mission per day</label>
+    <div class="hn2"><div><label>Child asks … (name)</label><input type="text" id="pan" value="${esc(AW().n)}"></div><div><label>Hindi spelling (voice)</label><input type="text" id="pah" value="${esc(AW().h)}"></div></div>
     <label class="inl"><input type="checkbox" id="pwo" ${S.win.on?'checked':''}> Allow only between these times</label>
     <div class="row"><input type="time" id="pwf" value="${S.win.from}" style="width:45%"><input type="time" id="pwt" value="${S.win.to}" style="width:45%"></div>
+  </details>
+  <details><summary>🔒 Breaks & real-world activities</summary>
+    <label class="inl"><input type="checkbox" id="plk" ${S.lock.on?'checked':''}> <b>Lock them</b> — the Done button stays locked until the timer finishes (no skipping)</label>
+    <label class="inl"><input type="checkbox" id="plc" ${S.lock.confirm?'checked':''}> Also need a grown-up to confirm with PIN / fingerprint after the timer</label>
+    <p class="note">Applies to: Move break, Hands-on maths, Notebook time. A tiny “Grown-up: skip this” link (PIN needed) is always there. Test mode bypasses the lock.</p>
+  </details>
+  <details><summary>🖨️ Print sheets (real-world tasks + hand-off notes)</summary>
+    <p class="note">One A4 page per mission: the move break, hands-on task, notebook tracing lines, a family-time task and a grown-up hand-off checklist (English + Hindi).</p>
+    <div class="row"><label style="margin:0">From mission</label><input type="number" id="prf" min="1" value="${S.day}" style="width:90px"><label style="margin:0">to</label><input type="number" id="prt" min="1" value="${S.day}" style="width:90px"></div>
+    <div class="row"><button id="prb">🖨️ Print / Save as PDF</button><button class="grey" id="prw">This week (7 days)</button></div>
+    <p class="note">Up to 14 missions at once. In the print window choose your printer or “Save as PDF”.</p>
   </details>
   <details><summary>📚 Content</summary>${blocks}
     <label>Max counting number (0 = automatic, grows from 10 to 20)</label><input type="number" id="pmc" min="0" max="20" value="${S.content.maxCount}">
   </details>
-  <details><summary>🔊 Voice</summary>
-    <p class="note">Hindi voice: <b>${hasHi()?'found ✅':'not found ❌'}</b> (${VOICES.length} voices). If missing: Android Settings → General management → Text-to-speech → Google → install Hindi.</p>
+  <details><summary>🔊 Voice (Hindi teacher)</summary>
+    <p class="note">Hindi voice on this tablet: <b>${hasHi()?'found ✅':'not found ❌'}</b> (${VOICES.length} voices). If missing: Settings → General management → Language → Text-to-speech → <b>Speech Services by Google</b> → install Hindi (India).</p>
     <label class="inl"><input type="checkbox" id="pvo" ${S.voice.on?'checked':''}> Voice on</label>
-    <label>Voice style</label><select id="pvm"><option value="single" ${S.voice.mode==='single'?'selected':''}>One Hindi voice reads everything (smooth, Indian accent)</option><option value="dual" ${S.voice.mode==='dual'?'selected':''}>Hindi voice + English voice for English words</option></select>
-    <label>Speed: <span id="prv">${S.voice.rate}</span></label><input type="range" id="pvr" min="0.6" max="1.2" step="0.05" value="${S.voice.rate}" style="width:100%">
-    <div class="row"><button id="vt">▶ Test voice</button></div>
+    <label>Voice style</label><select id="pvm"><option value="dual" ${S.voice.mode==='dual'?'selected':''}>Hindi teacher + English voice for English words (recommended)</option><option value="single" ${S.voice.mode==='single'?'selected':''}>One Hindi voice reads everything</option></select>
+    <label>Hindi voice</label><select id="pvh"><option value="">Auto (best available)</option>${vopt('hi',LOCAL.hiVoice)}</select>
+    <label>English voice</label><select id="pve"><option value="">Auto (English-India if available)</option>${vopt('en',LOCAL.enVoice)}</select>
+    <label>Speed: <span id="prv">${S.voice.rate}</span></label><input type="range" id="pvr" min="0.55" max="1.2" step="0.05" value="${S.voice.rate}" style="width:100%">
+    <label>Pitch (higher = more child-friendly): <span id="ppv">${S.voice.pitch}</span></label><input type="range" id="pvp" min="0.8" max="1.5" step="0.05" value="${S.voice.pitch}" style="width:100%">
+    <label class="inl"><input type="checkbox" id="phg" ${S.voice.hinglish?'checked':''}> Read Hindi in English letters (Hinglish) — use if the Hindi voice sounds bad or is missing</label>
+    <label class="inl"><input type="checkbox" id="psf" ${S.sfx?'checked':''}> Sound effects</label>
+    <div class="row"><button id="vt">▶ Test mixed sentence</button><button id="vt2" class="grey">▶ Test Hindi only</button></div>
+    <details><summary style="font-size:15px">🎙 My voice — record the sounds & phrases yourself (best quality)</summary>
+      <p class="note">Your recording replaces the tablet voice for that line. Record in a quiet room, hold the tablet ~20 cm away, up to 7 seconds each. Start with the 20 letter sounds. Recordings stay on this tablet (not in the cloud backup).</p>
+      <div id="recList">${recRows}</div>
+    </details>
   </details>
+  <details><summary>🦸 Hero names</summary>${heroRows}<p class="note">Change a name here and it updates everywhere in the app.</p></details>
   <details><summary>🎁 Rewards</summary>
-    <label>Real-life reward</label><input type="text" id="prw" value="${esc(S.reward)}" placeholder="e.g. ice-cream at the park">
+    <label>Real-life reward</label><input type="text" id="prw2" value="${esc(S.reward)}" placeholder="e.g. ice-cream at the park">
     <label>Give the reward after every … missions</label><input type="number" id="pre" min="1" max="30" value="${S.rewardEvery}">
-    <p class="note">Stars so far: ${S.stars} · Badges: ${S.badges.length}</p>
+    <p class="note">Stars so far: ${S.stars} · Badges: ${S.badges.length} · Streak: ${streakDays()} days</p>
   </details>
   <details><summary>📈 Report</summary>
     <table><tr><th>Date</th><th>Mission</th><th>⭐</th><th>Min</th><th>Mood</th><th>Struggled with (wrong tries)</th></tr>${hist}</table>
   </details>
   <details><summary>☁️ Data & sync</summary>
     <p class="note">Saved on this tablet in the app database${navigator.storage&&navigator.storage.persist?' (persistent storage: <b id="pst">checking…</b>)':''}. Cloud: ${S.sync.last?'last synced '+S.sync.last.replace('T',' ').slice(0,16):'not synced yet'}${S.sync.dirty?' · <b>changes waiting</b>':''}</p>
+    <label class="inl"><input type="checkbox" id="plv" ${S.sync.live!==false?'checked':''}> Live link to the parent's phone (requests, remote settings, messages, pause)</label>
     <label>Apps Script Web App URL</label><input type="url" id="psu" value="${esc(S.sync.url)}" placeholder="https://script.google.com/macros/s/…/exec">
     <label>Sync token (same as TOKEN in the script)</label><input type="password" id="pst2" value="${esc(S.sync.token)}">
     <div class="row"><button id="sTest">Test connection</button><button id="sNow">Sync now ⬆</button><button class="grey" id="sPull">Restore from cloud ⬇</button></div>
-    <div class="row"><button id="bExp">Download backup file</button><label class="inl" style="margin:0"><button id="bImpB" type="button">Restore from file</button><input type="file" id="bImp" accept=".json,application/json" hidden></label></div>
+    <div class="row"><button id="bExp">Download backup file</button><button id="bImpB" type="button" class="grey">Restore from file</button><input type="file" id="bImp" accept=".json,application/json" hidden></div>
     <p class="note" id="smsg"></p>
     <details><summary style="font-size:14px">Error log</summary><pre>${esc(logs)}</pre></details>
   </details>
@@ -959,47 +1423,162 @@ function openParent(firstRun){
     <div class="row"><button id="cPin">Change PIN</button>${bioAvail()?`<button id="bioR">${LOCAL.bioId?'Re-register':'Add'} fingerprint / face</button>${LOCAL.bioId?'<button class="grey" id="bioX">Remove fingerprint / face</button>':''}`:'<span class="note">Fingerprint/face needs the app opened from its https website (GitHub Pages) in Chrome.</span>'}</div>
   </details>
   <details><summary>🧪 Test mode (for building & checking)</summary>
-    <label class="inl"><input type="checkbox" id="ptm" ${S.test?'checked':''}> Test mode ON — open any day and any block, Skip button visible, nothing is saved</label>
+    <label class="inl"><input type="checkbox" id="ptm" ${S.test?'checked':''}> Test mode ON — open any day and any block, Skip button visible, locks off, nothing is saved</label>
   </details>
   <div class="row"><button id="sv">💾 Save & close</button><button class="grey" id="cl">Close</button><button class="red" id="rs">Reset everything</button></div></div>`;
   if(navigator.storage&&navigator.storage.persisted)navigator.storage.persisted().then(p=>{const x=$('#pst');if(x)x.textContent=p?'ON ✅':'not granted'});
   const msg=t=>{$('#smsg').textContent=t};
   $('#pvr').oninput=e=>{$('#prv').textContent=e.target.value};
-  $('#vt').onclick=()=>{const o={...S.voice};S.voice.mode=$('#pvm').value;S.voice.rate=parseFloat($('#pvr').value);S.voice.on=true;say('नमस्ते! आज का letter है',['S','en'],'। इसकी आवाज़ है',SND.s,'।',['S for Sun!','en'],'चलो',['apples','en'],'गिनते हैं —',['one, two, three','en']).then(()=>{S.voice=o})};
+  $('#pvp').oninput=e=>{$('#ppv').textContent=e.target.value};
   const readForm=()=>{
     S.name=$('#pn').value.trim();S.day=Math.max(1,parseInt($('#pd').value)||1);S.oncePerDay=$('#pod').checked;
     S.win={on:$('#pwo').checked,from:$('#pwf').value||'15:00',to:$('#pwt').value||'17:00'};
+    S.lock={on:$('#plk').checked,confirm:$('#plc').checked};
     S.content.off=[...m.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk);
     S.content.maxCount=Math.max(0,Math.min(20,parseInt($('#pmc').value)||0));
-    S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.9};
-    S.reward=$('#prw').value.trim();S.rewardEvery=Math.max(1,parseInt($('#pre').value)||5);
-    S.sync.url=$('#psu').value.trim();S.sync.token=$('#pst2').value.trim();
+    S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.85,pitch:parseFloat($('#pvp').value)||1.1,hinglish:$('#phg').checked};
+    S.sfx=$('#psf').checked;
+    LOCAL.hiVoice=$('#pvh').value;LOCAL.enVoice=$('#pve').value;saveLocal();
+    m.querySelectorAll('[data-hn]').forEach(i=>{const k=i.dataset.hn;S.heroes[k].n=i.value.trim()||HERO_DEF[k].n});
+    m.querySelectorAll('[data-hh]').forEach(i=>{const k=i.dataset.hh;S.heroes[k].h=i.value.trim()||HERO_DEF[k].h});
+    S.reward=$('#prw2').value.trim();S.rewardEvery=Math.max(1,parseInt($('#pre').value)||5);
+    S.sync.url=$('#psu').value.trim();S.sync.token=$('#pst2').value.trim();S.sync.live=$('#plv').checked;
+    S.ask={n:$('#pan').value.trim()||'Mummy',h:$('#pah').value.trim()||'मम्मी'};
     S.test=$('#ptm').checked;
   };
-  $('#sv').onclick=async()=>{readForm();await DB.set('state',S);if(!S.test)save();m.hidden=true;home()};
+  $('#vt').onclick=()=>{readForm();const o={...S.voice};S.voice.on=true;say('नमस्ते! आज का letter है',['S','en'],'। इसकी आवाज़ है',sndP('s'),'। ',['S for Sun!','en'],'चलो',['apples','en'],'गिनते हैं —',['one, two, three','en']).then(()=>{S.voice=o})};
+  $('#vt2').onclick=()=>{readForm();const o={...S.voice};S.voice.on=true;say('नमस्ते! मैं आपका दोस्त हूँ। आज हम बहुत सारी नई बातें सीखेंगे। चलो शुरू करते हैं!').then(()=>{S.voice=o})};
+  $('#prb').onclick=()=>{m.hidden=true;printMissions(parseInt($('#prf').value)||1,parseInt($('#prt').value)||1)};
+  $('#prw').onclick=()=>{const f=parseInt($('#prf').value)||1;m.hidden=true;printMissions(f,f+6)};
+  /* recordings */
+  m.querySelectorAll('.recrow').forEach(row=>{
+    const k=row.dataset.rk,st=$('[data-rs]',row),rb=$('[data-ra=rec]',row);
+    rb.onclick=()=>{
+      if(recorder&&recKey===k){recorder.stop();return}
+      if(recorder)return;
+      startRec(k,s=>{if(s==='recording'){rb.textContent='■ Stop';st.textContent='🔴'}else{rb.textContent='● Record';st.textContent=RECS.has(k)?'✅':''}});
+    };
+    $('[data-ra=play]',row).onclick=async()=>{const a=await recAudio(k);if(a){stopAudio();curAudio=a;a.play().catch(()=>{})}else alert('Nothing recorded yet')};
+    $('[data-ra=del]',row).onclick=async()=>{await delRec(k);st.textContent=''};
+  });
+  $('#sv').onclick=async()=>{readForm();await DB.set('state',S);if(!S.test)save();m.hidden=true;home();kickLive()};
   $('#cl').onclick=()=>{m.hidden=true};
   $('#sTest').onclick=async()=>{readForm();msg('Testing…');try{await callSync('ping');msg('✅ Connected to the Google Sheet');await DB.set('state',S)}catch(e){msg('❌ '+e.message)}};
   $('#sNow').onclick=async()=>{readForm();await DB.set('state',S);msg('Syncing…');const was=S.test;S.test=false;const ok=await syncPush();S.test=was;msg(ok?'✅ Synced':'❌ Sync failed — see error log')};
   $('#sPull').onclick=async()=>{readForm();if(!confirm('Replace progress on this tablet with the copy saved in the Google Sheet?'))return;msg('Restoring…');try{await syncPull();msg('✅ Restored');setTimeout(()=>{m.hidden=true;home()},800)}catch(e){msg('❌ '+e.message)}};
   $('#bExp').onclick=()=>{const blob=new Blob([JSON.stringify({app:'hero-academy',v:APPV,saved:new Date().toISOString(),data:exportable()},null,1)],{type:'application/json'});const a=el('a');a.href=URL.createObjectURL(blob);a.download=`hero-academy-backup-${today()}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)};
   $('#bImpB').onclick=()=>$('#bImp').click();
-  $('#bImp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.app!=='hero-academy'||!j.data)throw new Error('Not a Hero Academy backup');if(!confirm('Replace progress with this backup file?'))return;const keep=S.sync;S=merge(JSON.parse(JSON.stringify(DEF)),j.data);S.sync=keep;await save();msg('✅ Restored from file');setTimeout(()=>{m.hidden=true;home()},800)}catch(err){msg('❌ '+err.message)}};
+  $('#bImp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.app!=='hero-academy'||!j.data)throw new Error('Not a Hero Academy backup');if(!confirm('Replace progress with this backup file?'))return;const keep={sync:S.sync,sec:S.sec};S=merge(JSON.parse(JSON.stringify(DEF)),j.data);S.sync=keep.sync;S.sec=keep.sec;await save();msg('✅ Restored from file');setTimeout(()=>{m.hidden=true;home()},800)}catch(err){msg('❌ '+err.message)}};
   $('#cPin').onclick=()=>pinPad('New PIN',async(p)=>{S.sec.salt=b64(crypto.getRandomValues(new Uint8Array(12)));S.sec.hash=await hashPin(p,S.sec.salt);await save();openParent()},{note:'4–6 digits',onCancel:()=>openParent()});
   if($('#bioR'))$('#bioR').onclick=async()=>{try{await bioRegister();alert('Fingerprint / face added ✅');openParent()}catch(e){alert('Could not add: '+e.message);L('bioreg '+e.message)}};
   if($('#bioX'))$('#bioX').onclick=async()=>{LOCAL.bioId='';await saveLocal();openParent()};
-  $('#rs').onclick=async()=>{if(!confirm('Erase ALL progress and settings on this tablet? (Cloud copy is not touched.)'))return;S=JSON.parse(JSON.stringify(DEF));LOCAL={bioId:''};await DB.set('state',S);await saveLocal();location.reload()};
+  $('#rs').onclick=async()=>{if(!confirm('Erase ALL progress and settings on this tablet? (Cloud copy is not touched.)'))return;S=JSON.parse(JSON.stringify(DEF));LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0};await DB.set('state',S);await saveLocal();location.reload()};
+}
+
+/* ---------- LIVE link to the parent's phone ---------- */
+const PATCH_KEYS=['name','day','oncePerDay','win','lock','content','sfx','voice','reward','rewardEvery','heroes','grant','ask'];
+const LIVE={timer:null,busy:false,paused:false,pending:{},asking:false,askIv:null};
+const liveOn=()=>!!(S.sync.url&&S.sync.token&&S.sync.live!==false);
+const AW=()=>S.ask||DEF.ask;
+function hbData(){
+  const b=SESS&&SESS.blocks[SESS.i];
+  return {t:Date.now(),v:APPV,mission:SESS?DAYV:S.day,block:b?b.title:'Home',bi:SESS?SESS.i:-1,bn:SESS?SESS.blocks.length:0,stars:SESS?SESS.stars:0,test:!!S.test,vis:document.visibilityState,lastPatch:LOCAL.lastPatch|0,asking:LIVE.asking,voiceHi:hasHi()};
+}
+function applyPatch(set){
+  for(const k of PATCH_KEYS){
+    if(!(k in set))continue;
+    const v=set[k];
+    if(v&&typeof v==='object'&&!Array.isArray(v)&&S[k]&&typeof S[k]==='object')merge(S[k],v);else S[k]=v;
+  }
+}
+function toast(text,big,ms){
+  let t=$('#toast');if(t)t.remove();
+  t=el('div','',esc(text));t.id='toast';if(big)t.className='big';document.body.appendChild(t);
+  t.onclick=()=>t.remove();setTimeout(()=>{if(t.parentNode)t.remove()},ms||4500);
+}
+function showParentMsg(text){
+  SFX.star();
+  toast(`💌 ${AW().n} says: ${text}`,true,16000);
+  const dev=/[\u0900-\u097F]/.test(text);
+  say(`${AW().h} ने कहा —`,dev?text:[text,'en']);
+}
+function setPaused(p){
+  if(p===LIVE.paused)return;
+  LIVE.paused=p;
+  let o=$('#pauseov');
+  if(p){
+    stopVoice();
+    if(!o){o=el('div','ov');o.id='pauseov';document.body.appendChild(o)}
+    o.innerHTML=`<div class="ovc"><div class="pic">💤</div><div class="cap" style="font-size:38px">Break time!</div><div class="sub">${esc(AW().n)} paused the app. Come back later.</div></div>`;
+    o.style.display='grid';
+  }else if(o){o.style.display='none';say(`${AW().h} ने app फिर से चालू कर दिया है!`)}
+}
+async function onLive(j){
+  let changed=false;
+  for(const p of (j.patches||[])){applyPatch(p.set);LOCAL.lastPatch=Math.max(LOCAL.lastPatch|0,p.id);changed=true}
+  if(changed){await saveLocal();await DB.set('state',S);if(!S.test)save();toast(`⚙️ Settings updated by ${AW().n}`);if(!SESS&&$('#modal').hidden&&!LIVE.asking)home()}
+  const ctl=j.ctl||{};
+  setPaused(!!ctl.paused);
+  if(ctl.msg&&ctl.msg.id>(LOCAL.lastMsg|0)){LOCAL.lastMsg=ctl.msg.id;await saveLocal();showParentMsg(ctl.msg.text)}
+  for(const id of Object.keys(LIVE.pending)){const r=j.reqs&&j.reqs[id];if(r&&r.status!=='pending'){const f=LIVE.pending[id];if(f)f(r)}}
+}
+async function liveTick(){
+  if(!liveOn()||LIVE.busy)return;
+  LIVE.busy=true;
+  try{const j=await callSync('sync',{hb:hbData(),lastPatch:LOCAL.lastPatch|0,reqIds:Object.keys(LIVE.pending).map(Number)});await onLive(j)}
+  catch(e){L('live '+e.message)}
+  finally{LIVE.busy=false}
+}
+function liveSchedule(){
+  clearTimeout(LIVE.timer);
+  if(!liveOn())return;
+  const d=document.visibilityState==='hidden'?30000:(Object.keys(LIVE.pending).length?2000:4000);
+  LIVE.timer=setTimeout(async()=>{await liveTick();liveSchedule()},d);
+}
+function kickLive(){clearTimeout(LIVE.timer);if(!liveOn())return;liveTick().finally(liveSchedule)}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')kickLive()});
+function showAsk(title,onCancel,onPin){
+  hideAsk();
+  const o=el('div','ov');o.id='askov';o.style.display='grid';
+  o.innerHTML=`<div class="ovc"><div>${heroSVG('snaya',170)}</div><div class="cap" style="font-size:36px">Ask your ${esc(AW().n)}! 🙋‍♀️</div><div class="sub">${esc(title)}</div><div class="dots">Waiting for ${esc(AW().n)} to say YES<span class="dd">.</span><span class="dd">.</span><span class="dd">.</span></div><div class="row"><button class="btn small" id="askC">Cancel</button>${onPin?'<button class="link" id="askP">Grown-up here? Use PIN</button>':''}</div></div>`;
+  document.body.appendChild(o);
+  $('#askC').onclick=onCancel;if(onPin)$('#askP').onclick=onPin;
+  LIVE.asking=true;
+  const sp=()=>say(`अपनी ${AW().h} से पूछो!`);
+  sp();LIVE.askIv=setInterval(sp,25000);
+}
+function hideAsk(){clearInterval(LIVE.askIv);const o=$('#askov');if(o)o.remove();LIVE.asking=false}
+async function askMummy(type,title,detail,onPin){
+  if(!liveOn())return {status:'offline'};
+  let id;
+  try{const j=await callSync('request',{type,title:`${kidName()}: ${title}`,detail});id=j.id}
+  catch(e){L('req '+e.message);return {status:'offline'}}
+  return new Promise(res=>{
+    const finish=async r=>{
+      delete LIVE.pending[id];
+      if(r.status==='approved'){const c=$('#askov .ovc');if(c)c.innerHTML=`<div class="pic pop">🎉</div><div class="cap" style="font-size:36px">${esc(AW().n)} said YES!</div>`;SFX.win();say(`${AW().h} ने हाँ कहा! शाबाश!`);await sleep(1700)}
+      hideAsk();res(r);
+    };
+    LIVE.pending[id]=finish;
+    const cancel=()=>{callSync('cancel',{id}).catch(()=>{});finish({status:'cancelled'})};
+    showAsk(title,cancel,onPin?()=>{cancel();onPin()}:null);
+    kickLive();
+  });
 }
 
 /* ---------- boot ---------- */
 (async function boot(){
   await DB.open();
-  const st=await DB.get('state');if(st)S=merge(JSON.parse(JSON.stringify(DEF)),st);
-  const lo=await DB.get('local');if(lo)LOCAL=Object.assign({bioId:''},lo);
+  const st=await DB.get('state');
+  if(st){const oldV=st.v||2;S=merge(JSON.parse(JSON.stringify(DEF)),st);if(oldV<3){S.voice.mode='dual';S.voice.rate=0.85;S.voice.pitch=1.1;S.lock={on:true,confirm:false};S.v=3}}
+  const lo=await DB.get('local');if(lo)LOCAL=Object.assign({bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0},lo);
+  const ri2=await DB.get('recIndex');if(Array.isArray(ri2))ri2.forEach(k=>RECS.add(k));
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(p=>L('persist '+p))}catch(e){}
   if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>L('sw '+e.message));
   home();
   if(!S.sec.hash)setupWizard();
   if(S.sync.dirty)syncPush();
+  kickLive();
 })();
 </script>
 </body>

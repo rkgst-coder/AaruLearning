@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1030">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hero Parent">
+<link rel="manifest" href="parent.webmanifest">
+<link rel="apple-touch-icon" href="parent-192.png">
+<link rel="icon" href="parent-192.png">
+<title>Hero Academy · Parent</title>
+<style>
+:root{--gold:#ffc83d;--ink:#e9ebff;--mut:#9aa0cf;--card:#161b4a;--card2:#1e2460;--ok:#2ecc71;--bad:#ff5a5f;--line:#ffffff1f}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#0b1030;color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Rounded','Segoe UI',Roboto,'Noto Sans Devanagari',sans-serif;-webkit-text-size-adjust:100%}
+body{background:linear-gradient(180deg,#0a0e2e,#1b2268 60%,#2a1d6e);background-attachment:fixed}
+#app{max-width:720px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+header{display:flex;align-items:center;gap:10px;padding:12px 16px 6px}
+header .logo{font-weight:900;font-size:20px;letter-spacing:.5px}
+header .sp{flex:1}
+.pill{display:inline-flex;align-items:center;gap:6px;background:#ffffff14;border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:700}
+.dot{width:10px;height:10px;border-radius:50%;background:#777}
+.dot.on{background:var(--ok);box-shadow:0 0 0 0 #2ecc71aa;animation:pulse 1.6s infinite}
+.dot.warn{background:#ffb300}
+@keyframes pulse{70%{box-shadow:0 0 0 10px #2ecc7100}100%{box-shadow:0 0 0 0 #2ecc7100}}
+main{flex:1;padding:6px 14px 100px}
+.tab{display:none}.tab.on{display:block;animation:rise .3s ease}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:linear-gradient(160deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:22px;padding:16px;margin:12px 0;box-shadow:0 8px 24px #0005}
+.card h3{margin:0 0 8px;font-size:15px;color:var(--mut);text-transform:uppercase;letter-spacing:1.2px}
+.big{font-size:26px;font-weight:900;line-height:1.2}
+.sub{color:var(--mut);font-size:14px;margin-top:2px}
+.bar{height:12px;background:#ffffff1c;border-radius:99px;overflow:hidden;margin:10px 0 2px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,#ffe45c,#ff9f1c);border-radius:99px;transition:width .6s}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:#ffffff10;border:1px solid var(--line);border-radius:16px;padding:12px}
+.tile b{display:block;font-size:24px}
+.tile span{font-size:12px;color:var(--mut)}
+button,.btn{font-family:inherit;font-size:16px;font-weight:800;border:0;border-radius:14px;padding:12px 16px;background:#3b3fb5;color:#fff}
+button:active{transform:scale(.97)}
+.btn-ok{background:linear-gradient(#35d27b,#1f9d55)}.btn-no{background:linear-gradient(#ff7a7e,#d63a40)}.btn-gold{background:linear-gradient(#ffe45c,#ffb300);color:#3b2a00}.btn-grey{background:#5a5f8f}
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.btn-row>button{flex:1;min-width:120px}
+input[type=text],input[type=number],input[type=url],input[type=password],input[type=time],select,textarea{width:100%;font-size:17px;padding:11px 12px;border-radius:12px;border:1px solid #ffffff33;background:#0d1240;color:#fff;font-family:inherit}
+label{display:block;font-size:13px;color:var(--mut);font-weight:700;margin:12px 0 4px}
+label.inl{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--ink);font-weight:600;margin:10px 0}
+label.inl input{width:22px;height:22px;accent-color:#ffb300}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chip{background:#ffffff14;border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-size:14px;font-weight:700;color:var(--ink)}
+.req{border:2px solid var(--gold);background:linear-gradient(160deg,#3a2f9f,#251d6e)}
+.req .t{font-size:19px;font-weight:900}
+.req .d{color:var(--mut);margin:4px 0 8px;font-size:14px}
+.hist{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.hist:last-child{border:0}.hist .ic{font-size:24px}
+.st-approved{color:var(--ok)}.st-denied{color:var(--bad)}.st-pending{color:var(--gold)}.st-expired,.st-cancelled{color:var(--mut)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;background:#0b1030f2;backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+nav .in{display:flex;max-width:720px;width:100%}
+nav button{flex:1;background:none;color:var(--mut);font-size:11px;font-weight:800;padding:6px 2px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+nav button .i{font-size:22px}
+nav button.on{color:var(--gold)}
+nav .badge{position:absolute;top:0;right:22%;background:var(--bad);color:#fff;border-radius:99px;font-size:11px;min-width:18px;height:18px;display:none;place-items:center;padding:0 5px}
+#alertBar{position:sticky;top:0;z-index:20}
+#alertBar .req{margin:8px 14px;animation:shakeb .6s}
+@keyframes shakeb{20%{transform:translateX(-6px)}60%{transform:translateX(6px)}}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--mut);font-size:11px;text-transform:uppercase}
+details{border:1px solid var(--line);border-radius:16px;padding:4px 14px;margin:10px 0;background:#ffffff08}
+summary{font-weight:900;padding:12px 0;font-size:16px}
+.note{font-size:13px;color:var(--mut)}
+.err{color:var(--bad);font-weight:700}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+svg text{fill:#9aa0cf;font-size:10px}
+.hero-ico{font-size:40px}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#241f4a;border-radius:16px;padding:10px 18px;font-weight:800;z-index:50;box-shadow:0 10px 30px #0008}
+</style>
+</head>
+<body>
+<div id="app">
+  <header><div class="logo">🦸 Hero Parent</div><div class="sp"></div><span class="pill"><span class="dot" id="dot"></span><span id="conn">Not linked</span></span></header>
+  <div id="alertBar"></div>
+  <main>
+    <!-- LIVE -->
+    <section class="tab on" id="t-live">
+      <div class="card"><h3>Right now</h3>
+        <div class="big" id="lvTitle">Waiting for the tablet…</div><div class="sub" id="lvSub"></div>
+        <div class="bar"><i id="lvBar" style="width:0%"></i></div><div class="sub" id="lvBarT"></div>
+      </div>
+      <div class="grid2">
+        <div class="tile"><b id="tMission">–</b><span>Next mission</span></div>
+        <div class="tile"><b id="tToday">–</b><span>Today</span></div>
+        <div class="tile"><b id="tStreak">–</b><span>Day streak</span></div>
+        <div class="tile"><b id="tStars">–</b><span>Total stars</span></div>
+      </div>
+      <div class="card"><h3>Quick actions</h3>
+        <div class="btn-row"><button class="btn-gold" id="qPause">⏸ Pause app</button><button id="qExtra">➕ 1 extra mission today</button></div>
+        <div class="btn-row"><button id="qOpen">⏰ Allow outside time window today</button></div>
+        <label>Send a message to the tablet <span class="note">(it appears with voice)</span></label>
+        <input type="text" id="msgIn" placeholder="e.g. Well done, hero!" maxlength="300">
+        <div class="chips" id="msgChips"></div>
+        <div class="btn-row"><button class="btn-gold" id="msgSend">💌 Send</button></div>
+      </div>
+    </section>
+
+    <!-- REQUESTS -->
+    <section class="tab" id="t-req">
+      <div id="reqPending"></div>
+      <div class="card"><h3>Recent requests</h3><div id="reqHist"><div class="note">No requests yet.</div></div></div>
+    </section>
+
+    <!-- REPORT -->
+    <section class="tab" id="t-rep">
+      <div class="grid2" id="repTiles"></div>
+      <div class="card"><h3>Last 14 missions</h3><div id="repChart"></div><div class="note">Bars = stars, line = minutes</div></div>
+      <div class="card"><h3>Needs practice</h3><div id="repWeak" class="note">Nothing yet.</div></div>
+      <div class="card"><h3>Recent missions</h3><div style="overflow-x:auto"><table id="repTable"></table></div></div>
+    </section>
+
+    <!-- CONTROL -->
+    <section class="tab" id="t-ctl">
+      <div class="note" id="ctlNote" style="margin:8px 4px">Changes go to the tablet within a few seconds.</div>
+      <div id="ctlForm"></div>
+    </section>
+
+    <!-- LINK -->
+    <section class="tab" id="t-link">
+      <div class="card"><h3>Connect to the tablet</h3>
+        <label>Apps Script Web App URL (the …/exec address)</label><input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/…/exec">
+        <label>PARENT_TOKEN (not the tablet's TOKEN)</label><input type="password" id="cfgTok">
+        <div class="btn-row"><button class="btn-gold" id="cfgSave">Save & connect</button><button class="btn-grey" id="cfgOut">Disconnect</button></div>
+        <div class="note" id="cfgMsg" style="margin-top:8px"></div>
+      </div>
+      <div class="card"><h3>Alerts</h3>
+        <label class="inl"><input type="checkbox" id="optSound" checked> Sound when the child asks for something (while this app is open)</label>
+        <div class="btn-row"><button id="optTest">🔔 Test sound</button></div>
+        <p class="note">iPhone can’t receive push from a home-made app, so: keep this app open for instant sound, and set <b>PARENT_EMAIL</b> in the Apps Script properties to also get an email whenever the child asks.</p>
+      </div>
+      <div class="card"><h3>Install on iPhone</h3><p class="note">Safari → Share button → <b>Add to Home Screen</b>. Open it from the Home Screen icon (full-screen, no browser bar).</p></div>
+    </section>
+  </main>
+  <nav><div class="in">
+    <button data-tab="live" class="on"><span class="i">📡</span>Live</button>
+    <button data-tab="req"><span class="i">🙋</span>Requests<span class="badge" id="bReq">0</span></button>
+    <button data-tab="rep"><span class="i">📈</span>Report</button>
+    <button data-tab="ctl"><span class="i">🎛️</span>Control</button>
+    <button data-tab="link"><span class="i">🔗</span>Link</button>
+  </div></nav>
+</div>
+<div id="toastBox"></div>
+
+<script>
+/* logging first */
+(function(){var b=[];window.L=function(m){try{b.push(new Date().toISOString().slice(11,19)+' '+m);if(b.length>60)b.shift();localStorage.setItem('pa_log',JSON.stringify(b))}catch(e){}};
+window.addEventListener('error',function(e){L('ERR '+e.message)});window.addEventListener('unhandledrejection',function(e){L('REJ '+(e.reason&&e.reason.message||e.reason))});L('boot')})();
+const $=(s,r=document)=>r.querySelector(s);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+
+/* config + cache */
+let CFG={url:'',token:'',sound:true};
+try{Object.assign(CFG,JSON.parse(localStorage.getItem('pa_cfg')||'{}'))}catch(e){}
+const saveCfg=()=>{try{localStorage.setItem('pa_cfg',JSON.stringify(CFG))}catch(e){}};
+let ST=null,SV=0,PATCHES=[],HB=null,CTL={paused:false,msg:null},REQS=[],NOW=0,ONLINE=false,ERR='';
+try{ST=JSON.parse(localStorage.getItem('pa_state')||'null');SV=+(localStorage.getItem('pa_sv')||0)}catch(e){}
+
+/* api */
+async function api(action,data){
+  const r=await fetch(CFG.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:CFG.token,action,data})});
+  const j=await r.json();if(!j.ok)throw new Error(j.error||'error');return j;
+}
+let busy=false,seenReq=new Set(),firstLoad=true,timer=null;
+async function poll(force){
+  if(!CFG.url||!CFG.token||busy)return;busy=true;
+  try{
+    const j=await api('pget',{sv:SV,force:!!force});
+    NOW=j.now;HB=j.hb;CTL=j.ctl||CTL;REQS=j.reqs||[];PATCHES=j.patches||[];ERR='';
+    if(j.state){ST=j.state;SV=j.sv;try{localStorage.setItem('pa_state',JSON.stringify(ST));localStorage.setItem('pa_sv',SV)}catch(e){}ctlBuilt=false}
+    else SV=j.sv;
+    checkNew();render();
+  }catch(e){ERR=e.message;L('poll '+e.message);renderConn()}
+  finally{busy=false}
+}
+function schedule(){
+  clearTimeout(timer);
+  const d=document.visibilityState==='hidden'?20000:3000;
+  timer=setTimeout(async()=>{await poll();schedule()},d);
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){poll();schedule()}});
+
+/* sound alert */
+let AC=null;
+function beep(){
+  if(!CFG.sound)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume();
+    [[880,0],[1175,.18],[880,.36],[1175,.54]].forEach(([f,t])=>{const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;o.type='sine';const T=AC.currentTime+t;g.gain.setValueAtTime(.0001,T);g.gain.exponentialRampToValueAtTime(.25,T+.02);g.gain.exponentialRampToValueAtTime(.0001,T+.16);o.connect(g).connect(AC.destination);o.start(T);o.stop(T+.2)});
+  }catch(e){}
+  try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+}
+document.addEventListener('pointerdown',()=>{try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){}},{once:true});
+function checkNew(){
+  const pend=REQS.filter(r=>r.status==='pending');
+  let fresh=false;
+  pend.forEach(r=>{if(!seenReq.has(r.id)){seenReq.add(r.id);if(!firstLoad)fresh=true}});
+  if(firstLoad&&pend.length)fresh=true;
+  firstLoad=false;
+  if(fresh)beep();
+  document.title=(pend.length?`(${pend.length}) `:'')+'Hero Academy · Parent';
+}
+function toast(t){const b=$('#toastBox');b.innerHTML='';const d=el('div','',esc(t));d.id='toast';b.appendChild(d);setTimeout(()=>d.remove(),2600)}
+
+/* helpers on child data */
+const childName=()=>(ST&&ST.name)||'Child';
+const askName=()=>(ST&&ST.ask&&ST.ask.n)||'Mummy';
+function effective(){ /* state + patches the tablet has not applied yet */
+  const e=JSON.parse(JSON.stringify(ST||{}));const last=HB&&HB.lastPatch|0;
+  PATCHES.filter(p=>p.id>last).forEach(p=>{for(const k in p.set){const v=p.set[k];if(v&&typeof v==='object'&&!Array.isArray(v)&&e[k]&&typeof e[k]==='object')Object.assign(e[k],v);else e[k]=v}});
+  return e;
+}
+function ago(ms){const s=Math.max(0,Math.round(ms/1000));if(s<60)return s+' s ago';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<48)return h+' h ago';return Math.round(h/24)+' days ago'}
+function streak(hist){const set=new Set((hist||[]).map(h=>h.d));let n=0;const d=new Date();const f=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');if(!set.has(f(d)))d.setDate(d.getDate()-1);while(set.has(f(d))){n++;d.setDate(d.getDate()-1)}return n}
+const TYPE_ICON={check:'✅',skip:'⏭️',extra:'➕',open:'⏰',other:'🙋'};
+
+/* render */
+function renderConn(){
+  const age=HB?NOW-HB.srv:Infinity;ONLINE=age<15000;
+  const dot=$('#dot'),c=$('#conn');
+  if(!CFG.url||!CFG.token){dot.className='dot';c.textContent='Not linked';return}
+  if(ERR){dot.className='dot warn';c.textContent='Connection problem';return}
+  if(ONLINE){dot.className='dot on';c.textContent=childName()+' online'}
+  else{dot.className='dot warn';c.textContent=HB?`${childName()} offline · ${ago(age)}`:'Waiting for the tablet'}
+}
+function render(){renderConn();renderLive();renderReq();renderReport();renderCtl();renderAlert()}
+function renderLive(){
+  const hb=HB,age=hb?NOW-hb.srv:Infinity,on=age<15000;
+  if(!hb){$('#lvTitle').textContent='Waiting for the tablet…';$('#lvSub').textContent=CFG.url?'It appears here as soon as the tablet is open.':'Link the app first (Link tab).';$('#lvBar').style.width='0%';$('#lvBarT').textContent=''}
+  else if(CTL.paused){$('#lvTitle').textContent='⏸ App is paused';$('#lvSub').textContent=on?`${childName()} sees “Break time”.`:`Last seen ${ago(age)}`;$('#lvBar').style.width='0%';$('#lvBarT').textContent=''}
+  else if(!on){$('#lvTitle').textContent=`${childName()} is offline`;$('#lvSub').textContent=`Last seen ${ago(age)}`+(hb.block&&hb.block!=='Home'?` · was on “${hb.block}”`:'');$('#lvBar').style.width='0%';$('#lvBarT').textContent=''}
+  else{
+    const doing=hb.bi>=0;
+    $('#lvTitle').textContent=hb.asking?`🙋 Asking you for something`:doing?`${childName()} is doing: ${hb.block}`:`${childName()} is on the home screen`;
+    $('#lvSub').textContent=(doing?`Mission ${hb.mission} · ⭐ ${hb.stars} this session`:`Next: mission ${hb.mission}`)+(hb.test?' · TEST MODE':'');
+    const pct=doing&&hb.bn?Math.round(hb.bi/hb.bn*100):0;
+    $('#lvBar').style.width=pct+'%';$('#lvBarT').textContent=doing?`Step ${hb.bi+1} of ${hb.bn}`:'';
+  }
+  const h=ST&&ST.history||[];const td=today();const doneToday=h.filter(x=>x.d===td).length;
+  $('#tMission').textContent=ST?ST.day:'–';
+  $('#tToday').textContent=ST?(doneToday?`✅ ${doneToday}`:'Not yet'):'–';
+  $('#tStreak').textContent=ST?'🔥 '+streak(h):'–';
+  $('#tStars').textContent=ST?'⭐ '+ST.stars:'–';
+  $('#qPause').textContent=CTL.paused?'▶ Resume app':'⏸ Pause app';
+}
+function reqHtml(r,withBtns){
+  const note=withBtns?`<input type="text" class="rn" placeholder="Note to ${esc(childName())} (optional)" maxlength="200"><div class="chips">${['Do it once more','Not now','After dinner','Well done!'].map(t=>`<span class="chip" data-note="${esc(t)}">${esc(t)}</span>`).join('')}</div><div class="btn-row"><button class="btn-ok" data-dec="approved">✔ Approve</button><button class="btn-no" data-dec="denied">✖ Deny</button></div>`:'';
+  return `<div class="card req" data-id="${r.id}"><div class="t">${TYPE_ICON[r.type]||'🙋'} ${esc(r.title)}</div><div class="d">${esc(r.detail||'')} · ${ago(NOW-r.ts)}</div>${note}</div>`;
+}
+function renderAlert(){
+  const pend=REQS.filter(r=>r.status==='pending');
+  const bar=$('#alertBar');
+  const onReqTab=$('#t-req').classList.contains('on');
+  const ids=pend.map(r=>r.id).join(',');
+  if(bar.dataset.ids!==ids||bar.dataset.tab!==String(onReqTab)){
+    bar.dataset.ids=ids;bar.dataset.tab=String(onReqTab);
+    bar.innerHTML=onReqTab?'':pend.map(r=>reqHtml(r,true)).join('');
+    bindReq(bar);
+  }
+  const b=$('#bReq');b.style.display=pend.length?'grid':'none';b.textContent=pend.length;
+}
+function bindReq(root){
+  root.querySelectorAll('.req').forEach(card=>{
+    const id=+card.dataset.id;
+    card.querySelectorAll('[data-note]').forEach(c=>c.onclick=()=>{card.querySelector('.rn').value=c.dataset.note});
+    card.querySelectorAll('[data-dec]').forEach(b=>b.onclick=async()=>{
+      b.disabled=true;
+      try{await api('pdecide',{id,status:b.dataset.dec,note:(card.querySelector('.rn')||{}).value||''});toast(b.dataset.dec==='approved'?'Approved ✔':'Denied');await poll(false)}
+      catch(e){toast('⚠️ '+e.message);b.disabled=false;await poll(false)}
+    });
+  });
+}
+function renderReq(){
+  const pend=REQS.filter(r=>r.status==='pending'),hist=REQS.filter(r=>r.status!=='pending');
+  const box=$('#reqPending');const key=pend.map(r=>r.id).join(',');
+  if(box.dataset.k!==key){box.dataset.k=key;box.innerHTML=pend.length?pend.map(r=>reqHtml(r,true)).join(''):'<div class="card"><div class="big">All clear 🎉</div><div class="sub">No requests waiting.</div></div>';bindReq(box)}
+  $('#reqHist').innerHTML=hist.length?hist.map(r=>`<div class="hist"><div class="ic">${TYPE_ICON[r.type]||'🙋'}</div><div><b>${esc(r.title)}</b><div class="note">${ago(NOW-r.ts)} · <span class="st-${r.status}">${r.status}</span>${r.note?` · “${esc(r.note)}”`:''}</div></div></div>`).join(''):'<div class="note">No requests yet.</div>';
+}
+function renderReport(){
+  if(!$('#t-rep').classList.contains('on'))return;
+  const h=(ST&&ST.history)||[];
+  const tot=h.length,stars=h.reduce((a,x)=>a+(x.stars||0),0),mins=h.filter(x=>x.mins!=null).map(x=>x.mins);
+  const avg=mins.length?Math.round(mins.reduce((a,b)=>a+b,0)/mins.length):0;
+  const wk=h.filter(x=>(new Date(today())-new Date(x.d))/864e5<7).length;
+  $('#repTiles').innerHTML=[['Missions done',tot],['Last 7 days',wk+' / 7'],['Avg minutes',avg||'–'],['Badges',(ST&&ST.badges||[]).length]].map(([a,b])=>`<div class="tile"><b>${b}</b><span>${a}</span></div>`).join('');
+  const last=h.slice(-14);
+  if(!last.length)$('#repChart').innerHTML='<div class="note">No missions yet.</div>';
+  else{
+    const W=330,H=130,bw=Math.min(26,Math.floor((W-20)/last.length)),maxS=Math.max(13,...last.map(x=>x.stars||0)),maxM=Math.max(30,...last.map(x=>x.mins||0));
+    let bars='',pts=[];
+    last.forEach((x,i)=>{const bh=Math.round((x.stars||0)/maxS*90),X=10+i*bw;bars+=`<rect x="${X+2}" y="${105-bh}" width="${bw-4}" height="${bh}" rx="4" fill="#ffc83d"/><text x="${X+bw/2}" y="122" text-anchor="middle">${x.day}</text>`;pts.push(`${X+bw/2},${105-Math.round((x.mins||0)/maxM*90)}`)});
+    $('#repChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%">${bars}<polyline points="${pts.join(' ')}" fill="none" stroke="#6ee7a0" stroke-width="2.4"/><text x="10" y="10">mission →</text></svg>`;
+  }
+  const weak={};h.forEach(x=>{String(x.weak||'').replace(/([^,()]+?) \((\d+)\)/g,(m,a,n)=>{a=a.trim();weak[a]=(weak[a]||0)+(+n)})});
+  const wl=Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  $('#repWeak').innerHTML=wl.length?wl.map(([a,n])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;color:#e9ebff"><span>${esc(a)}</span><b>${n} wrong tries</b></div>`).join(''):'Nothing yet — no repeated mistakes so far.';
+  $('#repTable').innerHTML='<tr><th>Date</th><th>#</th><th>⭐</th><th>Min</th><th>Mood</th><th>Struggled with</th></tr>'+h.slice(-14).reverse().map(x=>`<tr><td>${esc(x.d)}</td><td>${x.day}</td><td>${x.stars}</td><td>${x.mins??''}</td><td>${esc(x.mood||'')}</td><td>${esc(x.weak||'—')}</td></tr>`).join('');
+}
+
+/* control */
+const BLOCKS=[['mood','😊 Feelings check'],['letter','🔤 Letter sound'],['word','🧩 Build a word'],['move','🏃 Move break'],['count','🔢 Counting'],['hands','🧱 Hands-on maths'],['pattern','🎨 Patterns'],['logic','🧭 Maze / colour & shape'],['trace','✏️ Finger tracing'],['paper','📒 Notebook time'],['discover','🌍 Discover the world'],['story','💛 Feelings & habits'],['values','🏡 Family values']];
+const HEROES=[['shivansh','Red flyer'],['aarav','Blue flying suit'],['chiku','Green vine swinger'],['vidu','Purple super hearing'],['snaya','Girl hero — kindness']];
+let ctlBuilt=false,BASE=null;
+function renderCtl(){
+  if(!$('#t-ctl').classList.contains('on'))return;
+  const note=$('#ctlNote');
+  if(!ST){$('#ctlForm').innerHTML='<div class="card"><div class="sub">Waiting for the tablet to send its settings (open the app on the tablet once and finish or save something).</div></div>';ctlBuilt=false;return}
+  const pend=PATCHES.filter(p=>p.id>(HB&&HB.lastPatch|0)).length;
+  note.textContent=pend?`⏳ ${pend} change(s) waiting for the tablet…`:'✅ Tablet is up to date. Changes go to it within a few seconds.';
+  if(ctlBuilt)return;
+  ctlBuilt=true;const e=effective();BASE=JSON.parse(JSON.stringify(e));
+  const f=$('#ctlForm');
+  f.innerHTML=`
+  <details open><summary>👦 Child & schedule</summary>
+    <label>Child's name (used for tracing)</label><input type="text" id="c_name" value="${esc(e.name)}">
+    <label>Next mission number</label><input type="number" id="c_day" min="1" value="${e.day}">
+    <label class="inl"><input type="checkbox" id="c_once" ${e.oncePerDay?'checked':''}> Only one mission per day</label>
+    <label class="inl"><input type="checkbox" id="c_win" ${e.win&&e.win.on?'checked':''}> Allow only between these times</label>
+    <div class="row2"><input type="time" id="c_wf" value="${esc(e.win&&e.win.from||'15:00')}"><input type="time" id="c_wt" value="${esc(e.win&&e.win.to||'17:00')}"></div>
+    <div class="row2"><div><label>Child asks … (name)</label><input type="text" id="c_an" value="${esc(askName())}"></div><div><label>Hindi spelling</label><input type="text" id="c_ah" value="${esc(e.ask&&e.ask.h||'मम्मी')}"></div></div>
+  </details>
+  <details><summary>🔒 Breaks & activities</summary>
+    <label class="inl"><input type="checkbox" id="c_lk" ${e.lock&&e.lock.on?'checked':''}> Lock them until the timer ends</label>
+    <label class="inl"><input type="checkbox" id="c_lc" ${e.lock&&e.lock.confirm?'checked':''}> Child must ask me to confirm when done</label>
+  </details>
+  <details><summary>📚 Content</summary>
+    ${BLOCKS.map(([k,t])=>`<label class="inl"><input type="checkbox" data-blk="${k}" ${(e.content&&e.content.off||[]).includes(k)?'':'checked'}> ${t}</label>`).join('')}
+    <label>Max counting number (0 = automatic)</label><input type="number" id="c_mc" min="0" max="20" value="${e.content&&e.content.maxCount||0}">
+  </details>
+  <details><summary>🔊 Voice & sound</summary>
+    <label class="inl"><input type="checkbox" id="c_vo" ${e.voice&&e.voice.on?'checked':''}> Voice on</label>
+    <label>Voice style</label><select id="c_vm"><option value="dual" ${e.voice&&e.voice.mode==='dual'?'selected':''}>Hindi teacher + English voice</option><option value="single" ${e.voice&&e.voice.mode==='single'?'selected':''}>One Hindi voice</option></select>
+    <label>Speed: <span id="c_vrv">${e.voice&&e.voice.rate}</span></label><input type="range" id="c_vr" min="0.55" max="1.2" step="0.05" value="${e.voice&&e.voice.rate||0.85}" style="width:100%">
+    <label class="inl"><input type="checkbox" id="c_hg" ${e.voice&&e.voice.hinglish?'checked':''}> Read Hindi in English letters (Hinglish)</label>
+    <label class="inl"><input type="checkbox" id="c_sf" ${e.sfx!==false?'checked':''}> Sound effects</label>
+  </details>
+  <details><summary>🎁 Rewards</summary>
+    <label>Real-life reward</label><input type="text" id="c_rw" value="${esc(e.reward||'')}">
+    <label>After every … missions</label><input type="number" id="c_re" min="1" max="30" value="${e.rewardEvery||5}">
+  </details>
+  <details><summary>🦸 Hero names</summary>
+    ${HEROES.map(([k,t])=>`<label>${t}</label><div class="row2"><input type="text" data-hn="${k}" value="${esc(e.heroes&&e.heroes[k]&&e.heroes[k].n||'')}"><input type="text" data-hh="${k}" value="${esc(e.heroes&&e.heroes[k]&&e.heroes[k].h||'')}"></div>`).join('')}
+    <div class="note">Left = shown name, right = Hindi spelling for the voice.</div>
+  </details>
+  <div class="btn-row"><button class="btn-gold" id="c_apply">✔ Send changes to the tablet</button></div>`;
+  $('#c_vr').oninput=ev=>{$('#c_vrv').textContent=ev.target.value};
+  $('#c_apply').onclick=applyCtl;
+}
+function applyCtl(){
+  const g=id=>$('#'+id);
+  const nv={
+    name:g('c_name').value.trim(),day:Math.max(1,parseInt(g('c_day').value)||1),oncePerDay:g('c_once').checked,
+    win:{on:g('c_win').checked,from:g('c_wf').value||'15:00',to:g('c_wt').value||'17:00'},
+    lock:{on:g('c_lk').checked,confirm:g('c_lc').checked},
+    content:{off:[...document.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk),maxCount:Math.max(0,Math.min(20,parseInt(g('c_mc').value)||0))},
+    voice:{on:g('c_vo').checked,mode:g('c_vm').value,rate:parseFloat(g('c_vr').value)||0.85,hinglish:g('c_hg').checked},
+    sfx:g('c_sf').checked,reward:g('c_rw').value.trim(),rewardEvery:Math.max(1,parseInt(g('c_re').value)||5),
+    ask:{n:g('c_an').value.trim()||'Mummy',h:g('c_ah').value.trim()||'मम्मी'},heroes:{}
+  };
+  document.querySelectorAll('[data-hn]').forEach(i=>{const k=i.dataset.hn;nv.heroes[k]=nv.heroes[k]||{};nv.heroes[k].n=i.value.trim()});
+  document.querySelectorAll('[data-hh]').forEach(i=>{const k=i.dataset.hh;nv.heroes[k]=nv.heroes[k]||{};nv.heroes[k].h=i.value.trim()});
+  const set={};
+  for(const k in nv){
+    const a=JSON.stringify(nv[k]);
+    if(k==='voice'||k==='win'||k==='lock'||k==='content'||k==='ask'||k==='heroes'){ /* send only changed sub-keys */
+      const sub={};for(const s in nv[k]){if(JSON.stringify(nv[k][s])!==JSON.stringify((BASE&&BASE[k]||{})[s]))sub[s]=nv[k][s]}
+      if(Object.keys(sub).length)set[k]=sub;
+    }else if(a!==JSON.stringify(BASE&&BASE[k]))set[k]=nv[k];
+  }
+  if(!Object.keys(set).length){toast('Nothing changed');return}
+  sendSet(set);
+}
+async function sendSet(set,msg){
+  try{await api('pset',{set});toast(msg||'Sent to the tablet ✔');ctlBuilt=false;await poll(true)}catch(e){toast('⚠️ '+e.message)}
+}
+
+/* quick actions */
+$('#qPause').onclick=async()=>{try{await api('ppause',{paused:!CTL.paused});toast(!CTL.paused?'Paused ⏸':'Resumed ▶');await poll(false)}catch(e){toast('⚠️ '+e.message)}};
+$('#qExtra').onclick=()=>{const e=effective();const g=e.grant||{};sendSet({grant:{date:today(),extra:(g.date===today()?g.extra|0:0)+1}},'1 extra mission allowed today ➕')};
+$('#qOpen').onclick=()=>sendSet({grant:{open:today()}},'Time window open for today ⏰');
+const CHIPS=['Well done, hero! 🌟','शाबाश बेटा! 🌟','Dinner is ready 🍽️','Time to stop now','Come, give me a hug 🤗'];
+$('#msgChips').innerHTML=CHIPS.map(t=>`<span class="chip">${esc(t)}</span>`).join('');
+$('#msgChips').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('#msgIn').value=c.textContent});
+$('#msgSend').onclick=async()=>{const t=$('#msgIn').value.trim();if(!t)return;try{await api('pmsg',{text:t});$('#msgIn').value='';toast('Message sent 💌')}catch(e){toast('⚠️ '+e.message)}};
+
+/* tabs */
+document.querySelectorAll('nav [data-tab]').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav [data-tab]').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id==='t-'+b.dataset.tab));
+  window.scrollTo(0,0);$('#alertBar').dataset.tab='';
+  if(b.dataset.tab==='ctl')ctlBuilt=false;
+  render();
+});
+
+/* link */
+$('#cfgUrl').value=CFG.url;$('#cfgTok').value=CFG.token;$('#optSound').checked=CFG.sound!==false;
+$('#cfgSave').onclick=async()=>{
+  CFG.url=$('#cfgUrl').value.trim();CFG.token=$('#cfgTok').value.trim();saveCfg();
+  $('#cfgMsg').textContent='Connecting…';
+  try{const j=await api('pping',{});$('#cfgMsg').innerHTML='<span style="color:#2ecc71;font-weight:800">✅ Connected as parent.</span>';firstLoad=true;await poll(true);schedule();toast('Connected ✔');document.querySelector('nav [data-tab=live]').click()}
+  catch(e){$('#cfgMsg').innerHTML='<span class="err">❌ '+esc(e.message)+'</span>'}
+};
+$('#cfgOut').onclick=()=>{CFG.url='';CFG.token='';saveCfg();ST=null;HB=null;REQS=[];try{localStorage.removeItem('pa_state')}catch(e){}$('#cfgUrl').value='';$('#cfgTok').value='';render();toast('Disconnected')};
+$('#optSound').onchange=e=>{CFG.sound=e.target.checked;saveCfg()};
+$('#optTest').onclick=beep;
+
+/* boot */
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>L('sw '+e.message));
+render();
+if(CFG.url&&CFG.token){poll(true);schedule()}else document.querySelector('nav [data-tab=link]').click();
+setInterval(()=>{if(HB){NOW+=1000;renderConn()}},1000);
+</script>
+</body>
+</html>

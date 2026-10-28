@@ -1,9 +1,9 @@
 /* Hero Academy service worker — network-first so updates arrive, cache fallback for offline */
-const CACHE = 'hero-academy-v2.0.1';
-const ASSETS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
+const CACHE = 'hero-academy-v3.1.0';
+const ASSETS = ['./', './index.html', './parent.html', './manifest.webmanifest', './parent.webmanifest', './icon-192.png', './icon-512.png', './parent-192.png', './parent-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then(c => Promise.all(ASSETS.map(a => c.add(a).catch(() => null)))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', e => {
