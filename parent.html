@@ -50,6 +50,7 @@ label.inl{display:flex;align-items:center;gap:10px;font-size:16px;color:var(--in
 label.inl input{width:22px;height:22px;accent-color:#ffb300}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .chip{background:#ffffff14;border:1px solid var(--line);border-radius:99px;padding:7px 12px;font-size:14px;font-weight:700;color:var(--ink)}
+.edrow{border:1px solid var(--line);border-radius:14px;padding:10px;margin:10px 0;background:#ffffff08}
 .req{border:2px solid var(--gold);background:linear-gradient(160deg,#3a2f9f,#251d6e)}
 .req .t{font-size:19px;font-weight:900}
 .req .d{color:var(--mut);margin:4px 0 8px;font-size:14px}
@@ -93,7 +94,9 @@ svg text{fill:#9aa0cf;font-size:10px}
         <div class="tile"><b id="tMission">–</b><span>Next mission</span></div>
         <div class="tile"><b id="tToday">–</b><span>Today</span></div>
         <div class="tile"><b id="tStreak">–</b><span>Day streak</span></div>
-        <div class="tile"><b id="tStars">–</b><span>Total stars</span></div>
+        <div class="tile"><b id="tStars">–</b><span>Stars to spend</span></div>
+        <div class="tile"><b id="tHab">–</b><span>Habits today</span></div>
+        <div class="tile"><b id="tStk">–</b><span>Stickers</span></div>
       </div>
       <div class="card"><h3>Quick actions</h3>
         <div class="btn-row"><button class="btn-gold" id="qPause">⏸ Pause app</button><button id="qExtra">➕ 1 extra mission today</button></div>
@@ -116,6 +119,9 @@ svg text{fill:#9aa0cf;font-size:10px}
       <div class="grid2" id="repTiles"></div>
       <div class="card"><h3>Last 14 missions</h3><div id="repChart"></div><div class="note">Bars = stars, line = minutes</div></div>
       <div class="card"><h3>Needs practice</h3><div id="repWeak" class="note">Nothing yet.</div></div>
+      <div class="card"><h3>Interest meter</h3><div id="repFun" class="note">No ratings yet.</div></div>
+      <div class="card"><h3>Habits — last 7 days</h3><div id="repHab" class="note">No habits yet.</div></div>
+      <div class="card"><h3>Star log</h3><div id="repLed" class="note">No transactions yet.</div></div>
       <div class="card"><h3>Recent missions</h3><div style="overflow-x:auto"><table id="repTable"></table></div></div>
     </section>
 
@@ -222,7 +228,7 @@ function effective(){ /* state + patches the tablet has not applied yet */
 }
 function ago(ms){const s=Math.max(0,Math.round(ms/1000));if(s<60)return s+' s ago';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<48)return h+' h ago';return Math.round(h/24)+' days ago'}
 function streak(hist){const set=new Set((hist||[]).map(h=>h.d));let n=0;const d=new Date();const f=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');if(!set.has(f(d)))d.setDate(d.getDate()-1);while(set.has(f(d))){n++;d.setDate(d.getDate()-1)}return n}
-const TYPE_ICON={check:'✅',skip:'⏭️',extra:'➕',open:'⏰',other:'🙋'};
+const TYPE_ICON0={};const TYPE_ICON={check:'✅',skip:'⏭️',extra:'➕',open:'⏰',habit:'🧹',reward:'🎁',other:'🙋'};
 
 /* render */
 function renderConn(){
@@ -250,7 +256,11 @@ function renderLive(){
   $('#tMission').textContent=ST?ST.day:'–';
   $('#tToday').textContent=ST?(doneToday?`✅ ${doneToday}`:'Not yet'):'–';
   $('#tStreak').textContent=ST?'🔥 '+streak(h):'–';
-  $('#tStars').textContent=ST?'⭐ '+ST.stars:'–';
+  const wal=HB&&HB.wallet!=null?HB.wallet:(ST&&ST.wallet!=null?ST.wallet:null);
+  $('#tStars').textContent=wal!=null?'⭐ '+wal:'–';
+  let hd=HB&&HB.habits;if(!hd&&ST){const a=(ST.habits||[]).filter(x=>x.on!==false),lg=(ST.habitLog||{})[td]||{};hd={done:a.filter(x=>lg[x.id]).length,total:a.length}}
+  $('#tHab').textContent=hd?`${hd.done} / ${hd.total}`:'–';
+  $('#tStk').textContent=ST?'📒 '+new Set((ST.stickers||[]).map(x=>x.e)).size:'–';
   $('#qPause').textContent=CTL.paused?'▶ Resume app':'⏸ Pause app';
 }
 function reqHtml(r,withBtns){
@@ -304,8 +314,23 @@ function renderReport(){
   const weak={};h.forEach(x=>{String(x.weak||'').replace(/([^,()]+?) \((\d+)\)/g,(m,a,n)=>{a=a.trim();weak[a]=(weak[a]||0)+(+n)})});
   const wl=Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,6);
   $('#repWeak').innerHTML=wl.length?wl.map(([a,n])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;color:#e9ebff"><span>${esc(a)}</span><b>${n} wrong tries</b></div>`).join(''):'Nothing yet — no repeated mistakes so far.';
+  const days=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);days.push(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'))}
+  const hb=(ST&&ST.habits||[]).filter(x=>x.on!==false),lg=(ST&&ST.habitLog)||{};
+  $('#repHab').innerHTML=hb.length?`<table><tr><th></th>${days.map(d=>`<th>${d.slice(8)}</th>`).join('')}</tr>${hb.map(x=>`<tr><td>${esc(x.icon)} ${esc(x.title)}</td>${days.map(d=>`<td>${lg[d]&&lg[d][x.id]?'✅':'·'}</td>`).join('')}</tr>`).join('')}</table>`:'No habits yet.';
+  const VN={'mood':'Feelings + word of the day','letter':'Letter sound','word:build':'Build a word','word:pop':'Phonics pop','word:rhyme':'Rhyme radar','count':'Counting','count:add':'Feeding addition','pattern':'Pattern train','logic:maze':'Arrow maze','logic:sort':'Colour & shape','logic:story':'Story order','logic:fmaze':'Finger maze rescue','trace':'Laser tracing','disc:animals':'Animals','disc:weather':'Weather','disc:vehicles':'Vehicles & helpers','disc:riddle':'Who am I? riddles','disc:daytime':'Morning / afternoon / night','disc:wdress':'Weather dress-up','st:feel':'Feelings & habits','st:safe':'Safe or not safe','st:waste':'Wet / dry waste','values':'Family values'};
+  const fun=Object.entries((ST&&ST.fun)||{}).sort((a,b)=>((b[1].u|0)-(b[1].d|0))-((a[1].u|0)-(a[1].d|0)));
+  $('#repFun').innerHTML=fun.length?`<table><tr><th>Game</th><th>😀</th><th>😐</th><th>😴</th><th></th></tr>${fun.map(([k,f])=>`<tr><td>${esc(VN[k]||k)}</td><td>${f.u|0}</td><td>${f.m|0}</td><td>${f.d|0}</td><td>${f.rest>Date.now()?'💤 resting':''}</td></tr>`).join('')}</table><div class="note" style="margin-top:6px">A game marked 😴 three times rests for 7 days automatically.</div>`:'No ratings yet — he rates 3 random games each day.';
+  const led=(ST&&ST.ledger||[]).slice(-15).reverse();
+  $('#repLed').innerHTML=led.length?led.map(x=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ffffff14;color:#e9ebff"><span>${esc(x.d)} · ${esc(x.type)}: ${esc(x.item)}</span><b style="color:${x.amt>0?'#2ecc71':'#ff8a80'}">${x.amt>0?'+':''}${x.amt} → ${x.bal}</b></div>`).join(''):'No transactions yet.';
   $('#repTable').innerHTML='<tr><th>Date</th><th>#</th><th>⭐</th><th>Min</th><th>Mood</th><th>Struggled with</th></tr>'+h.slice(-14).reverse().map(x=>`<tr><td>${esc(x.d)}</td><td>${x.day}</td><td>${x.stars}</td><td>${x.mins??''}</td><td>${esc(x.mood||'')}</td><td>${esc(x.weak||'—')}</td></tr>`).join('');
 }
+
+/* control: habit & reward editors */
+function pHabitRow(h){return `<div class="edrow" data-hid="${esc(h.id)}"><div class="row2" style="grid-template-columns:64px 1fr"><input data-f="icon" value="${esc(h.icon)}" style="text-align:center;font-size:24px"><input data-f="title" value="${esc(h.title)}" placeholder="Title (English)"></div><input data-f="hi" value="${esc(h.hi||'')}" placeholder="Voice line (Hindi)" style="margin-top:6px"><div class="row2" style="margin-top:6px"><select data-f="slot">${['morning','evening','any'].map(x=>`<option value="${x}" ${h.slot===x?'selected':''}>${x}</option>`).join('')}</select><div class="row2"><input type="number" data-f="min" min="0" max="30" value="${h.min|0}" title="timer minutes"><input type="number" data-f="stars" min="1" max="10" value="${h.stars|0||1}" title="stars"></div></div><div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><label class="inl"><input type="checkbox" data-f="approve" ${h.approve?'checked':''}> needs my OK</label><label class="inl"><input type="checkbox" data-f="on" ${h.on!==false?'checked':''}> on</label><button class="btn-no" data-del style="padding:8px 12px">🗑</button></div><div class="note">⏳ timer min · ⭐ stars</div></div>`}
+function pRewardRow(r){return `<div class="edrow" data-rid="${esc(r.id)}"><div class="row2" style="grid-template-columns:64px 1fr 90px"><input data-f="icon" value="${esc(r.icon)}" style="text-align:center;font-size:24px"><input data-f="name" value="${esc(r.name)}"><input type="number" data-f="cost" min="1" max="2000" value="${r.cost|0}" title="stars"></div><div style="display:flex;gap:14px;align-items:center"><label class="inl"><input type="checkbox" data-f="on" ${r.on!==false?'checked':''}> in shop</label><button class="btn-no" data-del style="padding:8px 12px">🗑</button><span class="note">⭐ price</span></div></div>`}
+const pf=(r,f)=>r.querySelector(`[data-f="${f}"]`);
+function pReadHabits(){return [...document.querySelectorAll('#habEd .edrow')].map(r=>({id:r.dataset.hid,icon:pf(r,'icon').value.trim()||'⭐',title:pf(r,'title').value.trim()||'Habit',hi:pf(r,'hi').value.trim(),slot:pf(r,'slot').value,min:Math.max(0,Math.min(30,parseInt(pf(r,'min').value)||0)),stars:Math.max(1,Math.min(10,parseInt(pf(r,'stars').value)||1)),approve:pf(r,'approve').checked,on:pf(r,'on').checked}))}
+function pReadRewards(){return [...document.querySelectorAll('#rwEd .edrow')].map(r=>({id:r.dataset.rid,icon:pf(r,'icon').value.trim()||'🎁',name:pf(r,'name').value.trim()||'Reward',cost:Math.max(1,parseInt(pf(r,'cost').value)||1),on:pf(r,'on').checked}))}
 
 /* control */
 const BLOCKS=[['mood','😊 Feelings check'],['letter','🔤 Letter sound'],['word','🧩 Build a word'],['move','🏃 Move break'],['count','🔢 Counting'],['hands','🧱 Hands-on maths'],['pattern','🎨 Patterns'],['logic','🧭 Maze / colour & shape'],['trace','✏️ Finger tracing'],['paper','📒 Notebook time'],['discover','🌍 Discover the world'],['story','💛 Feelings & habits'],['values','🏡 Family values']];
@@ -327,6 +352,7 @@ function renderCtl(){
     <label class="inl"><input type="checkbox" id="c_once" ${e.oncePerDay?'checked':''}> Only one mission per day</label>
     <label class="inl"><input type="checkbox" id="c_win" ${e.win&&e.win.on?'checked':''}> Allow only between these times</label>
     <div class="row2"><input type="time" id="c_wf" value="${esc(e.win&&e.win.from||'15:00')}"><input type="time" id="c_wt" value="${esc(e.win&&e.win.to||'17:00')}"></div>
+    <div class="row2"><div><label>Phone number to learn</label><input type="text" id="c_ph" inputmode="numeric" value="${esc(e.phone&&e.phone.num||'')}"></div><div><label>Whose?</label><input type="text" id="c_pw" value="${esc(e.phone&&e.phone.who||'')}" placeholder="Mummy"></div></div>
     <div class="row2"><div><label>Child asks … (name)</label><input type="text" id="c_an" value="${esc(askName())}"></div><div><label>Hindi spelling</label><input type="text" id="c_ah" value="${esc(e.ask&&e.ask.h||'मम्मी')}"></div></div>
   </details>
   <details><summary>🔒 Breaks & activities</summary>
@@ -343,10 +369,21 @@ function renderCtl(){
     <label>Speed: <span id="c_vrv">${e.voice&&e.voice.rate}</span></label><input type="range" id="c_vr" min="0.55" max="1.2" step="0.05" value="${e.voice&&e.voice.rate||0.85}" style="width:100%">
     <label class="inl"><input type="checkbox" id="c_hg" ${e.voice&&e.voice.hinglish?'checked':''}> Read Hindi in English letters (Hinglish)</label>
     <label class="inl"><input type="checkbox" id="c_sf" ${e.sfx!==false?'checked':''}> Sound effects</label>
+    <label class="inl"><input type="checkbox" id="c_hx" ${e.haptics!==false?'checked':''}> Vibration on success</label>
   </details>
-  <details><summary>🎁 Rewards</summary>
-    <label>Real-life reward</label><input type="text" id="c_rw" value="${esc(e.reward||'')}">
-    <label>After every … missions</label><input type="number" id="c_re" min="1" max="30" value="${e.rewardEvery||5}">
+  <details><summary>✅ Habits & routines</summary>
+    <div class="note">Icon = any emoji · voice line = what the Hindi voice says · ⏳ timer minutes (0 = none) · “needs OK” = he must ask you.</div>
+    <div id="habEd">${(e.habits||[]).map(pHabitRow).join('')}</div>
+    <div class="btn-row"><button id="habAdd">➕ Add habit</button></div>
+  </details>
+  <details><summary>🛍️ Reward shop</summary>
+    <div id="rwEd">${(e.rewards||[]).map(pRewardRow).join('')}</div>
+    <div class="btn-row"><button id="rwAdd">➕ Add reward</button></div>
+  </details>
+  <details><summary>⭐ Star wallet</summary>
+    <div class="sub">Stars to spend now: <b>${e.wallet|0}</b> · lifetime: ${e.stars|0}</div>
+    <div class="row2" style="margin-top:8px"><input type="number" id="wAmt" placeholder="+10 or -5"><input type="text" id="wNote" placeholder="Reason"></div>
+    <div class="btn-row"><button class="btn-gold" id="wSend">Give / take stars</button></div>
   </details>
   <details><summary>🦸 Hero names</summary>
     ${HEROES.map(([k,t])=>`<label>${t}</label><div class="row2"><input type="text" data-hn="${k}" value="${esc(e.heroes&&e.heroes[k]&&e.heroes[k].n||'')}"><input type="text" data-hh="${k}" value="${esc(e.heroes&&e.heroes[k]&&e.heroes[k].h||'')}"></div>`).join('')}
@@ -355,6 +392,10 @@ function renderCtl(){
   <div class="btn-row"><button class="btn-gold" id="c_apply">✔ Send changes to the tablet</button></div>`;
   $('#c_vr').oninput=ev=>{$('#c_vrv').textContent=ev.target.value};
   $('#c_apply').onclick=applyCtl;
+  const bindDel=()=>document.querySelectorAll('#ctlForm [data-del]').forEach(b=>b.onclick=()=>b.closest('.edrow').remove());bindDel();
+  $('#habAdd').onclick=()=>{$('#habEd').insertAdjacentHTML('beforeend',pHabitRow({id:'h'+Date.now().toString(36),icon:'⭐',title:'New habit',hi:'',slot:'any',min:0,stars:1,approve:false,on:true}));bindDel()};
+  $('#rwAdd').onclick=()=>{$('#rwEd').insertAdjacentHTML('beforeend',pRewardRow({id:'r'+Date.now().toString(36),icon:'🎁',name:'New reward',cost:50,on:true}));bindDel()};
+  $('#wSend').onclick=()=>{const n=parseInt($('#wAmt').value)||0;if(!n){toast('Enter a number like 10 or -5');return}sendSet({walletAdj:{id:'adj'+Date.now().toString(36),amount:n,note:$('#wNote').value.trim()||(n>0?'Bonus from parent':'Taken by parent')}},n>0?`+${n} stars sent ⭐`:`${n} stars`)};
 }
 function applyCtl(){
   const g=id=>$('#'+id);
@@ -364,7 +405,8 @@ function applyCtl(){
     lock:{on:g('c_lk').checked,confirm:g('c_lc').checked},
     content:{off:[...document.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk),maxCount:Math.max(0,Math.min(20,parseInt(g('c_mc').value)||0))},
     voice:{on:g('c_vo').checked,mode:g('c_vm').value,rate:parseFloat(g('c_vr').value)||0.85,hinglish:g('c_hg').checked},
-    sfx:g('c_sf').checked,reward:g('c_rw').value.trim(),rewardEvery:Math.max(1,parseInt(g('c_re').value)||5),
+    phone:{num:g('c_ph').value.replace(/\D/g,'').slice(0,12),who:g('c_pw').value.trim()},
+    sfx:g('c_sf').checked,haptics:g('c_hx').checked,habits:pReadHabits(),rewards:pReadRewards(),
     ask:{n:g('c_an').value.trim()||'Mummy',h:g('c_ah').value.trim()||'मम्मी'},heroes:{}
   };
   document.querySelectorAll('[data-hn]').forEach(i=>{const k=i.dataset.hn;nv.heroes[k]=nv.heroes[k]||{};nv.heroes[k].n=i.value.trim()});
@@ -372,7 +414,7 @@ function applyCtl(){
   const set={};
   for(const k in nv){
     const a=JSON.stringify(nv[k]);
-    if(k==='voice'||k==='win'||k==='lock'||k==='content'||k==='ask'||k==='heroes'){ /* send only changed sub-keys */
+    if(k==='voice'||k==='win'||k==='lock'||k==='content'||k==='ask'||k==='heroes'||k==='phone'){ /* send only changed sub-keys */
       const sub={};for(const s in nv[k]){if(JSON.stringify(nv[k][s])!==JSON.stringify((BASE&&BASE[k]||{})[s]))sub[s]=nv[k][s]}
       if(Object.keys(sub).length)set[k]=sub;
     }else if(a!==JSON.stringify(BASE&&BASE[k]))set[k]=nv[k];
