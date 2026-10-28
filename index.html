@@ -9,7 +9,7 @@
 <link rel="icon" href="icon-192.png">
 <title>Hero Academy</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html,body{margin:0;height:100%;font-family:system-ui,'Segoe UI',Roboto,'Noto Sans Devanagari',sans-serif;background:#1b1f5e;color:#fff;overflow:hidden}
 #app{height:100dvh;display:flex;flex-direction:column;background:radial-gradient(circle at 20% 0%,#3b3fb5,#1b1f5e 62%)}
 #top{display:flex;align-items:center;gap:8px;padding:8px 12px}
@@ -124,7 +124,7 @@ body.test #testChip,body.test #skipBtn{display:inline-block}
   window.addEventListener('unhandledrejection',function(e){window.L('REJ '+(e.reason&&e.reason.message||e.reason))});
   window.L('boot');
 })();
-const APPV='2.0.0';
+const APPV='2.0.1';
 
 /* ---------- helpers ---------- */
 const $=(s,r=document)=>r.querySelector(s);
@@ -900,10 +900,18 @@ function setupWizard(){
     },{note:'Confirm your PIN',onCancel:setupWizard});
   },{note:'4–6 digits. Only grown-ups should know this. You can add fingerprint/face later.',onCancel:()=>{if(!S.sec.hash)setupWizard()}});
 }
-let pressT=null;
+/* Parent entry: tap the gear 5 times quickly (works everywhere) OR hold it 1.5 s.
+   The long-press browser menu (reload/share/print) is blocked on the whole app. */
+document.addEventListener('contextmenu',e=>e.preventDefault());
+let pressT=null,taps=[];
 const gear=$('#gear');
-gear.addEventListener('pointerdown',()=>{pressT=setTimeout(askUnlock,1500)});
+const openGate=()=>{if($('#modal').hidden)askUnlock()};
+gear.addEventListener('pointerdown',()=>{pressT=setTimeout(openGate,1500)});
 ['pointerup','pointerleave','pointercancel'].forEach(ev=>gear.addEventListener(ev,()=>clearTimeout(pressT)));
+gear.addEventListener('click',()=>{
+  const now=Date.now();taps=taps.filter(t=>now-t<3000);taps.push(now);
+  if(taps.length>=5){taps=[];clearTimeout(pressT);openGate()}
+});
 
 /* ---------- parent area ---------- */
 function openParent(firstRun){
