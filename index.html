@@ -233,6 +233,20 @@ button.node{color:#fff;font-family:inherit;text-align:left}
 .pghost{font-size:26px;letter-spacing:6px;opacity:.6;font-weight:800}
 .spark{position:fixed;pointer-events:none;z-index:52;font-size:18px;animation:sparkf .7s ease-out forwards}
 @keyframes sparkf{to{transform:translate(var(--sx),var(--sy)) scale(.3);opacity:0}}
+/* v3.4 */
+.choice.saying{outline:6px solid #fff;outline-offset:3px;transform:scale(1.07);box-shadow:0 0 30px #fff8}
+.numgrid{display:grid;grid-template-columns:repeat(10,minmax(52px,76px));gap:8px;justify-content:center}
+.nc{height:66px;border:0;border-radius:16px;font-size:26px;font-weight:900;background:#ffffff22;color:#fff;font-family:inherit}
+.nc.nx{background:linear-gradient(#ffe45c,#ffb300);color:#3b2a00;box-shadow:0 0 22px #ffc83d;animation:bounce 1s infinite}
+.nc.done{background:#69f0ae55}
+.lbar{display:block;height:28px;border-radius:14px;background:linear-gradient(90deg,#ffca28,#ff7043);box-shadow:inset 0 -4px 0 #0002}
+.devtag{display:inline-block;background:#ff9f1c;color:#3b2a00;border-radius:10px;padding:2px 8px;font-weight:800;font-size:12px}
+.planpg{page:plan;width:277mm;margin:0 auto;font-family:Arial,'Noto Sans Devanagari',sans-serif;color:#111;font-size:8.6pt;break-after:page;page-break-after:always}
+.planpg h1{font-size:16pt;color:#1e3a8a;margin:0 0 4px}.planpg h2{font-size:11.5pt;margin:8px 0 4px;color:#1e3a8a}
+.planpg table{border-collapse:collapse;width:100%}.planpg td,.planpg th{border:1px solid #bbb;padding:3px 4px;vertical-align:top;text-align:left}
+.planpg th{background:#e8eefc;font-size:8.3pt}.planpg tr.wk td{background:#fff3cd;font-weight:700}
+.planpg .box{border:1.5px solid #888;border-radius:8px;padding:5px 9px;margin:6px 0}
+@page plan{size:A4 landscape;margin:8mm}
 #fx{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50}
 #fx span{position:absolute;top:-40px;font-size:30px;animation:fall 1.9s ease-in forwards}
 @keyframes fall{to{transform:translateY(110vh) rotate(360deg);opacity:.2}}
@@ -305,7 +319,7 @@ button.node{color:#fff;font-family:inherit;text-align:left}
   window.addEventListener('unhandledrejection',function(e){window.L('REJ '+(e.reason&&e.reason.message||e.reason))});
   window.L('boot');
 })();
-const APPV='3.3.0';
+const APPV='3.4.0';
 
 /* ---------- helpers ---------- */
 const $=(s,r=document)=>r.querySelector(s);
@@ -350,11 +364,11 @@ const LOOK_DEF={suit:'blue',cape:'red',mask:'gold',emblem:'bolt',extra:'none'};
 const OWN_DEF=['suit:blue','cape:none','cape:red','mask:gold','emblem:bolt','extra:none'];
 const DEF={v:3,name:'',day:1,stars:0,badges:[],history:[],reward:'',rewardEvery:5,oncePerDay:true,
   win:{on:false,from:'15:00',to:'17:00'},content:{off:[],maxCount:0},
-  lock:{on:true,confirm:false},sfx:true,fun:{},phone:{num:'',who:''},phoneOk:0,phoneBadge:false,ask:{n:'Mummy',h:'मम्मी'},grant:{date:'',extra:0,open:''},heroes:JSON.parse(JSON.stringify(HERO_DEF)),
+  lock:{on:true,confirm:false,parent:true},sfx:true,school:null,fun:{},phone:{num:'',who:''},phoneOk:0,phoneBadge:false,ask:{n:'Mummy',h:'मम्मी'},grant:{date:'',extra:0,open:''},heroes:JSON.parse(JSON.stringify(HERO_DEF)),
   voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false,
   wallet:null,ledger:[],habits:JSON.parse(JSON.stringify(DEFAULT_HABITS)),habitLog:{},rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),look:Object.assign({},LOOK_DEF),owned:OWN_DEF.slice(),stickers:[],boxDate:'',haptics:true};
 let S=JSON.parse(JSON.stringify(DEF));
-let LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0}; /* device-only, never synced */
+let LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0,devId:'',devName:''}; /* device-only, never synced */
 const HN=k=>(S.heroes[k]&&S.heroes[k].n)||HERO_DEF[k].n;
 const HH=k=>(S.heroes[k]&&S.heroes[k].h)||HERO_DEF[k].h;
 const fillN=(s,sp)=>String(s).replace(/\[(\w+)\]/g,(m,k)=>HERO_DEF[k]?(sp?HH(k):HN(k)):m);
@@ -370,7 +384,7 @@ const saveLocal=()=>DB.set('local',LOCAL);
 /* ---------- cloud sync (Apps Script + Google Sheet) ---------- */
 function exportable(){const o=JSON.parse(JSON.stringify(S));delete o.sync;delete o.sec;o.test=false;return o}
 async function callSync(action,data){
-  const r=await fetch(S.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:S.sync.token,action,data})});
+  const r=await fetch(S.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:S.sync.token,action,data,dev:LOCAL.devId,devName:LOCAL.devName})});
   const j=await r.json();if(!j.ok)throw new Error(j.error||'sync error');return j;
 }
 let syncing=false;
@@ -466,8 +480,8 @@ function playRec(k,id){return new Promise(async res=>{
 })}
 const PH={shabash:'शाबाश!',wah:'वाह! बहुत बढ़िया!',again:'कोई बात नहीं, फिर से try करो!',star:'एक और star!',listen:'ध्यान से सुनो।',count:'हर एक को touch करो और गिनो!',howmany:'Total कितने हैं?',hello:'नमस्ते! चलो mission शुरू करते हैं!',timeup:'Time पूरा हुआ!',complete:'आज का पूरा mission complete! शाबाश!',trace:'अपनी उंगली से trace करो।',next:'चलो, अगला!',great:'बहुत अच्छे!'};
 const P=k=>({rec:'ph_'+k,t:PH[k]});
-const SND={s:'स्स्स',a:'ऍ',t:'ट',p:'प',i:'इ',n:'न्न',m:'म्म्म',d:'ड',g:'ग',o:'ऑ',c:'क',k:'क',e:'एह',u:'अ',r:'र्र',h:'ह',b:'ब',l:'ल्ल',f:'फ़्फ़',j:'ज'};
-const SNDEN={s:'/s/',a:'/a/',t:'/t/',p:'/p/',i:'/i/',n:'/n/',m:'/m/',d:'/d/',g:'/g/',o:'/o/',c:'/k/',k:'/k/',e:'/e/',u:'/u/',r:'/r/',h:'/h/',b:'/b/',l:'/l/',f:'/f/',j:'/j/'};
+const SND={s:'स्स्स',a:'ऍ',t:'ट',p:'प',i:'इ',n:'न्न',m:'म्म्म',d:'ड',g:'ग',o:'ऑ',c:'क',k:'क',e:'एह',u:'अ',r:'र्र',h:'ह',b:'ब',l:'ल्ल',f:'फ़्फ़',j:'ज',v:'व्व',w:'व',x:'क्स',y:'य',z:'ज़्ज़',q:'क्व'};
+const SNDEN={s:'/s/',a:'/a/',t:'/t/',p:'/p/',i:'/i/',n:'/n/',m:'/m/',d:'/d/',g:'/g/',o:'/o/',c:'/k/',k:'/k/',e:'/e/',u:'/u/',r:'/r/',h:'/h/',b:'/b/',l:'/l/',f:'/f/',j:'/j/',v:'/v/',w:'/w/',x:'/ks/',y:'/y/',z:'/z/',q:'/kw/'};
 const sndP=c=>({rec:'snd_'+c,t:SND[c]});
 let speakId=0,LAST=[];
 function chunks(text){
@@ -487,10 +501,13 @@ function say1(text,lang){return new Promise(res=>{
   try{speechSynthesis.speak(u)}catch(e){fin()}})}
 function segsOf(parts){
   const out=[];
-  const push=(t,l)=>{if(!t)return;const last=out[out.length-1];if(last&&last.l===l&&!last.rec)last.t+=' '+t;else out.push({t,l})};
+  const clean=t=>String(t).replace(/…|\.\.\./g,' ').replace(/\s+/g,' ').trim();
+  const push=(t,l)=>{t=clean(t);if(!t)return;const last=out[out.length-1];if(last&&last.l===l&&!last.rec)last.t+=' '+t;else out.push({t,l})};
   for(const p of parts){
     if(typeof p==='string')push(p,'hi');
     else if(Array.isArray(p))push(p[0],p[1]==='en'&&S.voice.mode!=='single'?'en':'hi');
+    else if(p&&p.pause)out.push({pause:p.pause});
+    else if(p&&p.fn)out.push({fn:p.fn});
     else if(p&&p.rec){if(RECS.has(p.rec))out.push({rec:p.rec});else push(p.t,'hi')}
   }
   return out;
@@ -503,6 +520,8 @@ async function say(...parts){
   const romanAll=S.voice.hinglish||(!voiceFor('hi')&&'speechSynthesis' in window);
   for(const sg of segsOf(parts)){
     if(id!==speakId)return;
+    if(sg.pause){await sleep(sg.pause);continue}
+    if(sg.fn){try{sg.fn()}catch(e){}continue}
     if(sg.rec){if(await playRec(sg.rec,id))continue}
     const roman=sg.l==='hi'&&romanAll;
     const text=roman?deva2rom(sg.t):sg.t,lang=(sg.l==='en'||roman)?'en':'hi';
@@ -592,15 +611,15 @@ function setLead(k){
 function confetti(n=24){const fx=$('#fx');for(let i=0;i<n;i++){const s=el('span','',rnd(['⭐','✨','🎉','💫','🌟']));s.style.left=Math.random()*100+'vw';s.style.animationDelay=Math.random()*.5+'s';fx.appendChild(s);setTimeout(()=>s.remove(),2700)}}
 
 /* ---------- curriculum data ---------- */
-const SEQ='satpinmdgockeurhblfj'.split('');
-const LW={s:['Sun','☀️'],a:['Apple','🍎'],t:['Tiger','🐯'],p:['Pizza','🍕'],i:['Ice-cream','🍦'],n:['Nose','👃'],m:['Moon','🌙'],d:['Dog','🐶'],g:['Goat','🐐'],o:['Octopus','🐙'],c:['Cat','🐱'],k:['Kite','🪁'],e:['Egg','🥚'],u:['Umbrella','☂️'],r:['Rocket','🚀'],h:['Hat','🎩'],b:['Ball','⚽'],l:['Lion','🦁'],f:['Fish','🐟'],j:['Juice','🧃']};
-const WORDS=[['tap','🚰','नल'],['pin','📌','पिन'],['pan','🍳','कड़ाही'],['tin','🥫','डिब्बा'],['nap','😴','झपकी'],['man','👨','आदमी'],['map','🗺️','नक्शा'],['pig','🐷','सूअर'],['dog','🐶','कुत्ता'],['cat','🐱','बिल्ली'],['pot','🍲','बर्तन'],['sun','☀️','सूरज'],['hat','🎩','टोपी'],['pen','🖊️','पेन'],['hen','🐔','मुर्गी'],['bat','🦇','चमगादड़'],['bus','🚌','बस'],['cup','🥤','कप'],['bed','🛏️','बिस्तर'],['bag','👜','बैग'],['net','🥅','जाल'],['nut','🥜','मेवा'],['van','🚐','वैन'],['rat','🐀','चूहा']];
+const SEQ='satpinmdgockeurhblfjvwxyzq'.split('');
+const LW={s:['Sun','☀️'],a:['Apple','🍎'],t:['Tiger','🐯'],p:['Pizza','🍕'],i:['Ice-cream','🍦'],n:['Nose','👃'],m:['Moon','🌙'],d:['Dog','🐶'],g:['Goat','🐐'],o:['Octopus','🐙'],c:['Cat','🐱'],k:['Kite','🪁'],e:['Egg','🥚'],u:['Umbrella','☂️'],r:['Rocket','🚀'],h:['Hat','🎩'],b:['Ball','⚽'],l:['Lion','🦁'],f:['Fish','🐟'],j:['Juice','🧃'],v:['Van','🚐'],w:['Watch','⌚'],x:['X-ray','🩻'],y:['Yo-yo','🪀'],z:['Zebra','🦓'],q:['Queen','👸']};
+const WORDS=[['tap','🚰','नल'],['pin','📌','पिन'],['pan','🍳','कड़ाही'],['tin','🥫','डिब्बा'],['nap','😴','झपकी'],['man','👨','आदमी'],['map','🗺️','नक्शा'],['pig','🐷','सूअर'],['dog','🐶','कुत्ता'],['cat','🐱','बिल्ली'],['pot','🍲','बर्तन'],['sun','☀️','सूरज'],['hat','🎩','टोपी'],['pen','🖊️','पेन'],['hen','🐔','मुर्गी'],['bat','🦇','चमगादड़'],['bus','🚌','बस'],['cup','🥤','कप'],['bed','🛏️','बिस्तर'],['bag','👜','बैग'],['net','🥅','जाल'],['nut','🥜','मेवा'],['van','🚐','वैन'],['rat','🐀','चूहा'],['web','🕸️','मकड़ी का जाला'],['box','📦','डिब्बा'],['fox','🦊','लोमड़ी'],['zip','🤐','ज़िप']];
 const BADGES=['⚡','🛡️','🔥','🦅','🚀','💎','🌟','🦁','🐺','🏹','🔱','🌪️','🧲','🪐','👑','⚔️','🌈','🧿','🥇','🏆'];
 let DAYV=1;
-const letterOf=day=>day<=20?SEQ[day-1]:SEQ[(day*7)%20];
-const learned=day=>SEQ.slice(0,Math.min(20,day));
+const letterOf=day=>day<=26?SEQ[day-1]:SEQ[(day*7)%26];
+const learned=day=>SEQ.slice(0,Math.min(26,day));
 const wordsFor=day=>{const k=learned(day);return WORDS.filter(w=>[...w[0]].every(c=>k.includes(c)))};
-const conflict=(a,b)=>(a==='c'&&b==='k')||(a==='k'&&b==='c');
+const conflict=(a,b)=>{const K=['c','k','q'];return a!==b&&K.includes(a)&&K.includes(b)};
 const kidName=()=>S.name||'hero';
 
 /* ---------- v3.3 game data ---------- */
@@ -614,37 +633,60 @@ const DAYOPT=[['🌅','Morning'],['☀️','Afternoon'],['🌙','Night']];
 const WEATHERS=[{e:'🌧️',w:'Rainy monsoon day',h:'आज बारिश वाला monsoon day है! Hero को क्या चाहिए?',ok:['☂️','Umbrella'],bad:[['🕶️','Sunglasses'],['🧤','Gloves']]},{e:'☀️',w:'Hot sunny afternoon',h:'आज बहुत तेज़ धूप है! Hero को क्या चाहिए?',ok:['🧢','Cap'],bad:[['🧣','Scarf'],['🧥','Sweater']]},{e:'❄️',w:'Cold winter morning',h:'आज ठंडी winter की सुबह है! Hero को क्या चाहिए?',ok:['🧥','Sweater'],bad:[['🩳','Shorts'],['🕶️','Sunglasses']]},{e:'🌧️',w:'Puddles everywhere',h:'बाहर पानी भरा है! पैरों के लिए क्या चाहिए?',ok:['🥾','Rain boots'],bad:[['🩴','Slippers'],['🧦','Only socks']]}];
 const SAFE=[['🧸','Teddy',1,'Teddy से खेलना safe है।'],['📚','Books',1,'Books पढ़ना safe है।'],['🖍️','Crayons',1,'Crayons से drawing करना safe है।'],['⚽','Ball',1,'Ball से खेलना safe है — खुली जगह में।'],['🧩','Puzzle',1,'Puzzle से खेलना safe है।'],['🔌','Plug socket',0,'Socket में कभी उंगली या कोई चीज़ नहीं डालते — current लग सकता है!'],['✂️','Sharp scissors',0,'तेज़ कैंची सिर्फ़ बड़ों के साथ — अकेले नहीं!'],['🔥','Stove and fire',0,'Gas और आग से दूर रहो — जल सकते हैं!'],['💊','Medicines',0,'दवाई सिर्फ़ बड़े देते हैं — खुद कभी नहीं खाते!'],['🔪','Knife',0,'चाकू बड़ों का है — बच्चे नहीं छूते!'],['🧴','Cleaning liquid',0,'सफ़ाई वाला liquid ज़हर जैसा होता है — कभी नहीं छूते!']];
 const WASTE=[['🍌','Banana peel','wet'],['🍎','Apple core','wet'],['🥚','Egg shells','wet'],['🥬','Vegetable peels','wet'],['🍚','Leftover food','wet'],['🍂','Dry leaves','wet'],['🧴','Plastic bottle','dry'],['📄','Paper','dry'],['🥫','Tin can','dry'],['📰','Newspaper','dry'],['🛍️','Plastic bag','dry'],['📦','Cardboard box','dry']];
-const VAR_NAMES={'mood':'Feelings check + word of the day','letter':'Letter sound','word:build':'Build a word','word:pop':'Phonics pop','word:rhyme':'Rhyme radar','count':'Counting','count:add':'Feeding addition','pattern':'Pattern train','logic:maze':'Arrow maze','logic:sort':'Colour & shape','logic:story':'Story order','logic:fmaze':'Finger maze rescue','trace':'Laser tracing','disc:animals':'Animals','disc:weather':'Weather','disc:vehicles':'Vehicles & helpers','disc:riddle':'Who am I? riddles','disc:daytime':'Morning / afternoon / night','disc:wdress':'Weather dress-up','st:feel':'Feelings & habits','st:safe':'Safe or not safe','st:waste':'Wet / dry waste','values':'Family values','move':'Move break','hands':'Hands-on maths','paper':'Notebook time'};
+const VAR_NAMES={'mood':'Feelings check + word of the day','letter':'Letter sound','word:build':'Build a word','word:pop':'Phonics pop','word:rhyme':'Rhyme radar','count':'Counting','count:add':'Feeding addition','pattern':'Pattern train','logic:maze':'Arrow maze','logic:sort':'Colour & shape','logic:story':'Story order','logic:fmaze':'Finger maze rescue','trace':'Laser tracing','disc:animals':'Animals','disc:weather':'Weather','disc:vehicles':'Vehicles & helpers','disc:riddle':'Who am I? riddles','disc:daytime':'Morning / afternoon / night','disc:wdress':'Weather dress-up','st:feel':'Feelings & habits','st:safe':'Safe or not safe','st:waste':'Wet / dry waste','values':'Family values','move':'Move break','hands':'Hands-on maths','paper':'Notebook time','count:moreless':'More or less','count:rocket':'Rocket back-counting','count:size':'Tall–short, long–short','count:fifty':'Count to 50','disc:animalsort':'Wild, pet, farm or water?','disc:aquatic':'Aquatic animals','disc:festivals':'Festivals','disc:calendar':'Days & months','st:tale':'Story time','st:myself':'“Myself” speech','st:rhyme':'Rhyme time'};
 const resting=v=>!!(S.fun&&S.fun[v]&&S.fun[v].rest>Date.now());
 function pickVar(list,day){const d=Math.max(0,day-1);for(let i=0;i<list.length;i++){const v=list[(d+i)%list.length];if(!resting(v))return v}return list[d%list.length]}
 const varWord=d=>pickVar(wordsFor(d).length>=2?['word:build','word:pop','word:build','word:rhyme']:['word:pop','word:rhyme'],d);
 const varLogic=d=>pickVar(['logic:maze','logic:sort','logic:story','logic:fmaze'],d);
-const varDisc=d=>pickVar(['disc:animals','disc:weather','disc:vehicles','disc:riddle','disc:daytime','disc:wdress'],d);
-const varStory=d=>pickVar(['st:feel','st:safe','st:feel','st:waste'],d);
+const varDisc=d=>pickVar(['disc:animals','disc:animalsort','disc:aquatic','disc:festivals','disc:calendar','disc:riddle','disc:weather','disc:vehicles','disc:daytime','disc:wdress'],d);
+const varCountX=d=>pickVar(['count:moreless','count:rocket','count:size','count:fifty'],d);
+const varStory=d=>pickVar(['st:feel','st:tale','st:safe','st:myself','st:feel','st:rhyme','st:waste'],d);
 function setVar(v){if(SESS)SESS.vars[SESS.i]=v}
+
+/* ---------- v3.4: varied praise, option read-out ---------- */
+const PRAISE=[['Shabash!',['शाबाश!']],['Wow, super!',['वाह! Super!']],['Excellent!',[['Excellent!','en']]],['Fantastic!',[['Fantastic!','en']]],['Very good!',[['Very good!','en']]],['You did it!',['कमाल कर दिया!']],['Well done, hero!',[['Well done, hero!','en']]],['Great work!',['बहुत बढ़िया!']],['Amazing!',[['Amazing!','en']]],['Exactly right!',['एकदम सही!']],['Brilliant!',[['Brilliant!','en']]],['You are a star!',[['You are a star!','en']]],['Awesome!',['ज़बरदस्त!']],['High five!',[['High five!','en']]],['Superb!',[['Superb!','en']]],['So clever!',['कितने smart हो आप!']]];
+const TRYAG=[['Try again! 💪',['कोई बात नहीं, फिर से try करो!']],['Almost! One more time!',['अरे, लगभग! एक बार और!']],['Think again!',['थोड़ा और सोचो!']],['You can do it!',[['You can do it!','en'],'फिर से try करो!']],['Listen again and choose!',['ध्यान से सुनो और फिर से चुनो!']]];
+const STARL=[['Another star! ⭐',['एक और star!']],['Star collected! ⭐',[['Star collected!','en']]],['One more star for your jar! ⭐',['Jar के लिए एक और star!']],['Shining star! ⭐',[['Shining star!','en']]]];
+const lastPick={};
+function pickFrom(name,list){let i;do{i=Math.floor(Math.random()*list.length)}while(list.length>1&&i===lastPick[name]);lastPick[name]=i;return list[i]}
+function cheerSay(extraD,extraP){const [d,p]=pickFrom('pr',PRAISE);const parts=[...p];if(RECS.has('ph_shabash')&&Math.random()<.3)parts.splice(0,parts.length,P('shabash'));return hero(extraD?`${d} ${extraD}`:d,[...parts,...(extraP||[])])}
+const OPT_HI={'Help him up and ask "Are you okay?"':'उसे उठाऊँगा और पूछूँगा — तुम ठीक हो?','Laugh':'हँसूँगा','Walk away':'चला जाऊँगा','Wait for my turn':'अपनी turn का wait करूँगा','Push him':'धक्का दूँगा','Cry':'रोऊँगा','Watch the phone':'phone देखूँगा','Wash hands':'hands wash करूँगा','Run around':'भागूँगा','Tidy up the toys':'toys समेटकर रखूँगा','Leave them':'ऐसे ही छोड़ दूँगा','Go to sleep':'सो जाऊँगा','Eat chocolate':'chocolate खाऊँगा','Watch TV':'TV देखूँगा','Brush teeth':'दाँत brush करूँगा','Share and play together':'share करके साथ खेलूँगा','Hide it':'छुपा लूँगा','Say no':'मना कर दूँगा','Share mine and say "It is okay"':'अपनी ice-cream share करूँगा और कहूँगा — कोई बात नहीं','Laugh at him':'उस पर हँसूँगा','Ignore him':'ध्यान नहीं दूँगा','Hit someone':'किसी को मारूँगा','Throw things':'चीज़ें फेंकूँगा','Take a deep breath, tell a grown-up':'गहरी साँस लूँगा और बड़ों को बताऊँगा','Say Namaste and greet them':'Namaste करूँगा','Keep playing on the phone':'phone पर खेलता रहूँगा','Ignore them':'ध्यान नहीं दूँगा','Tell the truth':'सच बताऊँगा','Blame someone else':'किसी और का नाम लगाऊँगा','Give him one':'उसे एक दे दूँगा','Eat both':'दोनों खुद खा लूँगा','Hide them':'छुपा लूँगा','Thank you!':'Thank you बोलूँगा','Nothing':'कुछ नहीं बोलूँगा','I want more':'और चाहिए, बोलूँगा','Help by carrying something small':'छोटा सामान उठाकर help करूँगा','Keep watching TV':'TV देखता रहूँगा','Run away':'भाग जाऊँगा','Sorry! Are you okay?':'Sorry बोलूँगा और पूछूँगा — ठीक हो?','It is not my fault':'बोलूँगा — मेरी गलती नहीं है','Politely, with both hands':'प्यार से, दोनों हाथों से','Throw it to them':'फेंककर दूँगा','Drop it and go':'गिराकर चला जाऊँगा','Use kind words and ask for it':'प्यार से माँगूँगा','Hit him':'उसे मारूँगा','Scream loudly':'ज़ोर से चिल्लाऊँगा','Wait and say "Excuse me"':'इंतज़ार करूँगा और Excuse me बोलूँगा','Shout loudly':'ज़ोर से चिल्लाऊँगा','Keep pulling her':'खींचता रहूँगा','Eating together and talking':'साथ खाना और बातें करना','Eating alone with a phone':'अकेले phone के साथ खाना','Running around':'इधर-उधर भागना'};
+function autoLabel(html){
+  const d=document.createElement('div');d.innerHTML=html;
+  const sm=d.querySelector('small');if(sm){const t=sm.textContent.trim();return t?[t,'en']:null}
+  const sp=d.querySelectorAll('span');
+  if(sp.length>=2){const t=sp[sp.length-1].textContent.trim();if(!t)return null;return OPT_HI[t]?OPT_HI[t]:[t,'en']}
+  const l=d.querySelector('.ltr');if(l){const t=l.textContent.trim();if(/^\d+$/.test(t))return [numWord(+t),'en'];return [t,'en']}
+  return null;
+}
+const numWord=n=>n<=20?NUM[n]:(['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'][Math.floor(n/10)]+(n%10?'-'+NUM[n%10]:''));
 
 /* ---------- session state ---------- */
 let SESS=null,RUNID=0,CURKEY='';
 function noteWrong(){if(SESS&&CURKEY)SESS.wrong[CURKEY]=(SESS.wrong[CURKEY]||0)+1}
 
 /* ---------- generic multiple choice ---------- */
-function ask(stage,{q,sp,opts,correct,cls,head,wrongMsg}){
+function ask(stage,{q,sp,opts,correct,cls,head,wrongMsg,os}){
   return new Promise(res=>{
     if(head)stage.appendChild(el('div','prow',head));
     const wrap=el('div','choices');let wrong=0,locked=false;
+    const hl=i=>{[...wrap.children].forEach((c,k)=>c.classList.toggle('saying',k===i))};
+    const labels=os===false?[]:(os||opts.map(autoLabel));
+    const seq=[...(sp||[q])];
+    if(labels.some(Boolean)){seq.push({pause:700});labels.forEach((lb,i)=>{if(!lb)return;seq.push({fn:()=>hl(i)},lb,{pause:550})});seq.push({fn:()=>hl(-1)})}
     opts.forEach((o,i)=>{
       const b=el('button','choice'+(cls?' '+cls:''),o);wrap.appendChild(b);
       b.onclick=()=>{
-        if(locked)return;
-        if(correct==null||i===correct){locked=true;b.classList.add('ok');SFX.ok();react('cheer');confetti(10);res({i,wrong})}
+        if(locked)return;hl(-1);
+        if(correct==null||i===correct){locked=true;b.classList.add('ok');SFX.ok();react('cheer');confetti(10);stopVoice();res({i,wrong})}
         else{
           wrong++;noteWrong();SFX.no();react('oops');b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),500);
-          if(wrongMsg)hero(wrongMsg[0],wrongMsg[1]);else hero('Try again! 💪',[P('again')]);
+          if(wrongMsg)hero(wrongMsg[0],wrongMsg[1]);else{const [d,pp]=pickFrom('try',TRYAG);hero(d,pp)}
           if(wrong>=2&&wrap.children[correct])wrap.children[correct].classList.add('hint');
         }
       };
     });
-    stage.appendChild(wrap);hero(q,sp);
+    stage.appendChild(wrap);hero(q,seq);
   });
 }
 /* swap in a brand-new stage so any unfinished block from the previous screen can never draw on the new one */
@@ -684,8 +726,8 @@ async function blkLetter(stage,done){
     const target=k===0?t:rnd(pool);
     const others=shuffle(SEQ.filter(x=>x!==target&&!conflict(x,target))).slice(0,2);
     const letters=shuffle([target,...others]);
-    await ask(stage,{q:`Which one starts with the ${SNDEN[target]} sound?`,sp:[sndP(target),'की आवाज़ से कौन सी चीज़ शुरू होती है?'],opts:letters.map(x=>`<span>${LW[x][1]}</span>`),correct:letters.indexOf(target),head:`<span class="bigL" style="font-size:80px">${target.toUpperCase()}</span>`});
-    await hero(`Great! ${target.toUpperCase()} for ${LW[target][0]}`,[P('shabash'),[`${target.toUpperCase()} for ${LW[target][0]}`,'en']]);
+    await ask(stage,{q:`Which one starts with the ${SNDEN[target]} sound?`,sp:[sndP(target),'की आवाज़ से कौन सी चीज़ शुरू होती है?'],opts:letters.map(x=>`<span>${LW[x][1]}</span>`),os:letters.map(x=>[LW[x][0],'en']),correct:letters.indexOf(target),head:`<span class="bigL" style="font-size:80px">${target.toUpperCase()}</span>`});
+    await cheerSay(`${target.toUpperCase()} for ${LW[target][0]}`,[[`${target.toUpperCase()} for ${LW[target][0]}`,'en']]);
   }
   done();
 }
@@ -747,7 +789,7 @@ function phonicsPop(stage){
           b.style.setProperty('--bc',c[0]);b.style.setProperty('--bc2',c[1]);
           b.onclick=()=>{
             if(doneR)return;const bi=$('.bi',b);
-            if(L===t){doneR=true;bi.classList.add('pop');SFX.ok();react('cheer');confetti(12);hero(`Pop! ${t.toUpperCase()} says ${SNDEN[t]}`,['Pop!',sndP(t)]).then(()=>setTimeout(next,300))}
+            if(L===t){doneR=true;bi.classList.add('pop');SFX.ok();react('cheer');confetti(12);cheerSay(`${t.toUpperCase()} says ${SNDEN[t]}`,[sndP(t)]).then(()=>setTimeout(next,300))}
             else{wrong++;noteWrong();SFX.no();bi.classList.remove('no');void bi.offsetWidth;bi.classList.add('no');hero('Listen again!',[P('listen'),sndP(t)])}
           };
           wrap.appendChild(b);
@@ -765,9 +807,9 @@ async function rhymeRadar(stage){
     const [tg,ok,bad]=RHYMES[(DAYV*3+k)%RHYMES.length];
     const opts=shuffle([ok,...bad]);
     stage.appendChild(el('div','card',`<div class="pic">${tg[0]}</div><div class="cap">${tg[1]}</div>`));
-    const sp=[[tg[1],'en'],'…',...opts.flatMap(o=>[[o[1],'en'],'…']),'कौन सा word',[tg[1],'en'],'के साथ rhyme करता है — यानी आख़िर में same आवाज़?'];
+    const sp=[[tg[1],'en'],{pause:400},'कौन सा word',[tg[1],'en'],'के साथ rhyme करता है? सुनो —'];
     await ask(stage,{q:`Which word rhymes with ${tg[1].toUpperCase()}?`,sp,opts:opts.map(o=>`<span>${o[0]}</span><small>${o[1]}</small>`),correct:opts.indexOf(ok)});
-    await hero(`${tg[1]} — ${ok[1]}! Same sound at the end!`,[[`${tg[1]}… ${ok[1]}!`,'en'],'दोनों की आवाज़ आख़िर में एक जैसी है!']);
+    await cheerSay(`${tg[1]} — ${ok[1]}!`,[[tg[1],'en'],{pause:300},[ok[1],'en'],{pause:200},'दोनों की आवाज़ आख़िर में एक जैसी है!']);
   }
 }
 async function blkWord(stage,done){
@@ -786,41 +828,41 @@ async function blkWord(stage,done){
 const OFF={
   move(day){
     const L=[
-      ['Jump like a hero 10 times! Count out loud: one, two, three…','Hero की तरह ten बार ऊँचा jump करो! हर jump पर गिनती बोलो — one, two, three!'],
-      ['Walk like a lion, then an elephant, then hop like a frog!','पहले lion की तरह चलो, फिर elephant की तरह, फिर frog की तरह कूदो!'],
-      ['Freeze dance! Dance when the music plays, freeze when it stops.','Freeze dance! Music बजे तो नाचो, music रुके तो statue बन जाओ!'],
-      ['Stand on one leg and count to 10. Now the other leg!','एक पैर पर खड़े होकर ten तक गिनो। फिर दूसरे पैर पर!'],
-      ['Hands up, hands down, turn around, clap — 5 times!','Hands up, hands down, घूमो, ताली बजाओ — five बार!'],
-      [`Fly like ${HN('shivansh')}! Arms out and zoom around the room 3 times.`,`${HH('shivansh')} की तरह उड़ो! हाथ फैलाओ और कमरे के three चक्कर लगाओ!`],
-      ['Traffic light game! GREEN = run on the spot, YELLOW = get ready, RED = FREEZE!','Traffic light game! Green मतलब दौड़ो, Yellow मतलब तैयार हो जाओ, Red मतलब freeze — रुक जाओ!',1]];
+      ['Jump like a hero 10 times! Count out loud: one, two, three…','Hero की तरह ten बार ऊँचा jump करो! हर jump पर गिनती बोलो — one, two, three!',0,1],
+      ['Walk like a lion, then an elephant, then hop like a frog!','पहले lion की तरह चलो, फिर elephant की तरह, फिर frog की तरह कूदो!',0,2],
+      ['Freeze dance! Dance when the music plays, freeze when it stops.','Freeze dance! Music बजे तो नाचो, music रुके तो statue बन जाओ!',0,2],
+      ['Stand on one leg and count to 10. Now the other leg!','एक पैर पर खड़े होकर ten तक गिनो। फिर दूसरे पैर पर!',0,1],
+      ['Hands up, hands down, turn around, clap — 5 times!','Hands up, hands down, घूमो, ताली बजाओ — five बार!',0,1],
+      [`Fly like ${HN('shivansh')}! Arms out and zoom around the room 3 times.`,`${HH('shivansh')} की तरह उड़ो! हाथ फैलाओ और कमरे के three चक्कर लगाओ!`,0,1],
+      ['Traffic light game! GREEN = run on the spot, YELLOW = get ready, RED = FREEZE!','Traffic light game! Green मतलब दौड़ो, Yellow मतलब तैयार हो जाओ, Red मतलब freeze — रुक जाओ!',1,2]];
     const x=L[(day-1)%L.length];
-    return {icon:'🏃',lead:'shivansh',title:x[2]?'Traffic light game':'Move break',traffic:!!x[2],text:x[0],sp:x[1],parent:x[2]?'Watch the screen together — the light changes by itself.':'Join in — it is more fun together.',mat:'Open floor space (and music for freeze dance).',ask:x[2]?'Did he freeze on red every time?':'Can he count out loud while moving?',min:3};
+    return {icon:'🏃',lead:'shivansh',title:x[2]?'Traffic light game':'Move break',traffic:!!x[2],text:x[0],sp:x[1],parent:x[2]?'Watch the screen together — the light changes by itself.':'Join in — it is more fun together.',mat:'Open floor space (and music for freeze dance).',ask:x[2]?'Did he freeze on red every time?':'Can he count out loud while moving?',min:x[3]};
   },
   hands(day){
     const N=Math.min(20,5+day);
     const L=[
-      [`Bring ${N} small things (blocks, spoons, pencils). Touch each one and count. How many?`,`घर से ${NUM[N]} छोटी चीज़ें लाओ — blocks, spoons, pencils। हर चीज़ को छूकर गिनो। Total कितनी हुईं?`,'One touch per object. If he skips one, count again together.',`${N} small objects — blocks, spoons, pencils, bottle caps`,'How many in all? Touch each one as you count.'],
-      ['Make two piles — one with MORE, one with LESS. Which is more? Which is less?','दो ढेर बनाओ — एक में ज़्यादा, एक में कम। बताओ, कौन सा more है? कौन सा less?','Match items one-to-one between piles; the leftover pile has more.','Any small objects — buttons, beans, toy cars','Which pile has MORE? How do you know?'],
-      ['Make a pattern with blocks: red, blue, red, blue… What comes next?','Blocks से pattern बनाओ — red, blue, red, blue… अब next क्या आएगा?','Start with AB, then try AABB.','Coloured blocks, clips or bottle caps (2–3 colours)','What comes next? Which colour?'],
-      ['From fruits and vegetables, find the things that are RED and ROUND.','फल और सब्ज़ियों में से वो चीज़ें ढूँढो जो red भी हों और round भी!','Two rules at the same time — colour AND shape.','A few fruits and vegetables, two baskets','Which ones are red AND round?'],
-      ['Hold two things. Which is HEAVY? Which is LIGHT? Then find something BIG and something SMALL.','दोनों हाथों में एक-एक चीज़ उठाओ। कौन सी heavy है? कौन सी light?','Ask him to guess first, then check by lifting.','Two household items (e.g. a book and a pencil)','Which is heavier? Which is lighter?'],
-      ['Build a tower of 5 blocks. Add 2 more. How many now?','Five blocks का tower बनाओ। अब two blocks और जोड़ो। अब कितने हुए? गिनकर देखो!','This is early addition — always with real objects.','7 blocks or small cups','5 and 2 more — how many in all?'],
-      ['Take 6 things. Take away 2. How many are left?','Six चीज़ें लो, two हटा दो। कितनी बचीं? गिनकर check करो!','Subtraction = taking away. Recount to check.','6 small objects and a bowl','6, take away 2 — how many are left?'],
-      ['Coin time! Drop ₹1 coins into a box one by one and count them. Then find the coin with 5 on it and the coin with 10 on it.','Coin time! ₹1 के coins एक-एक करके box में डालो और गिनो। फिर वो coin ढूँढो जिस पर 5 लिखा है, और जिस पर 10 लिखा है।','Recognise and count only. Swapping 5 × ₹1 for ₹5 can wait until about age 6–7.','Some ₹1, ₹2, ₹5 and ₹10 coins and a small box','How many ₹1 coins? Which coin has 5 on it?']];
+      [`Bring ${N} small things (blocks, spoons, pencils). Touch each one and count. How many?`,`घर से ${NUM[N]} छोटी चीज़ें लाओ — blocks, spoons, pencils। हर चीज़ को छूकर गिनो। Total कितनी हुईं?`,'One touch per object. If he skips one, count again together.',`${N} small objects — blocks, spoons, pencils, bottle caps`,'How many in all? Touch each one as you count.',3],
+      ['Make two piles — one with MORE, one with LESS. Which is more? Which is less?','दो ढेर बनाओ — एक में ज़्यादा, एक में कम। बताओ, कौन सा more है? कौन सा less?','Match items one-to-one between piles; the leftover pile has more.','Any small objects — buttons, beans, toy cars','Which pile has MORE? How do you know?',3],
+      ['Make a pattern with blocks: red, blue, red, blue… What comes next?','Blocks से pattern बनाओ — red, blue, red, blue… अब next क्या आएगा?','Start with AB, then try AABB.','Coloured blocks, clips or bottle caps (2–3 colours)','What comes next? Which colour?',3],
+      ['From fruits and vegetables, find the things that are RED and ROUND.','फल और सब्ज़ियों में से वो चीज़ें ढूँढो जो red भी हों और round भी!','Two rules at the same time — colour AND shape.','A few fruits and vegetables, two baskets','Which ones are red AND round?',2],
+      ['Find something TALL and something SHORT, then something LONG and something SHORT.','घर में कोई TALL चीज़ और कोई SHORT चीज़ ढूँढो। फिर कोई LONG और कोई SHORT चीज़।','This is this month’s school concept (tall–short, long–short).','Household things — bottles, pencils, ribbons, spoons','Which is taller? Which is longer?',3],
+      ['Build a tower of 5 blocks. Add 2 more. How many now?','Five blocks का tower बनाओ। अब two blocks और जोड़ो। अब कितने हुए? गिनकर देखो!','This is early addition — always with real objects.','7 blocks or small cups','5 and 2 more — how many in all?',3],
+      ['Take 6 things. Take away 2. How many are left?','Six चीज़ें लो, two हटा दो। कितनी बचीं? गिनकर check करो!','Subtraction = taking away. Recount to check.','6 small objects and a bowl','6, take away 2 — how many are left?',2],
+      ['Coin time! Drop ₹1 coins into a box one by one and count them. Then find the coin with 5 on it and the coin with 10 on it.','Coin time! ₹1 के coins एक-एक करके box में डालो और गिनो। फिर वो coin ढूँढो जिस पर 5 लिखा है, और जिस पर 10 लिखा है।','Recognise and count only. Swapping 5 × ₹1 for ₹5 can wait until about age 6–7.','Some ₹1, ₹2, ₹5 and ₹10 coins and a small box','How many ₹1 coins? Which coin has 5 on it?',3]];
     const x=L[(day-1)%L.length];
-    return {icon:'🧱',lead:'shivansh',title:'Hands-on maths',text:x[0],sp:x[1],parent:x[2],mat:x[3],ask:x[4],min:7};
+    return {icon:'🧱',lead:'shivansh',title:'Hands-on maths',text:x[0],sp:x[1],parent:x[2],mat:x[3],ask:x[4],min:x[5]};
   },
   paper(day){
     const t=letterOf(day),T=t.toUpperCase(),nm=S.name?S.name.toUpperCase():'your name';
     const L=[
-      [`Write ${T} and ${t} three times each in your notebook.`,`Copy में आज का letter ${T} और छोटा ${t} three-three बार लिखो।`,'Check the pencil grip; no need to press hard.','What sound does this letter make?'],
-      [`Trace your name ${nm} on dotted lines.`,`बड़ों से copy में dotted line से अपना नाम लिखवाओ और उस पर pencil चलाओ।`,'Write the name in CAPITALS with dots; let him go over it.','Can you read the first letter of your name?'],
-      ['Draw standing lines and sleeping lines: | — | — then make a ladder!','Standing line और sleeping line बनाओ, फिर उनसे ladder बनाओ!','Standing = vertical, sleeping = horizontal.','Which lines are standing? Which are sleeping?'],
-      [`Write ${T} and draw something that starts with ${T}.`,`${T} लिखो, और ${T} से शुरू होने वाली किसी चीज़ की drawing बनाओ।`,'Praise the effort, not how the drawing looks.','What did you draw? What sound does it start with?'],
-      ['Draw a triangle, a square and a circle — then make a rocket with them!','Triangle, square और circle बनाओ — फिर उनसे rocket बनाओ!','Combining shapes prepares for tangram puzzles.','Which shapes did you use?'],
-      [`Try writing ${nm} — follow the dots a grown-up makes.`,`अपना नाम लिखने की कोशिश करो — बड़ों के बनाए dots पर चलो।`,'Reduce the dots a little every week.','Can you point to each letter of your name?']];
+      [`Write ${T} and ${t} three times each in your notebook.`,`Copy में आज का letter ${T} और छोटा ${t} three-three बार लिखो।`,'Check the pencil grip; no need to press hard.','What sound does this letter make?',3],
+      [`Trace your name ${nm} on dotted lines.`,`बड़ों से copy में dotted line से अपना नाम लिखवाओ और उस पर pencil चलाओ।`,'Write the name in CAPITALS with dots; let him go over it.','Can you read the first letter of your name?',3],
+      ['Draw standing lines and sleeping lines: | — | — then make a ladder!','Standing line और sleeping line बनाओ, फिर उनसे ladder बनाओ!','Standing = vertical, sleeping = horizontal.','Which lines are standing? Which are sleeping?',3],
+      [`Write ${T} and draw something that starts with ${T}.`,`${T} लिखो, और ${T} से शुरू होने वाली किसी चीज़ की drawing बनाओ।`,'Praise the effort, not how the drawing looks.','What did you draw? What sound does it start with?',4],
+      ['Draw a heart, a circle and a triangle — then colour the heart!','Heart, circle और triangle बनाओ — फिर heart में रंग भरो!','Heart is this month’s school shape.','Which shape did you colour?',3],
+      [`Try writing ${nm} — follow the dots a grown-up makes.`,`अपना नाम लिखने की कोशिश करो — बड़ों के बनाए dots पर चलो।`,'Reduce the dots a little every week.','Can you point to each letter of your name?',3]];
     const x=L[(day-1)%L.length];
-    return {icon:'📒',lead:'chiku',title:'Notebook time',text:x[0],sp:x[1],parent:x[2],mat:'Notebook, pencil and eraser',ask:x[3],min:6};
+    return {icon:'📒',lead:'chiku',title:'Notebook time',text:x[0],sp:x[1],parent:x[2],mat:'Notebook, pencil and eraser',ask:x[3],min:x[4]};
   }
 };
 /* grown-up verification (PIN or the tablet's fingerprint/face) */
@@ -831,45 +873,49 @@ function parentConfirm(onOk,title){
   },{note:'A grown-up confirms the activity was really done.',bio:bioAvail()&&!!LOCAL.bioId,onBio:()=>{$('#modal').hidden=true;onOk()}});
 }
 async function offline(stage,done,o){
-  const locked=S.lock.on&&!S.test,remote=liveOn();
+  const parentOnly=S.lock.parent!==false&&!S.test,locked=!parentOnly&&S.lock.on&&!S.test,remote=liveOn()&&LIVE.role!=='test';
   setLead(o.lead);
   const wrap=el('div','off');
   wrap.innerHTML=`${o.traffic?'':`<div class="ic">${o.icon}</div>`}<div class="st">${esc(o.text)}</div>${o.mat&&!o.traffic?`<div class="mat">🧰 You need: ${esc(o.mat)}</div>`:''}<div class="pr">For grown-ups: ${esc(o.parent)}</div><div class="offrow">${o.traffic?'<div class="tlight"><i class="r"></i><i class="y"></i><i class="g"></i></div>':''}<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" class="rbg"/><circle cx="60" cy="60" r="52" class="rfg" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><div class="tm">${o.min}:00</div></div></div>`;
   stage.appendChild(wrap);
   const total=o.min*60000,endAt=Date.now()+total;let fin=false,half=false,finished=false;
+  const tm=$('.tm',wrap),rf=$('.rfg',wrap);
+  const complete=()=>{if(finished)return;finished=true;clearInterval(iv);SFX.win();done()};
   if(o.traffic){
-    const L={r:['Red — FREEZE!','Red — freeze! रुक जाओ!'],y:['Yellow — get ready!','Yellow — तैयार हो जाओ!'],g:['Green — GO! Run on the spot!','Green — go! दौड़ो!']};
+    const TL={r:['Red — FREEZE!','Red','रुक जाओ!'],y:['Yellow — get ready!','Yellow','तैयार हो जाओ!'],g:['Green — GO! Run on the spot!','Green','दौड़ो!']};
     let cur='';
     const step=()=>{
-      if(!document.body.contains(wrap)||fin)return;
-      if(!LIVE.paused){
-        const nx=rnd(['r','y','g'].filter(c=>c!==cur));cur=nx;
-        wrap.querySelectorAll('.tlight i').forEach(i=>i.classList.toggle('on',i.classList.contains(nx)));
-        SFX.tap();hero(L[nx][0],[[L[nx][1].split(' — ')[0],'en'],'—',L[nx][1].split(' — ')[1]]);
-      }
+      if(!document.body.contains(wrap)||finished)return;
+      if(!LIVE.paused){const nx=rnd(['r','y','g'].filter(c=>c!==cur));cur=nx;wrap.querySelectorAll('.tlight i').forEach(i=>i.classList.toggle('on',i.classList.contains(nx)));SFX.tap();hero(TL[nx][0],[[TL[nx][1],'en'],{pause:200},TL[nx][2]])}
       setTimeout(step,3500+Math.random()*3000);
     };
     setTimeout(step,2500);
   }
-  const tm=$('.tm',wrap),rf=$('.rfg',wrap);
-  const needConfirm=locked&&S.lock.confirm;
-  const b=el('button','btn',locked?'🔒 Done unlocks when the timer ends':'Done ✔');
-  b.disabled=locked;
-  const complete=()=>{if(finished)return;finished=true;clearInterval(iv);SFX.win();done()};
-  async function askCheck(){
-    const r=await askMummy('check',`${o.title} finished`,o.text,()=>parentConfirm(complete));
+  async function askCheck(kind){
+    const r=await askMummy(kind,`${o.title}${kind==='skip'?': wants to skip':' finished'}`,o.text,()=>parentConfirm(complete,'Grown-up: activity done?'));
     if(r.status==='approved')complete();
-    else if(r.status==='offline')parentConfirm(complete);
+    else if(r.status==='offline')parentConfirm(complete,'Grown-up: activity done?');
     else if(r.status==='denied')hero(`${AW().n} says: ${r.note||'Please do it once more!'}`,[`${AW().h} कहती हैं —`,r.note||'एक बार फिर से करो!']);
     else if(r.status==='expired')hero(`${AW().n} did not answer yet. Try again!`,[`${AW().h} ने अभी जवाब नहीं दिया। फिर से पूछो!`]);
   }
-  b.onclick=()=>{if(b.disabled)return;if(needConfirm){if(remote)askCheck();else parentConfirm(complete)}else complete()};
-  stage.appendChild(b);
-  if(locked){
-    const lk=el('div','row');lk.style.cssText='display:flex;gap:16px;flex-wrap:wrap;justify-content:center';
-    if(remote){const a=el('button','link',`Ask ${esc(AW().n)} to skip`);a.onclick=async()=>{const r=await askMummy('skip',`${o.title}: wants to skip`,o.text,()=>parentConfirm(complete,'Grown-up skip'));if(r.status==='approved')complete();else if(r.status==='denied')hero(`${AW().n} says: ${r.note||'Not now — do it first!'}`,[`${AW().h} कहती हैं —`,r.note||'पहले यह करो!'])};lk.appendChild(a)}
-    const g=el('button','link','Grown-up: skip with PIN');g.onclick=()=>parentConfirm(complete,'Grown-up skip');lk.appendChild(g);
-    stage.appendChild(lk);
+  let b;
+  if(parentOnly){
+    /* practical task: only a grown-up can mark it done (phone approval or PIN) — the timer is just a guide */
+    b=el('button','btn',remote?`🙋 Done? Ask ${esc(AW().n)} to check`:'🙋 Done? Call a grown-up to check');
+    b.onclick=()=>{if(remote)askCheck('check');else parentConfirm(complete,'Grown-up: activity done?')};
+    stage.appendChild(b);
+    const g=el('button','link','Grown-up here: mark done with PIN');g.onclick=()=>parentConfirm(complete,'Grown-up: activity done?');stage.appendChild(g);
+  }else{
+    const needConfirm=locked&&S.lock.confirm;
+    b=el('button','btn',locked?'🔒 Done unlocks when the timer ends':'Done ✔');b.disabled=locked;
+    b.onclick=()=>{if(b.disabled)return;if(needConfirm){if(remote)askCheck('check');else parentConfirm(complete)}else complete()};
+    stage.appendChild(b);
+    if(locked){
+      const lk=el('div','row');lk.style.cssText='display:flex;gap:16px;flex-wrap:wrap;justify-content:center';
+      if(remote){const a=el('button','link',`Ask ${esc(AW().n)} to skip`);a.onclick=()=>askCheck('skip');lk.appendChild(a)}
+      const g=el('button','link','Grown-up: skip with PIN');g.onclick=()=>parentConfirm(complete,'Grown-up skip');lk.appendChild(g);
+      stage.appendChild(lk);
+    }
   }
   const tick=()=>{
     if(!document.body.contains(wrap)){clearInterval(iv);return}
@@ -877,11 +923,178 @@ async function offline(stage,done,o){
     const left=Math.max(0,endAt-Date.now()),secs=Math.ceil(left/1000);
     tm.textContent=Math.floor(secs/60)+':'+String(secs%60).padStart(2,'0');
     rf.style.strokeDashoffset=String(326.7*(1-left/total));
-    if(!half&&left<total/2&&left>3000){half=true;hero('Keep going — you are doing great!',['बहुत बढ़िया! करते रहो, आप बहुत अच्छा कर रहे हो!'])}
-    if(left===0&&!fin){fin=true;SFX.star();b.disabled=false;b.textContent=needConfirm?(remote?`Ask your ${AW().n} to check ✔`:'Grown-up: check & confirm ✔'):'I did it! ✔';b.classList.add('glow');hero('Time is up! Press the button.',[P('timeup'),needConfirm?(remote?`अब अपनी ${AW().h} से check करवाओ।`:'अब बड़ों को check करने के लिए बुलाओ।'):'अब बटन दबाओ।'])}
+    if(!half&&left<total/2&&left>3000&&!o.traffic){half=true;const [d,pp]=pickFrom('pr',PRAISE);hero(`${d} Keep going!`,[...pp,'करते रहो!'])}
+    if(left===0&&!fin){fin=true;SFX.star();b.classList.add('glow');
+      if(parentOnly)hero(`Time is up! Show ${AW().n} what you did.`,[P('timeup'),`अब अपनी ${AW().h} को दिखाओ कि आपने क्या किया!`]);
+      else{b.disabled=false;b.textContent=locked&&S.lock.confirm?(remote?`Ask your ${AW().n} to check ✔`:'Grown-up: check & confirm ✔'):'I did it! ✔';hero('Time is up! Press the button.',[P('timeup'),'अब बटन दबाओ।'])}}
   };
   const iv=setInterval(tick,500);tick();
   hero(o.text,[o.sp]);
+}
+
+/* ===== v3.4 School Connect games ===== */
+const SCHOOL_DEF={month:'October 2026',theme:'Cleanliness',letters:'A K M N V W X Y Z',numbers:'8 9 10 11',countTo:50,backFrom:10,shape:'heart',colour:'white',
+  rhymes:[{t:'Incy Wincy Spider',e:'🕷️',url:'https://youtu.be/QjGPmnuAalY'},{t:'Are You Sleeping?',e:'😴',url:'https://youtu.be/yzzpwUIFmRQ'}],
+  myself:{mother:'',father:'',age:'5',klass:'Nursery',school:'Apollo Juniors, Tragad',food:'',colour:''}};
+const SCH=()=>Object.assign({},SCHOOL_DEF,S.school||{});
+const listOf=s=>String(s||'').split(/[\s,]+/).map(x=>x.trim()).filter(Boolean);
+const SCHOOL_HABITS=[{id:'s1',icon:'🚽',title:'Flush after using the toilet',hi:'Toilet के बाद flush करो और hands wash करो।',slot:'any',min:0,stars:1,approve:false,on:true},{id:'s2',icon:'🤧',title:'Wipe nose with a napkin',hi:'नाक साफ़ करनी हो तो napkin या tissue use करो।',slot:'any',min:0,stars:1,approve:false,on:true},{id:'s3',icon:'🗑️',title:'Throw rubbish in the dustbin',hi:'कचरा हमेशा dustbin में डालो।',slot:'any',min:0,stars:1,approve:false,on:true},{id:'s4',icon:'💅',title:'Nails cut and hair oiled (weekly)',hi:'इस हफ़्ते nails कटवाओ और बालों में तेल लगवाओ।',slot:'evening',min:0,stars:1,approve:true,on:true}];
+function rocketCount(stage){
+  return new Promise(res=>{
+    stage.innerHTML='';
+    const top=Math.max(5,Math.min(20,SCH().backFrom|0||10));
+    const rk=el('div','pic','🚀');rk.style.transition='transform 1.4s ease-in';
+    const g=el('div','field');let next=top;
+    shuffle([...Array(top+1).keys()]).forEach(n=>{
+      const b=el('button','item',`<span style="font-size:38px;font-weight:900">${n}</span>`);
+      b.onclick=()=>{
+        if(n===next){b.style.visibility='hidden';SFX.tap();say([NUM[n],'en']);next--;
+          if(next<0){SFX.win();rk.style.transform='translateY(-120vh)';react('cheer');confetti(40);hero('Blast off!',[['Zero, blast off!','en'],{pause:200},'Rocket उड़ गया!']).then(()=>setTimeout(res,500))}}
+        else{noteWrong();SFX.no();b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400);hero(`Find ${next}`,['अब',[NUM[next],'en'],'ढूँढो!'])}
+      };
+      g.appendChild(b);
+    });
+    stage.append(rk,g);
+    hero(`Rocket launch! Count back from ${top}. Tap ${top}, then ${top-1}…`,['Rocket launch! उल्टी गिनती करो —',[`${NUM[top]}, ${NUM[top-1]}, ${NUM[top-2]}`,'en'],{pause:200},'zero तक!']);
+  });
+}
+async function sizeGame(stage){
+  const TALL=[['🌳','tree'],['🦒','giraffe'],['🏠','house'],['🌻','sunflower'],['🧍','boy']];
+  for(let k=0;k<3;k++){
+    stage.innerHTML='';
+    const want=Math.random()<.5?'big':'small';
+    if(k!==1){
+      const [e,n]=rnd(TALL),order=shuffle(['big','small']);
+      const opts=order.map(z=>`<span style="font-size:${z==='big'?118:54}px;line-height:1">${e}</span>`);
+      const W=want==='big'?'TALL':'SHORT';
+      await ask(stage,{q:`Which ${n} is ${W}?`,sp:['कौन सा',[n,'en'],[W.toLowerCase(),'en'],'है?'],opts,os:false,correct:order.indexOf(want)});
+      await cheerSay(`That ${n} is ${W.toLowerCase()}.`,[[`${n} is ${W.toLowerCase()}`,'en']]);
+    }else{
+      const order=shuffle(['big','small']);
+      const opts=order.map(z=>`<span style="display:flex;align-items:center;gap:4px"><i class="lbar" style="width:${z==='big'?230:80}px"></i><span style="font-size:34px">✏️</span></span>`);
+      const W=want==='big'?'LONG':'SHORT';
+      await ask(stage,{q:`Which pencil is ${W}?`,sp:['कौन सी pencil',[W.toLowerCase(),'en'],'है?'],opts,os:false,correct:order.indexOf(want),cls:'wide'});
+      await cheerSay(`That pencil is ${W.toLowerCase()}.`,[[`The pencil is ${W.toLowerCase()}`,'en']]);
+    }
+  }
+}
+function countTo(stage){
+  return new Promise(res=>{
+    stage.innerHTML='';
+    const N=Math.max(10,Math.min(50,SCH().countTo|0||20));
+    const g=el('div','numgrid');let next=1;const cells=[];
+    for(let n=1;n<=N;n++){
+      const c=el('button','nc',String(n));
+      c.onclick=()=>{
+        if(n!==next)return;
+        c.classList.remove('nx');c.classList.add('done');SFX.tap();say([numWord(n),'en']);next++;
+        if(next>N){SFX.win();react('cheer');confetti(50);cheerSay(`You counted to ${N}!`,[[`You counted to ${numWord(N)}!`,'en']]).then(()=>setTimeout(res,400))}
+        else cells[next-1].classList.add('nx');
+      };
+      cells.push(c);g.appendChild(c);
+    }
+    cells[0].classList.add('nx');stage.appendChild(g);
+    hero(`Count with me to ${N}! Tap the glowing number.`,['मेरे साथ',[numWord(N),'en'],'तक गिनो! चमकते number को touch करो।']);
+  });
+}
+const ANIMALS=[['🦁','Lion','wild'],['🐯','Tiger','wild'],['🐘','Elephant','wild'],['🦒','Giraffe','wild'],['🐒','Monkey','wild'],['🐻','Bear','wild'],['🐶','Dog','pet'],['🐱','Cat','pet'],['🦜','Parrot','pet'],['🐰','Rabbit','pet'],['🐄','Cow','farm'],['🐐','Goat','farm'],['🐔','Hen','farm'],['🐑','Sheep','farm'],['🐴','Horse','farm'],['🐬','Dolphin','water'],['🐳','Whale','water'],['🐙','Octopus','water'],['🦀','Crab','water'],['🐢','Turtle','water'],['🦈','Shark','water']];
+const AHOME={wild:['🌳','Wild','#43a047','#1b5e20','जंगल में रहने वाला wild animal'],pet:['🏠','Pet','#ff8a65','#e64a19','घर में रहने वाला pet animal'],farm:['🚜','Farm','#ffb300','#e68a00','farm पर रहने वाला domestic animal'],water:['🌊','Water','#42a5f5','#1565c0','पानी में रहने वाला aquatic animal']};
+async function animalSort(stage){
+  const items=shuffle(ANIMALS).slice(0,6);
+  for(const it of items){
+    stage.innerHTML='';
+    stage.appendChild(el('div','card',`<div class="pic">${it[0]}</div><div class="cap">${it[1]}</div>`));
+    const n=el('div','navbig');
+    await new Promise(next=>{
+      Object.keys(AHOME).forEach(k=>{const h=AHOME[k];nbtn(n,h[0],h[1],h[2],h[3],async()=>{
+        if(k===it[2]){SFX.ok();react('cheer');confetti(10);await cheerSay(`The ${it[1].toLowerCase()} is a ${h[1].toLowerCase()} animal.`,[[it[1],'en'],'—',h[4],'!']);next()}
+        else{noteWrong();SFX.no();hero('Think again!',['सोचो —',[it[1],'en'],'कहाँ रहता है?'])}
+      })});
+      stage.appendChild(n);
+      hero(`Where does the ${it[1].toLowerCase()} live? Wild, pet, farm or water?`,[[it[1],'en'],'कहाँ रहता है?',{pause:500},[`Wild`,'en'],{pause:300},['Pet','en'],{pause:300},['Farm','en'],{pause:300},['or water?','en']]);
+    });
+  }
+}
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+async function calendarGame(stage){
+  stage.innerHTML='';
+  stage.appendChild(el('div','card',`<div class="pic">📅</div><div class="cap">Days of the week</div>`));
+  const sing=()=>hero(DAYS.join(', '),['चलो, days of the week बोलते हैं —',{pause:300},[DAYS.join(', '),'en']]);
+  await sing();await waitBtn(stage,"Let's play ▶");
+  for(let k=0;k<3;k++){
+    stage.innerHTML='';const i=ri(0,5),ans=DAYS[i+1];
+    const opts=shuffle([ans,...shuffle(DAYS.filter(d=>d!==ans&&d!==DAYS[i])).slice(0,2)]);
+    await ask(stage,{q:`What comes after ${DAYS[i]}?`,sp:[[DAYS[i],'en'],'के बाद कौन सा day आता है?'],opts:opts.map(d=>`<span>📅</span><small>${d}</small>`),correct:opts.indexOf(ans)});
+    await cheerSay(`${DAYS[i]}, ${ans}!`,[[`${DAYS[i]}, ${ans}!`,'en']]);
+  }
+  stage.innerHTML='';
+  stage.appendChild(el('div','card',`<div class="pic">🗓️</div><div class="cap">Months of the year</div>`));
+  await hero(MONTHS.join(', '),['अब months of the year —',{pause:300},[MONTHS.join(', '),'en']]);
+  await waitBtn(stage,'Question ▶');
+  for(let k=0;k<2;k++){
+    stage.innerHTML='';const i=ri(0,10),ans=MONTHS[i+1];
+    const opts=shuffle([ans,...shuffle(MONTHS.filter(d=>d!==ans&&d!==MONTHS[i])).slice(0,2)]);
+    await ask(stage,{q:`What comes after ${MONTHS[i]}?`,sp:[[MONTHS[i],'en'],'के बाद कौन सा month आता है?'],opts:opts.map(d=>`<span>🗓️</span><small>${d}</small>`),correct:opts.indexOf(ans)});
+    await cheerSay(`${MONTHS[i]}, ${ans}!`,[[`${MONTHS[i]}, ${ans}!`,'en']]);
+  }
+}
+const TALES=[
+ {t:'Two Silly Goats',e:'🐐',story:[['🐐🌉🐐','Two goats came to a narrow bridge from two sides.','दो बकरियाँ एक पतले पुल पर दोनों तरफ़ से आईं।'],['😠','Each goat shouted, "Move! I will go first!"','दोनों चिल्लाईं — हटो! पहले मैं जाऊँगी!'],['💦','They pushed and pushed — splash! Both fell into the river.','दोनों ने धक्का दिया — छपाक! दोनों नदी में गिर गईं।'],['🤝','Next time they took turns, and both crossed safely.','अगली बार उन्होंने बारी-बारी से पुल पार किया, और दोनों safe रहीं।']],
+  q:'What should the two goats do on the bridge?',hq:'पुल पर दोनों बकरियों को क्या करना चाहिए?',o:[['🤝','Take turns','बारी-बारी से जाना'],['💪','Push hard','ज़ोर से धक्का देना'],['📢','Shout loudly','ज़ोर से चिल्लाना']],moral:'Taking turns keeps everyone safe.',hm:'बारी-बारी से करने में सबका भला है।'},
+ {t:'The Elephant and the Ant',e:'🐘',story:[['🐘🐜','An elephant and a tiny ant went for a walk. The elephant was big and strong.','एक हाथी और एक छोटी चींटी साथ में घूमने निकले। हाथी बहुत बड़ा और ताकतवर था।'],['😏','The elephant laughed: "You are so small! How can you help anyone?"','हाथी हँसा — तुम तो इतनी छोटी हो! तुम किसी की क्या help करोगी?'],['🥵','Soon the elephant was very thirsty, but tall grass hid the pond.','थोड़ी देर बाद हाथी को बहुत प्यास लगी, पर ऊँची घास के पीछे तालाब छिपा था।'],['🌼','The ant climbed a flower, saw the water and showed the way.','चींटी एक फूल पर चढ़ी, उसने पानी देखा और रास्ता दिखाया।'],['💧😊','The elephant drank and said, "Thank you, little friend!"','हाथी ने पानी पिया और कहा — thank you, छोटी दोस्त!']],
+  q:'Who helped the elephant find water?',hq:'हाथी को पानी किसने ढूँढकर दिया?',o:[['🐜','The tiny ant','छोटी चींटी'],['🦁','A lion','एक शेर'],['🐟','A fish','एक मछली']],moral:'Big or small, everyone can help.',hm:'छोटा हो या बड़ा, हर कोई help कर सकता है।'}];
+async function taleGame(stage){
+  const T=TALES[DAYV%TALES.length];
+  stage.innerHTML='';
+  stage.appendChild(el('div','card',`<div class="pic">${T.e}</div><div class="cap">Story time: ${esc(T.t)}</div>`));
+  await hero(`Story time: ${T.t}!`,['चलो, story सुनते हैं —',[T.t,'en'],'!']);
+  await waitBtn(stage,'Start ▶');
+  for(let i=0;i<T.story.length;i++){
+    stage.innerHTML='';const [em,en,hi]=T.story[i];
+    stage.appendChild(el('div','scene',`<div class="pic pop">${em}</div><div class="cap">${esc(en)}</div>`));
+    await hero(en,[hi]);
+    await waitBtn(stage,i<T.story.length-1?'Next ▶':'Question ▶');
+  }
+  stage.innerHTML='';
+  const opts=shuffle(T.o.map((x,i)=>({x,ok:i===0})));
+  await ask(stage,{q:T.q,sp:[T.hq],opts:opts.map(o=>`<span>${o.x[0]}</span><span>${esc(o.x[1])}</span>`),os:opts.map(o=>o.x[2]),correct:opts.findIndex(o=>o.ok),cls:'txt'});
+  await cheerSay(T.moral,[T.hm]);
+}
+async function myselfGame(stage){
+  const m=SCH().myself||{},nm=S.name||'';
+  const L=[['👋','Good morning everyone!'],nm&&['😊',`My name is ${nm}.`],m.mother&&['👩',`My mother's name is ${m.mother}.`],m.father&&['👨',`My father's name is ${m.father}.`],m.age&&['🎂',`I am ${m.age} years old.`],m.klass&&['🏫',`I study in ${m.klass} class.`],m.school&&['🎒',`I study at ${m.school}.`],m.food&&['🍽️',`My favourite food is ${m.food}.`],m.colour&&['🎨',`My favourite colour is ${m.colour}.`],['❤️','I love my family very much.'],['🙏','Thank you!']].filter(Boolean);
+  stage.innerHTML='';
+  stage.appendChild(el('div','card',`<div class="pic">🎤</div><div class="cap">Little speaker: “Myself”</div><div class="sub">Stand up, big smile, look at the grown-up!</div>`));
+  await hero('Let us practise your “Myself” speech!',['चलो, अपनी Myself speech की practice करते हैं! खड़े हो जाओ और smile करो!']);
+  await waitBtn(stage,'Ready ▶');
+  for(const [e,line] of L){
+    stage.innerHTML='';
+    stage.appendChild(el('div','scene',`<div class="pic pop">${e}</div><div class="bigL" style="font-size:clamp(30px,5vw,52px)">${esc(line)}</div>`));
+    await hero(line,['मेरे साथ बोलो —',{pause:200},[line,'en']]);
+    await waitBtn(stage,'I said it! 🗣️');SFX.tap();
+  }
+  SFX.win();confetti(40);react('cheer');
+  await cheerSay('Great speech!',[['Great speech!','en'],'आप तो बहुत अच्छे speaker हो!']);
+}
+async function rhymeTime(stage){
+  const list=SCH().rhymes||[];if(!list.length)return;
+  const r=list[DAYV%list.length];
+  stage.innerHTML='';
+  stage.appendChild(el('div','card',`<div class="pic">${esc(r.e||'🎵')}</div><div class="cap">Rhyme time: ${esc(r.t)}</div><div class="sub">Sing it with actions together!</div>`));
+  hero(`Rhyme time! Let's sing ${r.t} with actions.`,['Rhyme time! चलो,',[r.t,'en'],'मिलकर actions के साथ गाते हैं!']);
+  if(r.url){const g=el('button','link','Grown-up: play the school video');g.onclick=()=>parentConfirm(()=>{try{window.open(r.url,'_blank')}catch(e){}},'Grown-up: open video?');stage.appendChild(g)}
+  await waitBtn(stage,'We sang it! 🎵');SFX.win();confetti(30);
+  await cheerSay('Lovely singing!');
+}
+const COLOUR_THINGS={white:['☁️','🥛','🐑','🦢','⚪'],red:['🍎','🍅','🚒','🌹'],yellow:['🍌','🌻','🐥','🌽'],green:['🥦','🐸','🌳','🥒'],blue:['🐳','💙','🧊','🫐'],orange:['🍊','🥕','🎃'],pink:['🌸','🐷','🩷'],brown:['🐻','🥔','🪵'],black:['🎱','🖤','🕷️'],purple:['🍇','🍆','💜']};
+async function colourFind(stage){
+  const c=String(SCH().colour||'').toLowerCase();if(!COLOUR_THINGS[c])return;
+  stage.innerHTML='';
+  const okE=rnd(COLOUR_THINGS[c]),others=shuffle(Object.keys(COLOUR_THINGS).filter(x=>x!==c)).slice(0,2).map(x=>rnd(COLOUR_THINGS[x]));
+  const opts=shuffle([okE,...others]);
+  await ask(stage,{q:`Find something ${c.toUpperCase()}!`,sp:['कोई',[c,'en'],'चीज़ ढूँढो!'],opts:opts.map(x=>`<span>${x}</span>`),os:false,correct:opts.indexOf(okE)});
+  await cheerSay(`${c[0].toUpperCase()+c.slice(1)}!`,[[c,'en'],'— this month’s school colour!'.replace('— this month’s school colour!','')]);
 }
 
 /* ===== Counting ===== */
@@ -973,16 +1186,20 @@ async function blkCount(stage,done){
     let nums=[...new Set([N,N+1,Math.max(1,N-1),N+2])].filter(x=>x!==N);
     const opts=shuffle([N,...shuffle(nums).slice(0,2)]);
     await ask(stage,{q:'How many are there?',sp:[P('howmany')],opts:opts.map(x=>`<span class="ltr">${x}</span>`),correct:opts.indexOf(N)});
-    await hero(`Yes! ${N}`,['बिल्कुल सही!',[NUM[N],'en'],'!']);
+    await cheerSay(`${N}!`,[[NUM[N],'en']]);
   }
   if(DAYV>=10){setVar('count:add');await feedAdd(stage,ri(1,5),ri(1,4))}else{setVar('count');await feed(stage,ri(lo,Math.min(mx,12)),rnd(FRUIT))}
-  if(DAYV>=3){
+  const cx=DAYV>=3?varCountX(DAYV):'';
+  if(cx==='count:rocket')await rocketCount(stage);
+  else if(cx==='count:size')await sizeGame(stage);
+  else if(cx==='count:fifty')await countTo(stage);
+  else if(cx==='count:moreless'){
     stage.innerHTML='';
     const a=ri(2,9);let b=ri(2,9);if(b===a)b=a+1;
     const ea=rnd(FRUIT);let eb=rnd(FRUIT);if(eb===ea)eb=FRUIT[(FRUIT.indexOf(ea)+1)%FRUIT.length];
     const more=Math.random()<.5,correct=more?(a>b?0:1):(a<b?0:1);
-    await ask(stage,{q:more?'Which group has MORE?':'Which group has LESS?',sp:['किस group में',[more?'more':'less','en'],'है?'],opts:[ea.repeat(a),eb.repeat(b)],correct,cls:'wide'});
-    await hero('Well done!',[P('shabash')]);
+    await ask(stage,{q:more?'Which group has MORE?':'Which group has LESS?',sp:['किस group में',[more?'more':'less','en'],'है?'],opts:[ea.repeat(a),eb.repeat(b)],os:false,correct,cls:'wide'});
+    await cheerSay();
   }
   done();
 }
@@ -1004,7 +1221,7 @@ async function blkPattern(stage,done){
     const q=$('.car.q',train);q.textContent=ans;q.classList.remove('q');
     [523,659,523].forEach((f,i)=>tone(f,.25,'square',.06,i*.18));
     await sleep(350);train.classList.add('go');
-    await hero('Choo-choo! The train is off!',['छुक-छुक! Train चल पड़ी!']);
+    await cheerSay('Choo-choo!',['छुक-छुक! Train चल पड़ी!']);
   }
   done();
 }
@@ -1128,13 +1345,14 @@ async function blkMaze(stage,done){
 /* ===== Colour AND shape sorting ===== */
 const COLS=[['blue','🔵','🟦'],['red','🔴','🟥'],['green','🟢','🟩'],['yellow','🟡','🟨']];
 async function blkSort(stage,done){
+  await colourFind(stage);
   for(let k=0;k<3;k++){
     stage.innerHTML='';
     const [c1,c2]=shuffle(COLS).slice(0,2),round=Math.random()<.5;
     const shape=round?'round':'square',idx=round?1:2,other=round?2:1;
     const opts=shuffle([c1[idx],c1[other],c2[idx],c2[other]]);
     await ask(stage,{q:`Pick the one that is ${c1[0].toUpperCase()} and ${shape.toUpperCase()}.`,sp:['वो चुनो जो',[c1[0],'en'],'भी हो और',[shape,'en'],'भी!'],opts:opts.map(x=>`<span>${x}</span>`),correct:opts.indexOf(c1[idx])});
-    await hero('Correct!',['सही चुना!']);
+    await cheerSay();
   }
   done();
 }
@@ -1142,7 +1360,8 @@ async function blkSort(stage,done){
 /* ===== Tracing ===== */
 function shapePath(g,kind,W,H){
   const cx=W/2,cy=H/2,r=Math.min(W,H)*0.36;g.beginPath();
-  if(kind==='circle')g.arc(cx,cy,r,0,Math.PI*2);
+  if(kind==='heart'){g.moveTo(cx,cy+r*.95);g.bezierCurveTo(cx-r*1.6,cy+r*.1,cx-r*.9,cy-r*1.15,cx,cy-r*.35);g.bezierCurveTo(cx+r*.9,cy-r*1.15,cx+r*1.6,cy+r*.1,cx,cy+r*.95);g.closePath()}
+  else if(kind==='circle')g.arc(cx,cy,r,0,Math.PI*2);
   else if(kind==='square')g.rect(cx-r,cy-r,2*r,2*r);
   else if(kind==='triangle'){g.moveTo(cx,cy-r);g.lineTo(cx+r*1.1,cy+r*0.8);g.lineTo(cx-r*1.1,cy+r*0.8);g.closePath()}
   else{for(let i=0;i<10;i++){const rr=i%2?r*0.45:r,a=-Math.PI/2+i*Math.PI/5;g[i?'lineTo':'moveTo'](cx+rr*Math.cos(a),cy+rr*Math.sin(a))}g.closePath()}
@@ -1192,28 +1411,32 @@ function traceOne(stage,item){
       if(!drawing)return;drawing=false;
       if(finished)return;
       const s=score();
-      if(s.cov>=0.5&&s.out<=0.6){finished=true;clearTimeout(skipTimer);SFX.ok();react('cheer');confetti(24);await hero('Beautiful tracing!',['वाह! कितना सुंदर trace किया!']);res()}
+      if(s.cov>=0.5&&s.out<=0.6){finished=true;clearTimeout(skipTimer);SFX.ok();react('cheer');confetti(24);await cheerSay('Beautiful tracing!');res()}
       else if(s.out>0.6){noteWrong();SFX.no();hero('Try to stay inside the lines.',['थोड़ा line के अंदर रहो। फिर से try करो!'])}
       else hero('Good! Colour a little more.',['बहुत अच्छे! थोड़ा और रंग भरो।']);
     });
     cv.addEventListener('pointercancel',()=>{drawing=false});
   });
 }
+function traceThird(day){
+  const sc=SCH(),sl=listOf(sc.letters),sn=listOf(sc.numbers),num=((day-1)%20)+1,k=day%5;
+  if(k===0&&S.name)return {t:S.name.toUpperCase(),d:`Now your name: ${S.name.toUpperCase()}`,sp:['अब अपना नाम —',[S.name,'en']],label:'his name'};
+  if(k===1&&sl.length){const L=sl[day%sl.length].toUpperCase();return {t:L,d:`School letter: ${L}`,sp:['School का letter —',[L,'en']],label:'school letter '+L}}
+  if(k===3&&sn.length){const n=sn[day%sn.length];return {t:n,d:`School number: ${n}`,sp:['School का number —',[numWord(+n)||n,'en']],label:'school number '+n}}
+  if(k===4){const sh=sc.shape&&['heart','circle','triangle','square','star'].includes(sc.shape)&&day%2?sc.shape:['circle','triangle','square','star','heart'][day%5];return {shape:sh,d:`Trace the ${sh}.`,sp:['अब इस',[sh,'en'],'पर चलो।'],label:sh}}
+  return {t:String(num),d:`Now the number ${num}.`,sp:['अब number',[NUM[num],'en'],'।'],label:'number '+num};
+}
 async function blkTrace(stage,done){
   const t=letterOf(DAYV),T=t.toUpperCase();
-  const shapes=['circle','triangle','square','star'];
   const items=[{t:T,d:`Trace ${T} with your finger.`,sp:[P('trace'),[T,'en']]},{t:t,d:`Now small ${t}.`,sp:['अब छोटा',[t,'en'],'।']}];
   setVar('trace');
-  const num=((DAYV-1)%20)+1;
-  if(S.name&&DAYV%2===0)items.push({t:S.name.toUpperCase(),d:`Now your name: ${S.name.toUpperCase()}`,sp:['अब अपना नाम —',[S.name,'en']]});
-  else if(DAYV%3===0){const sh=shapes[DAYV%4];items.push({shape:sh,d:`Trace the ${sh}.`,sp:['अब इस',[sh,'en'],'पर चलो।']})}
-  else items.push({t:String(num),d:`Now the number ${num}.`,sp:['अब number',[NUM[num],'en'],'।']});
+  items.push(traceThird(DAYV));
   for(const it of items){stage.innerHTML='';hero(it.d,it.sp);await traceOne(stage,it)}
   done();
 }
 
 /* ===== Discover the world ===== */
-const DISC={
+const DISC_X=0;const DISC={
   0:[
     {e:'🦁',n:'Lion',f:'The lion lives in the forest. It eats meat.',hf:'यह है Lion। Lion forest में रहता है — यानी जंगल में। Lion meat खाता है।',q:'Where does the lion live?',hq:'Lion कहाँ रहता है?',o:[['🌳','Forest'],['🌊','Water'],['❄️','Snow']],a:0},
     {e:'🐘',n:'Elephant',f:'The elephant eats grass and leaves.',hf:'यह है Elephant, यानी हाथी। Elephant grass और leaves खाता है।',q:'What does the elephant eat?',hq:'Elephant क्या खाता है?',o:[['🍖','Meat'],['🌿','Grass & leaves'],['🍫','Chocolate']],a:1},
@@ -1241,7 +1464,7 @@ async function riddles(stage){
     stage.appendChild(el('div','pic','❓'));
     await ask(stage,{q:r.c+' Who am I?',sp:[r.h],opts:opts.map(x=>`<span>${x}</span>`),correct:opts.indexOf(r.e)});
     stage.innerHTML='';stage.appendChild(el('div','pic pop',r.e));stage.appendChild(el('div','cap',r.n));
-    await hero(`Yes! I am the ${r.n}!`,['हाँ! मैं हूँ',[r.n,'en'],'!']);
+    await cheerSay(`I am the ${r.n}!`,['मैं हूँ',[r.n,'en'],'!']);
   }
 }
 async function daytime(stage){
@@ -1249,7 +1472,7 @@ async function daytime(stage){
     stage.innerHTML='';
     const q=DAYQ[(DAYV*3+k)%DAYQ.length];
     await ask(stage,{q:q.q,sp:[q.h],opts:DAYOPT.map(o=>`<span>${o[0]}</span><small>${o[1]}</small>`),correct:q.a});
-    await hero(`Yes — ${DAYOPT[q.a][1]}!`,['हाँ —',[DAYOPT[q.a][1],'en'],'!']);
+    await cheerSay(`${DAYOPT[q.a][1]}!`,[[DAYOPT[q.a][1],'en']]);
   }
 }
 async function weatherDress(stage){
@@ -1266,13 +1489,29 @@ async function weatherDress(stage){
     await hero(`Ready! ${w.ok[1]} for a ${w.w.toLowerCase()}!`,['बिल्कुल सही! अब hero',[w.ok[1],'en'],'के साथ तैयार है!']);
   }
 }
+DISC[3]=[
+ {e:'🐬',n:'Dolphin',f:'The dolphin lives in the sea. It is very clever and loves to jump.',hf:'यह है Dolphin। Dolphin sea में रहती है, बहुत clever है और उछलना पसंद करती है।',q:'Where does the dolphin live?',hq:'Dolphin कहाँ रहती है?',o:[['🌊','Sea'],['🌳','Forest'],['🏜️','Desert']],a:0},
+ {e:'🐙',n:'Octopus',f:'The octopus lives in the sea and has eight arms!',hf:'यह है Octopus। इसके eight arms होते हैं — आठ हाथ!',q:'How many arms does an octopus have?',hq:'Octopus के कितने arms होते हैं?',o:[['8️⃣','Eight'],['2️⃣','Two'],['4️⃣','Four']],a:0},
+ {e:'🦀',n:'Crab',f:'The crab has a hard shell and walks sideways.',hf:'यह है Crab, यानी केकड़ा। Crab sideways चलता है — तिरछा!',q:'How does a crab walk?',hq:'Crab कैसे चलता है?',o:[['↔️','Sideways'],['🦘','Jumping'],['🕊️','Flying']],a:0},
+ {e:'🐳',n:'Whale',f:'The whale is the biggest animal in the sea.',hf:'यह है Whale। Whale sea का सबसे बड़ा animal है।',q:'Which is the biggest animal in the sea?',hq:'Sea का सबसे बड़ा animal कौन है?',o:[['🦀','Crab'],['🐳','Whale'],['🐟','Fish']],a:1},
+ {e:'🐢',n:'Turtle',f:'The turtle has a hard shell on its back and swims slowly.',hf:'यह है Turtle, यानी कछुआ। इसकी पीठ पर hard shell होता है।',q:'What does a turtle have on its back?',hq:'Turtle की पीठ पर क्या होता है?',o:[['🛡️','A hard shell'],['🪽','Wings'],['🎒','A school bag']],a:0}];
+DISC[4]=[
+ {e:'🪔',n:'Diwali',f:'On Diwali we light diyas, make rangoli and share sweets.',hf:'Diwali पर हम दीये जलाते हैं, rangoli बनाते हैं और मिठाई बाँटते हैं।',q:'On which festival do we light diyas?',hq:'किस festival पर हम दीये जलाते हैं?',o:[['🪔','Diwali'],['🎨','Holi'],['🪁','Uttarayan']],a:0},
+ {e:'🎨',n:'Holi',f:'On Holi we play with colours and say "Happy Holi!"',hf:'Holi पर हम रंगों से खेलते हैं और Happy Holi बोलते हैं।',q:'Which festival do we play with colours?',hq:'किस festival में रंगों से खेलते हैं?',o:[['🎄','Christmas'],['🎨','Holi'],['🪔','Diwali']],a:1},
+ {e:'🪁',n:'Uttarayan',f:'On Uttarayan we fly kites from the terrace.',hf:'Uttarayan पर हम छत से पतंग उड़ाते हैं — Kai po che!',q:'On which festival do we fly kites?',hq:'किस festival पर पतंग उड़ाते हैं?',o:[['🪁','Uttarayan'],['🎄','Christmas'],['🎨','Holi']],a:0},
+ {e:'💃',n:'Navratri',f:'On Navratri we dance garba for nine nights.',hf:'Navratri में हम nine nights तक garba करते हैं।',q:'On which festival do we dance garba?',hq:'किस festival में garba करते हैं?',o:[['💃','Navratri'],['🪁','Uttarayan'],['🌙','Eid']],a:0},
+ {e:'🧵',n:'Raksha Bandhan',f:'On Raksha Bandhan a sister ties a rakhi on her brother.',hf:'Raksha Bandhan पर बहन भाई को राखी बाँधती है।',q:'On which festival does a sister tie a rakhi?',hq:'किस festival पर बहन राखी बाँधती है?',o:[['🧵','Raksha Bandhan'],['🎨','Holi'],['🎄','Christmas']],a:0},
+ {e:'🌙',n:'Eid',f:'On Eid people wear new clothes, hug and share sweet sevaiyan.',hf:'Eid पर लोग नए कपड़े पहनते हैं, गले मिलते हैं और मीठी सेवइयाँ बाँटते हैं।',q:'On which festival do we say "Eid Mubarak"?',hq:'किस festival पर Eid Mubarak बोलते हैं?',o:[['🌙','Eid'],['🪁','Uttarayan'],['💃','Navratri']],a:0},
+ {e:'🎄',n:'Christmas',f:'On Christmas we decorate a tree and Santa brings gifts.',hf:'Christmas पर हम tree सजाते हैं और Santa gifts लाता है।',q:'On which festival do we decorate a tree?',hq:'किस festival पर tree सजाते हैं?',o:[['🎄','Christmas'],['🪔','Diwali'],['🧵','Raksha Bandhan']],a:0}];
 async function blkDiscover(stage,done){
   const v=varDisc(DAYV);setVar(v);
-  if(v==='disc:riddle')await riddles(stage);
+  if(v==='disc:animalsort')await animalSort(stage);
+  else if(v==='disc:calendar')await calendarGame(stage);
+  else if(v==='disc:riddle')await riddles(stage);
   else if(v==='disc:daytime')await daytime(stage);
   else if(v==='disc:wdress')await weatherDress(stage);
   else{
-    const list=DISC[{'disc:animals':0,'disc:weather':1,'disc:vehicles':2}[v]],base=(Math.floor((DAYV-1)/3)*2)%list.length;
+    const list=DISC[{'disc:animals':0,'disc:weather':1,'disc:vehicles':2,'disc:aquatic':3,'disc:festivals':4}[v]],base=(Math.floor((DAYV-1)/3)*2)%list.length;
     for(let k=0;k<2;k++){
       const it=list[(base+k)%list.length];
       stage.innerHTML='';
@@ -1283,7 +1522,7 @@ async function blkDiscover(stage,done){
       await waitBtn(stage,'Question ▶');
       stage.innerHTML='';
       await ask(stage,{q:it.q,sp:[it.hq],opts:it.o.map(x=>`<span>${x[0]}</span><small>${x[1]}</small>`),correct:it.a});
-      await hero('Well done! You know so much!',['शाबाश! आपको तो सब पता है!']);
+      await cheerSay();
     }
   }
   done();
@@ -1362,21 +1601,25 @@ async function phoneGame(stage){
     hero(memory?`Can you dial ${who}'s number from memory?`:`Let's learn ${who}'s phone number. Press the numbers you see.`,[memory?`क्या आप बिना देखे ${who} का number दबा सकते हो?`:`चलो ${who} का phone number सीखते हैं। जो number दिख रहा है, वही दबाओ —`,[num.split('').map(d=>NUM[+d]).join(', '),'en']]);
   });
 }
+SCEN.forEach(s=>{s.hq=s.hq.replace(/ — [^—]*\?$/,'?')});
 async function blkStory(stage,done){
   if(S.phone&&S.phone.num&&DAYV%7===0&&!S.test){await phoneGame(stage);stage.innerHTML=''}
   const v=varStory(DAYV);setVar(v);
   if(v==='st:safe'){await safeGame(stage);return done()}
   if(v==='st:waste'){await wasteGame(stage);return done()}
+  if(v==='st:tale'){await taleGame(stage);return done()}
+  if(v==='st:myself'){await myselfGame(stage);return done()}
+  if(v==='st:rhyme'&&(SCH().rhymes||[]).length){await rhymeTime(stage);return done()}
 
   const fi=(DAYV-1)%FEEL.length,f=FEEL[fi];
   stage.appendChild(el('div','pic',f[0]));
   const idxs=shuffle([fi,...shuffle(FEEL.map((x,i)=>i).filter(i=>i!==fi)).slice(0,2)]);
   await ask(stage,{q:'What feeling is this face showing?',sp:['यह face कौन सी feeling दिखा रहा है?'],opts:idxs.map(i=>`<span>${FEEL[i][0]}</span><small>${FEEL[i][1]}</small>`),correct:idxs.indexOf(fi)});
-  await hero(`Yes! ${f[1]}`,['हाँ!',[f[1],'en'],`— यानी ${f[2]}।`]);
+  await cheerSay(f[1],[[f[1],'en'],`— यानी ${f[2]}।`]);
   stage.innerHTML='';
   const sc=SCEN[(DAYV-1)%SCEN.length];
   await ask(stage,{q:sc.q,sp:[sc.hq],opts:sc.o.map(x=>`<span>${x[0]}</span><span>${esc(x[1])}</span>`),correct:sc.a,cls:'txt',wrongMsg:['Hmm, would a hero do that? Think again.',['हम्म… क्या hero ऐसा करेगा? फिर से सोचो।']]});
-  await hero("Well done! That's what heroes do.",['बहुत अच्छे! Heroes ऐसे ही करते हैं!']);
+  await cheerSay("That's what heroes do.",['Heroes ऐसे ही करते हैं!']);
   done();
 }
 
@@ -1450,8 +1693,8 @@ async function blkValues(stage,done){
   }
   stage.innerHTML='';
   const opts=shuffle(v.o.map((x,i)=>({x,ok:i===0})));
-  await ask(stage,{q:v.q,sp:[v.hq],opts:opts.map(o=>`<span>${o.x[0]}</span><span>${esc(o.x[1])}</span>`),correct:opts.findIndex(o=>o.ok),cls:'txt',wrongMsg:['Think about your family. What would make them happy?',['अपने परिवार के बारे में सोचो। किस बात से उन्हें खुशी होगी?']]});
-  await hero('Yes! That is what a good family member does.',['बिल्कुल सही! अच्छे बच्चे ऐसा ही करते हैं।']);
+  await ask(stage,{q:v.q,sp:[v.hq],opts:opts.map(o=>`<span>${o.x[0]}</span><span>${esc(o.x[1])}</span>`),os:opts.map(o=>OPT_HI[o.x[1]]||[o.x[1],'en']),correct:opts.findIndex(o=>o.ok),cls:'txt',wrongMsg:['Think about your family. What would make them happy?',['अपने परिवार के बारे में सोचो। किस बात से उन्हें खुशी होगी?']]});
+  await cheerSay('That is what a good family member does.',['अच्छे बच्चे ऐसा ही करते हैं।']);
   stage.innerHTML='';
   stage.appendChild(el('div','card',`<div class="pic">✋</div><div class="cap">Hero promise</div><div class="sub" style="font-size:24px;font-weight:900">“${esc(v.promise)}”</div>`));
   hero(`Hero promise: ${v.promise}`,['चलो, एक hero promise करते हैं —',v.hpromise]);
@@ -1464,18 +1707,19 @@ async function blkValues(stage,done){
 /* ---------- block list ---------- */
 function allBlocks(day){
   const lv=varLogic(day),wv=varWord(day),dv=varDisc(day),sv=varStory(day),mv=OFF.move(day);
-  const LI={'logic:maze':'🧭','logic:sort':'🎯','logic:story':'📖','logic:fmaze':'🐶'},WI={'word:build':'🧩','word:pop':'🫧','word:rhyme':'🎵'},DI={'disc:animals':'🦁','disc:weather':'🌦️','disc:vehicles':'🚒','disc:riddle':'❓','disc:daytime':'🌅','disc:wdress':'☂️'},SI={'st:feel':'💛','st:safe':'🛡️','st:waste':'♻️'};
+  const LI={'logic:maze':'🧭','logic:sort':'🎯','logic:story':'📖','logic:fmaze':'🐶'},WI={'word:build':'🧩','word:pop':'🫧','word:rhyme':'🎵'},DI={'disc:animals':'🦁','disc:weather':'🌦️','disc:vehicles':'🚒','disc:riddle':'❓','disc:daytime':'🌅','disc:wdress':'☂️','disc:animalsort':'🐾','disc:aquatic':'🐬','disc:festivals':'🪔','disc:calendar':'📅'},SI={'st:feel':'💛','st:safe':'🛡️','st:waste':'♻️','st:tale':'📚','st:myself':'🎤','st:rhyme':'🎵'};
+  const hd=OFF.hands(day),pp=OFF.paper(day);
   return [
     {k:'mood',icon:'😊',title:'Feelings + hero word',min:3,lead:'snaya',run:blkMood},
     {k:'letter',icon:'🔤',title:'Letter sound',min:6,lead:'vidu',run:blkLetter},
     {k:'word',icon:WI[wv],title:VAR_NAMES[wv],min:5,lead:'vidu',run:blkWord},
-    {k:'move',icon:mv.traffic?'🚦':'🏃',title:mv.title,min:3,lead:'shivansh',run:(s,d)=>{setVar(mv.traffic?'move:traffic':'move');offline(s,d,OFF.move(day))}},
+    {k:'move',icon:mv.traffic?'🚦':'🏃',title:mv.title,min:mv.min,lead:'shivansh',run:(s,d)=>{setVar(mv.traffic?'move:traffic':'move');offline(s,d,OFF.move(day))}},
     {k:'count',icon:'🔢',title:day>=10?'Counting + adding':'Counting',min:6,lead:'shivansh',run:blkCount},
-    {k:'hands',icon:'🧱',title:'Hands-on maths',min:6,lead:'shivansh',run:(s,d)=>{setVar('hands');offline(s,d,OFF.hands(day))}},
+    {k:'hands',icon:'🧱',title:'Hands-on maths',min:hd.min,lead:'shivansh',run:(s,d)=>{setVar('hands');offline(s,d,OFF.hands(day))}},
     {k:'pattern',icon:'🚂',title:'Pattern train',min:3,lead:'aarav',run:blkPattern},
     {k:'logic',icon:LI[lv],title:VAR_NAMES[lv],min:5,lead:lv==='logic:fmaze'?'chiku':'aarav',run:blkLogic},
     {k:'trace',icon:'✏️',title:'Laser tracing',min:4,lead:'chiku',run:blkTrace},
-    {k:'paper',icon:'📒',title:'Notebook time',min:5,lead:'chiku',run:(s,d)=>{setVar('paper');offline(s,d,OFF.paper(day))}},
+    {k:'paper',icon:'📒',title:'Notebook time',min:pp.min,lead:'chiku',run:(s,d)=>{setVar('paper');offline(s,d,OFF.paper(day))}},
     {k:'discover',icon:DI[dv],title:VAR_NAMES[dv],min:4,lead:'chiku',run:blkDiscover},
     {k:'story',icon:SI[sv],title:VAR_NAMES[sv],min:4,lead:'snaya',run:blkStory},
     {k:'values',icon:'🏡',title:'Family values',min:5,lead:'snaya',run:blkValues}];
@@ -1504,6 +1748,37 @@ function printPage(day){
    <li>☐ He finished the activities himself &nbsp; ☐ We did the family talk</li></ul>
    Notes: ______________________________________________ &nbsp; Stars: <span class="stars">☆☆☆☆☆</span></div>
   </section>`;
+}
+function stageOf(d){if(d<=6)return ['Stage 1','First Sounds','s a t p i n'];if(d<=12)return ['Stage 2','Sound Builders','m d g o c k'];if(d<=20)return ['Stage 3','Word Makers','e u r h b l f j'];if(d<=26)return ['Stage 4','All 26 Sounds','v w x y z q'];return ['Stage 5','Sound Champions','review + blending']}
+function planDate(d){const x=new Date();x.setDate(x.getDate()+(d-S.day));return x}
+const fmtD=x=>x.toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+function planRow(d){
+  const t=letterOf(d),st=stageOf(d),mv=OFF.move(d),hd=OFF.hands(d),pp=OFF.paper(d),vl=VALUES[(d-1)%VALUES.length],w=WOTD[(d-1)%WOTD.length],ws=wordsFor(d);
+  const pat=d<6?'AB':d<13?'AABB, AB':'AABB, ABB, ABC';
+  const sv=varStory(d);
+  return [d,fmtD(planDate(d)),`${st[0]}: ${st[1]}`,`${t.toUpperCase()}${t} ${SNDEN[t]} (${LW[t][0]})`,VAR_NAMES[varWord(d)]+(varWord(d)==='word:build'?` — ${ws.slice(0,3).map(x=>x[0]).join(', ')}`:''),`Count 1–${maxCountFor(d)}${d>=10?', adding':''}${d>=3?'; '+VAR_NAMES[varCountX(d)]:''}; pattern ${pat}`,VAR_NAMES[varLogic(d)],`${t.toUpperCase()}, ${t}, ${traceThird(d).label}`,VAR_NAMES[varDisc(d)],VAR_NAMES[sv]+(S.phone&&S.phone.num&&d%7===0?' + phone number':''),vl.title,`${mv.title} (${mv.min}′) · ${hd.text.split(/[.!?]/)[0]} (${hd.min}′) · ${pp.text.split(/[.!?]/)[0]} (${pp.min}′)`,`${w[1]} — ${w[2]}`];
+}
+function printPlan(from,count,label){
+  from=Math.max(1,from|0);const to=from+count-1;const sc=SCH();
+  const stages=[[1,6],[7,12],[13,20],[21,26],[27,999]].filter(([a,b])=>b>=from&&a<=to).map(([a,b])=>{const st=stageOf(a);return `<tr><td>${st[0]}</td><td><b>${st[1]}</b></td><td>Missions ${a}–${b===999?'onwards':b}</td><td>Letter sounds: ${st[2]}</td></tr>`}).join('');
+  let html=`<section class="planpg"><h1>Hero Academy — Learning plan: ${esc(label)}</h1>
+  <div>Child: <b>${esc(S.name||'—')}</b> · Missions <b>${from}–${to}</b> · ${fmtD(planDate(from))} to ${fmtD(planDate(to))} (planned at one mission a day) · Printed ${fmtD(new Date())}</div>
+  <h2>Stages in this period</h2><table><tr><th>Stage</th><th>Name</th><th>Missions</th><th>Focus</th></tr>${stages}</table>
+  <h2>Maths path</h2><div class="box">Counting grows from 1–10 to 1–20 (about +1 every two missions) · Addition with real fruit from mission 10 · Patterns: AB (1–5) → AABB (6–12) → ABB / ABC (13+) · Mazes get one step harder every 3 missions · Rocket back-counting from ${sc.backFrom}, count to ${sc.countTo}, tall–short and long–short rotate in.</div>
+  <h2>School Connect — ${esc(sc.month)} (theme: ${esc(sc.theme)})</h2><div class="box">Letters: ${esc(sc.letters)} · Numbers: ${esc(sc.numbers)} · Count to ${sc.countTo} · Back-count from ${sc.backFrom} · Shape: ${esc(sc.shape)} · Colour: ${esc(sc.colour)} · Rhymes: ${(sc.rhymes||[]).map(r=>esc(r.t)).join(', ')} · Stories: Two Silly Goats, The Elephant and the Ant · Topics: wild / pet / farm / aquatic animals, festivals, days & months · “Myself” speech practice.</div>
+  <h2>Every mission (about 50–55 minutes)</h2><div class="box">Feelings + hero word → Letter sound → Word game → Move break → Counting → Hands-on maths → Pattern train → Brain game → Laser tracing → Notebook → Discover → Hero smarts → Family values. Practical tasks are marked done only by a grown-up. After 3 random games he rates 😀 😐 😴; a game rated 😴 three times rests for 7 days, so the plan below can change slightly.</div>
+  <h2>Grown-up review checklist</h2><div class="box">☐ Letter sounds clear (not letter names) ☐ Counts objects with one touch each ☐ Tries tracing without help ☐ Speaks the “Myself” lines ☐ Habits ticked most days ☐ Interest meter checked weekly</div></section>`;
+  const head='<tr><th>#</th><th>Date</th><th>Stage</th><th>Letter</th><th>Word game</th><th>Maths</th><th>Brain game</th><th>Tracing</th><th>Discover</th><th>Hero smarts</th><th>Family value</th><th>Real-world tasks</th><th>Hero word</th></tr>';
+  for(let a=from;a<=to;a+=14){
+    let rows='';
+    for(let d=a;d<=Math.min(to,a+13);d++){
+      if((d-from)%7===0)rows+=`<tr class="wk"><td colspan="13">Week ${Math.floor((d-from)/7)+1} — missions ${d}–${Math.min(to,d+6)}</td></tr>`;
+      rows+='<tr>'+planRow(d).map(x=>`<td>${esc(x)}</td>`).join('')+'</tr>';
+    }
+    html+=`<section class="planpg"><h1>Missions ${a}–${Math.min(to,a+13)}</h1><table>${head}${rows}</table></section>`;
+  }
+  $('#printArea').innerHTML=html;
+  setTimeout(()=>{try{window.print()}catch(e){L('print '+e.message)}},350);
 }
 function printMissions(from,to){
   from=Math.max(1,from|0);to=Math.max(from,Math.min(from+13,to|0));
@@ -1581,7 +1856,7 @@ async function blockDone(){
   const stage=freshStage();
   stage.appendChild(el('div','pic pop','⭐'));
   SFX.star();react('cheer');confetti(12);
-  hero('Another star! ⭐',[P('star')]);
+  {const [d,pp]=pickFrom('star',STARL);hero(d,RECS.has('ph_star')?[P('star')]:pp)}
   setTimeout(()=>{if(myRun!==RUNID||!SESS)return;SESS.i++;if(SESS.i>=SESS.blocks.length)finishScreen();else runBlock()},1500);
 }
 async function finishScreen(){
@@ -1751,7 +2026,7 @@ async function runHabit(h,slot){
     markHabit(h);earn(h.stars|0||1);await save();
     SFX.win();react('cheer');confetti(40);
     stage.innerHTML='';stage.appendChild(el('div','pic pop','⭐'));stage.appendChild(el('div','cap',`+${h.stars|0||1} ⭐`));
-    await hero(`Great job! +${h.stars|0||1} stars`,[P('shabash'),[`plus ${NUM[Math.min(h.stars|0||1,20)]} stars!`,'en']]);
+    await cheerSay(`+${h.stars|0||1} stars`,[[`plus ${NUM[Math.min(h.stars|0||1,20)]} stars!`,'en']]);
     if(boxReady())home();else openHabits(slot);
   };
   btn.onclick=async()=>{
@@ -1977,7 +2252,7 @@ gear.addEventListener('click',()=>{
 });
 
 /* ---------- voice recording (parent's own voice) ---------- */
-const REC_ITEMS=[
+const REC_ITEMS_X=0;const REC_ITEMS=[
   ...SEQ.map(c=>({k:'snd_'+c,label:`Sound of “${c.toUpperCase()}”`,hint:`Say only the sound (${SNDEN[c]}) — not the letter name. Keep it short and crisp.`})),
   ...Object.keys(PH).map(k=>({k:'ph_'+k,label:PH[k],hint:'Say it warmly, like a teacher.'}))
 ];
@@ -2027,15 +2302,32 @@ function openParent(firstRun){
     <div class="row"><input type="time" id="pwf" value="${S.win.from}" style="width:45%"><input type="time" id="pwt" value="${S.win.to}" style="width:45%"></div>
   </details>
   <details><summary>🔒 Breaks & real-world activities</summary>
-    <label class="inl"><input type="checkbox" id="plk" ${S.lock.on?'checked':''}> <b>Lock them</b> — the Done button stays locked until the timer finishes (no skipping)</label>
-    <label class="inl"><input type="checkbox" id="plc" ${S.lock.confirm?'checked':''}> Also need a grown-up to confirm with PIN / fingerprint after the timer</label>
+    <label class="inl"><input type="checkbox" id="plp" ${S.lock.parent!==false?'checked':''}> <span><b>Parent marks practical tasks done</b> — ON: only a grown-up can finish Move break, Hands-on maths and Notebook time (phone approval or PIN). OFF: the child presses Done himself.</span></label>
+    <label class="inl"><input type="checkbox" id="plk" ${S.lock.on?'checked':''}> If the box above is off: lock the child's Done button until the timer ends</label>
+    <label class="inl"><input type="checkbox" id="plc" ${S.lock.confirm?'checked':''}> If the box above is off: also ask a grown-up after the timer</label>
     <p class="note">Applies to: Move break, Hands-on maths, Notebook time. A tiny “Grown-up: skip this” link (PIN needed) is always there. Test mode bypasses the lock.</p>
+  </details>
+  <details><summary>🏫 School Connect (update monthly)</summary>
+    <p class="note">Copy this from the school’s “Month at a glance”. These drive tracing, counting, colour, shape, rhymes and the “Myself” speech games.</p>
+    <div class="hn2"><div><label>Month</label><input type="text" id="sc_m" value="${esc(SCH().month)}"></div><div><label>Theme</label><input type="text" id="sc_t" value="${esc(SCH().theme)}"></div></div>
+    <div class="hn2"><div><label>Letters (space-separated)</label><input type="text" id="sc_l" value="${esc(SCH().letters)}"></div><div><label>Numbers to trace</label><input type="text" id="sc_n" value="${esc(SCH().numbers)}"></div></div>
+    <div class="hn2"><div><label>Count to</label><input type="number" id="sc_c" min="10" max="50" value="${SCH().countTo}"></div><div><label>Back-count from</label><input type="number" id="sc_b" min="5" max="20" value="${SCH().backFrom}"></div></div>
+    <div class="hn2"><div><label>Shape</label><select id="sc_s">${['heart','circle','triangle','square','star'].map(x=>`<option ${SCH().shape===x?'selected':''}>${x}</option>`).join('')}</select></div><div><label>Colour</label><select id="sc_co">${Object.keys(COLOUR_THINGS).map(x=>`<option ${SCH().colour===x?'selected':''}>${x}</option>`).join('')}</select></div></div>
+    ${[0,1].map(i=>`<div class="hn2"><div><label>Rhyme ${i+1}</label><input type="text" id="sc_r${i}" value="${esc((SCH().rhymes[i]||{}).t||'')}"></div><div><label>Video link (grown-up only)</label><input type="url" id="sc_u${i}" value="${esc((SCH().rhymes[i]||{}).url||'')}"></div></div>`).join('')}
+    <label>“Myself” speech details</label>
+    <div class="hn2"><input type="text" id="my_mo" placeholder="Mother's name" value="${esc(SCH().myself.mother||'')}"><input type="text" id="my_fa" placeholder="Father's name" value="${esc(SCH().myself.father||'')}"></div>
+    <div class="hn2"><input type="text" id="my_ag" placeholder="Age" value="${esc(SCH().myself.age||'')}"><input type="text" id="my_cl" placeholder="Class" value="${esc(SCH().myself.klass||'')}"></div>
+    <div class="hn2"><input type="text" id="my_sc" placeholder="School" value="${esc(SCH().myself.school||'')}"><input type="text" id="my_fd" placeholder="Favourite food" value="${esc(SCH().myself.food||'')}"></div>
+    <div class="hn2"><input type="text" id="my_co" placeholder="Favourite colour" value="${esc(SCH().myself.colour||'')}"><span></span></div>
+    <div class="row"><button id="scHab">➕ Add school life-skill habits</button></div>
   </details>
   <details><summary>🖨️ Print sheets (real-world tasks + hand-off notes)</summary>
     <p class="note">One A4 page per mission: the move break, hands-on task, notebook tracing lines, a family-time task and a grown-up hand-off checklist (English + Hindi).</p>
     <div class="row"><label style="margin:0">From mission</label><input type="number" id="prf" min="1" value="${S.day}" style="width:90px"><label style="margin:0">to</label><input type="number" id="prt" min="1" value="${S.day}" style="width:90px"></div>
     <div class="row"><button id="prb">🖨️ Print / Save as PDF</button><button class="grey" id="prw">This week (7 days)</button></div>
     <p class="note">Up to 14 missions at once. In the print window choose your printer or “Save as PDF”.</p>
+    <label>Learning plan for parents (what he will learn, stage by stage — landscape)</label>
+    <div class="row"><button id="plW">📅 Next week (7)</button><button id="plM">📅 Next month (30)</button><button id="plQ">📅 Next quarter (90)</button></div>
   </details>
   <details><summary>📚 Content</summary>${blocks}
     <label>Max counting number (0 = automatic, grows from 10 to 20)</label><input type="number" id="pmc" min="0" max="20" value="${S.content.maxCount}">
@@ -2082,6 +2374,7 @@ function openParent(firstRun){
   <details><summary>☁️ Data & sync</summary>
     <p class="note">Saved on this tablet in the app database${navigator.storage&&navigator.storage.persist?' (persistent storage: <b id="pst">checking…</b>)':''}. Cloud: ${S.sync.last?'last synced '+S.sync.last.replace('T',' ').slice(0,16):'not synced yet'}${S.sync.dirty?' · <b>changes waiting</b>':''}</p>
     <label class="inl"><input type="checkbox" id="plv" ${S.sync.live!==false?'checked':''}> Live link to the parent's phone (requests, remote settings, messages, pause)</label>
+    <div class="hn2"><div><label>This device's name</label><input type="text" id="pdn" value="${esc(LOCAL.devName)}"></div><div><label>Role</label><div style="padding:10px 0">${LIVE.role==='test'?'<span class="devtag">TEST DEVICE</span> — the parent app does not control it and its progress is not saved to the cloud':LIVE.role==='main'?'✅ Main tablet — controlled by the parent app':'— (not linked yet)'}</div></div></div>
     <label>Apps Script Web App URL</label><input type="url" id="psu" value="${esc(S.sync.url)}" placeholder="https://script.google.com/macros/s/…/exec">
     <label>Sync token (same as TOKEN in the script)</label><input type="password" id="pst2" value="${esc(S.sync.token)}">
     <div class="row"><button id="sTest">Test connection</button><button id="sNow">Sync now ⬆</button><button class="grey" id="sPull">Restore from cloud ⬇</button></div>
@@ -2103,7 +2396,7 @@ function openParent(firstRun){
   const readForm=()=>{
     S.name=$('#pn').value.trim();S.day=Math.max(1,parseInt($('#pd').value)||1);S.oncePerDay=$('#pod').checked;
     S.win={on:$('#pwo').checked,from:$('#pwf').value||'15:00',to:$('#pwt').value||'17:00'};
-    S.lock={on:$('#plk').checked,confirm:$('#plc').checked};
+    S.lock={on:$('#plk').checked,confirm:$('#plc').checked,parent:$('#plp').checked};
     S.content.off=[...m.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk);
     S.content.maxCount=Math.max(0,Math.min(20,parseInt($('#pmc').value)||0));
     S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.85,pitch:parseFloat($('#pvp').value)||1.1,hinglish:$('#phg').checked};
@@ -2112,6 +2405,10 @@ function openParent(firstRun){
     m.querySelectorAll('[data-hn]').forEach(i=>{const k=i.dataset.hn;S.heroes[k].n=i.value.trim()||HERO_DEF[k].n});
     m.querySelectorAll('[data-hh]').forEach(i=>{const k=i.dataset.hh;S.heroes[k].h=i.value.trim()||HERO_DEF[k].h});
     S.haptics=$('#phx').checked;
+    S.school={month:$('#sc_m').value.trim(),theme:$('#sc_t').value.trim(),letters:$('#sc_l').value.trim(),numbers:$('#sc_n').value.trim(),countTo:Math.max(10,Math.min(50,parseInt($('#sc_c').value)||20)),backFrom:Math.max(5,Math.min(20,parseInt($('#sc_b').value)||10)),shape:$('#sc_s').value,colour:$('#sc_co').value,
+      rhymes:[0,1].map(i=>({t:$('#sc_r'+i).value.trim(),e:i?'😴':'🕷️',url:$('#sc_u'+i).value.trim()})).filter(r=>r.t),
+      myself:{mother:$('#my_mo').value.trim(),father:$('#my_fa').value.trim(),age:$('#my_ag').value.trim(),klass:$('#my_cl').value.trim(),school:$('#my_sc').value.trim(),food:$('#my_fd').value.trim(),colour:$('#my_co').value.trim()}};
+    LOCAL.devName=($('#pdn')&&$('#pdn').value.trim())||LOCAL.devName;
     S.phone={num:$('#pph').value.replace(/\D/g,'').slice(0,12),who:$('#ppw').value.trim()};
     S.habits=readHabitRows($('#habEd'));S.rewards=readRewardRows($('#rwEd'));
     S.sync.url=$('#psu').value.trim();S.sync.token=$('#pst2').value.trim();S.sync.live=$('#plv').checked;
@@ -2120,6 +2417,10 @@ function openParent(firstRun){
   };
   $('#vt').onclick=()=>{readForm();const o={...S.voice};S.voice.on=true;say('नमस्ते! आज का letter है',['S','en'],'। इसकी आवाज़ है',sndP('s'),'। ',['S for Sun!','en'],'चलो',['apples','en'],'गिनते हैं —',['one, two, three','en']).then(()=>{S.voice=o})};
   $('#vt2').onclick=()=>{readForm();const o={...S.voice};S.voice.on=true;say('नमस्ते! मैं आपका दोस्त हूँ। आज हम बहुत सारी नई बातें सीखेंगे। चलो शुरू करते हैं!').then(()=>{S.voice=o})};
+  $('#plW').onclick=()=>{readForm();m.hidden=true;printPlan(S.day,7,'next week')};
+  $('#plM').onclick=()=>{readForm();m.hidden=true;printPlan(S.day,30,'next month')};
+  $('#plQ').onclick=()=>{readForm();m.hidden=true;printPlan(S.day,90,'next quarter')};
+  $('#scHab').onclick=async()=>{readForm();SCHOOL_HABITS.forEach(h=>{if(!S.habits.some(x=>x.id===h.id))S.habits.push(JSON.parse(JSON.stringify(h)))});await save();openParent()};
   $('#funReset').onclick=async()=>{Object.values(S.fun||{}).forEach(f=>{delete f.rest;f.last=[]});await save();openParent()};
   $('#habAdd').onclick=()=>{$('#habEd').insertAdjacentHTML('beforeend',habitRow({id:'h'+Date.now().toString(36),icon:'⭐',title:'New habit',hi:'',slot:'any',min:0,stars:1,approve:false,on:true}));bindDel()};
   $('#rwAdd').onclick=()=>{$('#rwEd').insertAdjacentHTML('beforeend',rewardRow({id:'r'+Date.now().toString(36),icon:'🎁',name:'New reward',cost:50,on:true}));bindDel()};
@@ -2153,7 +2454,7 @@ function openParent(firstRun){
 }
 
 /* ---------- LIVE link to the parent's phone ---------- */
-const PATCH_KEYS=['name','day','oncePerDay','win','lock','content','sfx','voice','reward','rewardEvery','heroes','grant','ask','habits','rewards','walletAdj','haptics','phone'];
+const PATCH_KEYS=['name','day','oncePerDay','win','lock','content','sfx','voice','reward','rewardEvery','heroes','grant','ask','habits','rewards','walletAdj','haptics','phone','school'];
 const LIVE={timer:null,busy:false,paused:false,pending:{},asking:false,askIv:null};
 const liveOn=()=>!!(S.sync.url&&S.sync.token&&S.sync.live!==false);
 const AW=()=>S.ask||DEF.ask;
@@ -2192,6 +2493,7 @@ function setPaused(p){
   }else if(o){o.style.display='none';say(`${AW().h} ने app फिर से चालू कर दिया है!`)}
 }
 async function onLive(j){
+  LIVE.role=j.test?'test':'main';
   let changed=false;
   for(const p of (j.patches||[])){applyPatch(p.set);LOCAL.lastPatch=Math.max(LOCAL.lastPatch|0,p.id);changed=true}
   if(changed){await saveLocal();await DB.set('state',S);if(!S.test)save();toast(`⚙️ Settings updated by ${AW().n}`);if(SCREEN==='home'&&$('#modal').hidden&&!LIVE.asking)home()}
@@ -2227,7 +2529,7 @@ function showAsk(title,onCancel,onPin){
 }
 function hideAsk(){clearInterval(LIVE.askIv);const o=$('#askov');if(o)o.remove();LIVE.asking=false}
 async function askMummy(type,title,detail,onPin){
-  if(!liveOn())return {status:'offline'};
+  if(!liveOn()||LIVE.role==='test')return {status:'offline'};
   let id;
   try{const j=await callSync('request',{type,title:`${kidName()}: ${title}`,detail});id=j.id}
   catch(e){L('req '+e.message);return {status:'offline'}}
@@ -2252,7 +2554,9 @@ async function askMummy(type,title,detail,onPin){
   if(S.wallet==null)S.wallet=S.stars|0;
   if(!Array.isArray(S.owned))S.owned=OWN_DEF.slice();
   if(!Array.isArray(S.ledger))S.ledger=[];if(!Array.isArray(S.stickers))S.stickers=[];
-  const lo=await DB.get('local');if(lo)LOCAL=Object.assign({bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0},lo);
+  const lo=await DB.get('local');if(lo)LOCAL=Object.assign({bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0,devId:'',devName:''},lo);
+  if(!LOCAL.devId){LOCAL.devId='d'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);const ua=navigator.userAgent;LOCAL.devName=/SM-T|SM-X|Tab/i.test(ua)?'Samsung tablet':/iPhone/i.test(ua)?'iPhone':/iPad/i.test(ua)?'iPad':/Android/i.test(ua)?'Android device':'Computer';await saveLocal()}
+  if(!S.school)S.school=JSON.parse(JSON.stringify(SCHOOL_DEF));
   const ri2=await DB.get('recIndex');if(Array.isArray(ri2))ri2.forEach(k=>RECS.add(k));
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(p=>L('persist '+p))}catch(e){}
   if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>L('sw '+e.message));

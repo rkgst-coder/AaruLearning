@@ -139,6 +139,11 @@ svg text{fill:#9aa0cf;font-size:10px}
         <div class="btn-row"><button class="btn-gold" id="cfgSave">Save & connect</button><button class="btn-grey" id="cfgOut">Disconnect</button></div>
         <div class="note" id="cfgMsg" style="margin-top:8px"></div>
       </div>
+      <div class="card"><h3>Devices</h3>
+        <div class="note">Only the <b>main tablet</b> is controlled from this phone and saved to the Google Sheet. Every other device that opens the app is a <b>test device</b>.</div>
+        <div id="devList" style="margin-top:8px">—</div>
+        <div class="btn-row"><button class="btn-grey" id="devRef">🔄 Refresh devices</button></div>
+      </div>
       <div class="card"><h3>Alerts</h3>
         <label class="inl"><input type="checkbox" id="optSound" checked> Sound when the child asks for something (while this app is open)</label>
         <div class="btn-row"><button id="optTest">🔔 Test sound</button></div>
@@ -356,6 +361,7 @@ function renderCtl(){
     <div class="row2"><div><label>Child asks … (name)</label><input type="text" id="c_an" value="${esc(askName())}"></div><div><label>Hindi spelling</label><input type="text" id="c_ah" value="${esc(e.ask&&e.ask.h||'मम्मी')}"></div></div>
   </details>
   <details><summary>🔒 Breaks & activities</summary>
+    <label class="inl"><input type="checkbox" id="c_lp" ${!e.lock||e.lock.parent!==false?'checked':''}> <span><b>Parent marks practical tasks done</b> — ON: he taps “Ask Mummy” and I approve here. OFF: he presses Done himself.</span></label>
     <label class="inl"><input type="checkbox" id="c_lk" ${e.lock&&e.lock.on?'checked':''}> Lock them until the timer ends</label>
     <label class="inl"><input type="checkbox" id="c_lc" ${e.lock&&e.lock.confirm?'checked':''}> Child must ask me to confirm when done</label>
   </details>
@@ -402,7 +408,7 @@ function applyCtl(){
   const nv={
     name:g('c_name').value.trim(),day:Math.max(1,parseInt(g('c_day').value)||1),oncePerDay:g('c_once').checked,
     win:{on:g('c_win').checked,from:g('c_wf').value||'15:00',to:g('c_wt').value||'17:00'},
-    lock:{on:g('c_lk').checked,confirm:g('c_lc').checked},
+    lock:{on:g('c_lk').checked,confirm:g('c_lc').checked,parent:g('c_lp').checked},
     content:{off:[...document.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk),maxCount:Math.max(0,Math.min(20,parseInt(g('c_mc').value)||0))},
     voice:{on:g('c_vo').checked,mode:g('c_vm').value,rate:parseFloat(g('c_vr').value)||0.85,hinglish:g('c_hg').checked},
     phone:{num:g('c_ph').value.replace(/\D/g,'').slice(0,12),who:g('c_pw').value.trim()},
@@ -459,6 +465,19 @@ $('#optTest').onclick=beep;
 /* boot */
 if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>L('sw '+e.message));
 render();
+async function loadDevs(){
+  const box=$('#devList');if(!box)return;
+  if(!(CFG.url&&CFG.token)){box.textContent='Connect first.';return}
+  box.textContent='Loading…';
+  try{const j=await api('pdevs',{});
+    if(!j.devices.length){box.textContent='No device has opened the app in the last few hours.';return}
+    box.innerHTML=j.devices.map(d=>{const main=d.id===j.primary,ago=Math.round((Date.now()-d.seen)/60000);
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #ffffff1a"><div style="flex:1"><b>${esc(d.name)}</b> ${main?'<span style="background:#2ecc71;color:#06301a;border-radius:8px;padding:1px 7px;font-weight:800;font-size:12px">MAIN TABLET</span>':'<span style="background:#ff9f1c;color:#3b2a00;border-radius:8px;padding:1px 7px;font-weight:800;font-size:12px">TEST</span>'}<div class="note">seen ${ago<1?'just now':ago+' min ago'} · id ${esc(d.id.slice(-6))}</div></div>${main?'':`<button class="btn-gold" data-prim="${esc(d.id)}">Make main tablet</button>`}</div>`}).join('');
+    box.querySelectorAll('[data-prim]').forEach(b=>b.onclick=async()=>{if(!confirm('Make this the main tablet? The old one becomes a test device.'))return;try{await api('pprimary',{id:b.dataset.prim});toast('Main tablet changed ✔');loadDevs()}catch(e){toast(e.message)}});
+  }catch(e){box.innerHTML='<span class="err">'+esc(e.message)+'</span>'}
+}
+$('#devRef').onclick=loadDevs;
+document.querySelector('nav [data-tab=link]').addEventListener('click',()=>setTimeout(loadDevs,50));
 if(CFG.url&&CFG.token){poll(true);schedule()}else document.querySelector('nav [data-tab=link]').click();
 setInterval(()=>{if(HB){NOW+=1000;renderConn()}},1000);
 </script>
