@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#0b1030">
+<meta name="theme-color" content="#fbf6ec">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -12,6 +12,8 @@
 <link rel="apple-touch-icon" href="parent-192.png">
 <link rel="icon" href="parent-192.png">
 <title>Hero Academy · Parent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap">
 <style>
 :root{--gold:#ffc83d;--ink:#e9ebff;--mut:#9aa0cf;--card:#161b4a;--card2:#1e2460;--ok:#2ecc71;--bad:#ff5a5f;--line:#ffffff1f}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -77,11 +79,46 @@ summary{font-weight:900;padding:12px 0;font-size:16px}
 svg text{fill:#9aa0cf;font-size:10px}
 .hero-ico{font-size:40px}
 #toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#fff;color:#241f4a;border-radius:16px;padding:10px 18px;font-weight:800;z-index:50;box-shadow:0 10px 30px #0008}
+/* ===== v3.5 daytime look ===== */
+:root{--gold:#f5b316;--ink:#33305a;--mut:#6b6788;--card:#fffdf8;--card2:#fffdf8;--ok:#2f9e5b;--bad:#e0483f;--line:#e3dccd;--org:#f08a2c;--orgd:#b9601a}
+html,body{background:#fbf6ec;color:var(--ink);font-family:'Fredoka',-apple-system,BlinkMacSystemFont,'SF Pro Rounded','Segoe UI',Roboto,'Noto Sans Devanagari',sans-serif}
+body{background:#fbf6ec}
+.ic{width:1em;height:1em;display:inline-block;vertical-align:-.14em;fill:currentColor;flex:none}
+header .logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:24px;letter-spacing:0}
+header .logo .ic{color:#f5b316;font-size:28px}
+.pill{background:#e3f4e8;border:0;color:#2f7a4a}
+.card{background:var(--card);border:0;box-shadow:0 4px 0 var(--line)}
+.card h3{color:var(--mut);font-weight:600}
+.big{font-weight:600}
+.bar{background:#efe8d8}.bar>i{background:#f5b316}
+.tile{background:var(--card);border:0;box-shadow:0 3px 0 var(--line)}
+.tile b{font-weight:600}
+button,.btn{font-weight:600;background:#5b8fe0;box-shadow:0 4px 0 #3a64ad}
+button:active{box-shadow:0 1px 0 #3a64ad}
+.btn-ok{background:#4fbf73;box-shadow:0 4px 0 #2f8f52}.btn-no{background:#ee6f5e;box-shadow:0 4px 0 #b9473a}
+.btn-gold{background:var(--org);color:#fff;box-shadow:0 4px 0 var(--orgd)}.btn-grey{background:#efe8d8;color:var(--ink);box-shadow:0 4px 0 #d9d0bd}
+input[type=text],input[type=number],input[type=url],input[type=password],input[type=time],select,textarea{background:#fff;border:2px solid var(--line);color:var(--ink)}
+label.inl input{accent-color:var(--org)}
+.chip{background:#efe8d8;border:0;color:var(--ink)}
+.edrow,details{background:var(--card);border:0;box-shadow:0 3px 0 var(--line)}
+summary{font-weight:600}
+.req{border:0;background:var(--org);color:#fff;box-shadow:0 5px 0 var(--orgd)}
+.req .d{color:#fff;opacity:.92}
+.req .chip{background:#ffffff33;color:#fff}
+.req input[type=text]{border-color:#ffffff66}
+.req .btn-ok{background:#fffdf8;color:#2f8f52;box-shadow:0 4px 0 #0002}.req .btn-no{background:#c96a20;box-shadow:0 4px 0 #0002}
+nav{background:#fffdf8f2;border-top:0;box-shadow:0 -4px 20px #0000000f}
+nav button{background:none;box-shadow:none;color:var(--mut);font-size:12px;font-weight:600}
+nav button .i{font-size:26px}
+nav button.on{color:var(--org)}
+svg text{fill:var(--mut)}
+#toast{background:var(--ink);color:#fff;box-shadow:0 10px 30px #0003}
+#repWeak div,#repLed div{color:var(--ink)!important;border-color:var(--line)!important}
 </style>
 </head>
 <body>
 <div id="app">
-  <header><div class="logo">🦸 Hero Parent</div><div class="sp"></div><span class="pill"><span class="dot" id="dot"></span><span id="conn">Not linked</span></span></header>
+  <header><div class="logo"><svg class="ic" viewBox="0 0 24 24"><path d="M12 1.5l8.5 3.2v6.6c0 5.2-3.6 9.6-8.5 11.2-4.9-1.6-8.5-6-8.5-11.2V4.7z"/><path d="M12 16.5c-3.2-2.3-4.4-3.8-4.4-5.6 0-1.4 1-2.4 2.3-2.4.9 0 1.6.5 2.1 1.2.5-.7 1.2-1.2 2.1-1.2 1.3 0 2.3 1 2.3 2.4 0 1.8-1.2 3.3-4.4 5.6z" fill="#ff5c7a"/></svg>Hero Parent</div><div class="sp"></div><span class="pill"><span class="dot" id="dot"></span><span id="conn">Not linked</span></span></header>
   <div id="alertBar"></div>
   <main>
     <!-- LIVE -->
@@ -153,11 +190,11 @@ svg text{fill:#9aa0cf;font-size:10px}
     </section>
   </main>
   <nav><div class="in">
-    <button data-tab="live" class="on"><span class="i">📡</span>Live</button>
-    <button data-tab="req"><span class="i">🙋</span>Requests<span class="badge" id="bReq">0</span></button>
-    <button data-tab="rep"><span class="i">📈</span>Report</button>
-    <button data-tab="ctl"><span class="i">🎛️</span>Control</button>
-    <button data-tab="link"><span class="i">🔗</span>Link</button>
+    <button data-tab="live" class="on"><span class="i"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 7.5a6.4 6.4 0 0 1 0 9M4.6 4.6a10.5 10.5 0 0 0 0 14.8M19.4 4.6a10.5 10.5 0 0 1 0 14.8" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span>Live</button>
+    <button data-tab="req"><span class="i"><svg class="ic" viewBox="0 0 24 24"><path d="M9 3.5a1.5 1.5 0 0 1 3 0V11h.5V2.5a1.5 1.5 0 0 1 3 0V11h.5V4.5a1.5 1.5 0 0 1 3 0v9.5c0 4.4-3.1 8-7.5 8-2.6 0-4.5-1.2-5.9-3.3L3 13.4a1.5 1.5 0 0 1 2.4-1.8L7.5 14V5.5a1.5 1.5 0 0 1 1.5-1.5z"/></svg></span>Requests<span class="badge" id="bReq">0</span></button>
+    <button data-tab="rep"><span class="i"><svg class="ic" viewBox="0 0 24 24"><rect x="3" y="12" width="4.5" height="9" rx="1.5"/><rect x="9.75" y="6" width="4.5" height="15" rx="1.5"/><rect x="16.5" y="2.5" width="4.5" height="18.5" rx="1.5"/></svg></span>Report</button>
+    <button data-tab="ctl"><span class="i"><svg class="ic" viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="15" cy="6" r="2.6"/><circle cx="9" cy="12" r="2.6"/><circle cx="17" cy="18" r="2.6"/></svg></span>Control</button>
+    <button data-tab="link"><span class="i"><svg class="ic" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3.2-3.2a4.5 4.5 0 0 0-6.4-6.4l-1 1M14 10a4.5 4.5 0 0 0-6.4 0l-3.2 3.2a4.5 4.5 0 0 0 6.4 6.4l1-1" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></span>Link</button>
   </div></nav>
 </div>
 <div id="toastBox"></div>
@@ -357,6 +394,8 @@ function renderCtl(){
     <label class="inl"><input type="checkbox" id="c_once" ${e.oncePerDay?'checked':''}> Only one mission per day</label>
     <label class="inl"><input type="checkbox" id="c_win" ${e.win&&e.win.on?'checked':''}> Allow only between these times</label>
     <div class="row2"><input type="time" id="c_wf" value="${esc(e.win&&e.win.from||'15:00')}"><input type="time" id="c_wt" value="${esc(e.win&&e.win.to||'17:00')}"></div>
+    <label>Day / night look on the tablet</label><select id="c_thm">${[['auto','Automatic — by the times below'],['day','Always day'],['night','Always night']].map(([v,t])=>`<option value="${v}" ${((e.theme||{}).mode||'auto')===v?'selected':''}>${t}</option>`).join('')}</select>
+    <div class="row2"><div><label>Day starts</label><input type="time" id="c_thd" value="${esc((e.theme||{}).day||'07:00')}"></div><div><label>Night starts</label><input type="time" id="c_thn" value="${esc((e.theme||{}).night||'19:00')}"></div></div>
     <div class="row2"><div><label>Phone number to learn</label><input type="text" id="c_ph" inputmode="numeric" value="${esc(e.phone&&e.phone.num||'')}"></div><div><label>Whose?</label><input type="text" id="c_pw" value="${esc(e.phone&&e.phone.who||'')}" placeholder="Mummy"></div></div>
     <div class="row2"><div><label>Child asks … (name)</label><input type="text" id="c_an" value="${esc(askName())}"></div><div><label>Hindi spelling</label><input type="text" id="c_ah" value="${esc(e.ask&&e.ask.h||'मम्मी')}"></div></div>
   </details>
@@ -408,6 +447,7 @@ function applyCtl(){
   const nv={
     name:g('c_name').value.trim(),day:Math.max(1,parseInt(g('c_day').value)||1),oncePerDay:g('c_once').checked,
     win:{on:g('c_win').checked,from:g('c_wf').value||'15:00',to:g('c_wt').value||'17:00'},
+    theme:{mode:g('c_thm').value||'auto',day:g('c_thd').value||'07:00',night:g('c_thn').value||'19:00'},
     lock:{on:g('c_lk').checked,confirm:g('c_lc').checked,parent:g('c_lp').checked},
     content:{off:[...document.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk),maxCount:Math.max(0,Math.min(20,parseInt(g('c_mc').value)||0))},
     voice:{on:g('c_vo').checked,mode:g('c_vm').value,rate:parseFloat(g('c_vr').value)||0.85,hinglish:g('c_hg').checked},

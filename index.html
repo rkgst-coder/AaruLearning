@@ -297,13 +297,137 @@ button.node{color:#fff;font-family:inherit;text-align:left}
   #bg,#app,#modal,#fx{display:none!important}
   #printArea{display:block!important}
 }
+/* ===== v3.5 Day / Night world ===== */
+:root{--tx:#f4f3ff;--mut:#c9cbf0;--sf:rgba(255,255,255,.12);--sh:#0006;--chs:#9aa3d8;--dash:#ffffff88;--ink2:#3a3560;--org:#f08a2c;--orgd:#b9601a;--cream:#fffdf8}
+body.day{--tx:#33305a;--mut:#6b6788;--sf:#fffdf8;--sh:#d9d0bd;--chs:#e0d8c6;--dash:#c9bfa8}
+html,body{font-family:'Fredoka',ui-rounded,'SF Pro Rounded','Nunito','Segoe UI',system-ui,'Noto Sans Devanagari',sans-serif}
+html,body{color:var(--tx);background:#9fd3ee;transition:color 3s}
+body.night{background:#141a3d}
+body.noanim,body.noanim *{transition:none!important}
+.ic{width:1em;height:1em;display:inline-block;vertical-align:-.14em;fill:currentColor;flex:none}
+#bg{background:none}
+#bg .sky{position:absolute;inset:0;transition:opacity 6s ease}
+#bg .sky.d{background:linear-gradient(180deg,#8fcdf0 0%,#c6e8f7 60%,#e4f4fa 100%)}
+#bg .sky.n{background:linear-gradient(180deg,#0f1438 0%,#1d2460 55%,#33307a 100%);opacity:0}
+#bg .sun{position:absolute;right:6%;top:9%;width:96px;height:96px;border-radius:50%;background:#ffd84a;box-shadow:0 0 0 22px #ffd84a40,0 0 80px #ffd84a80;transition:transform 6s ease,opacity 6s ease}
+#bg .moon{transition:transform 6s ease,opacity 6s ease;opacity:0;transform:translateY(80px)}
+#bg .cloud{position:absolute;height:38px;border-radius:99px;background:#fff;opacity:.9;transition:opacity 6s;animation:drift 70s ease-in-out infinite alternate}
+#bg .cloud::before{content:'';position:absolute;left:22%;top:-22px;width:46px;height:46px;border-radius:50%;background:#fff}
+#bg .cloud::after{content:'';position:absolute;left:48%;top:-14px;width:34px;height:34px;border-radius:50%;background:#fff}
+@keyframes drift{to{transform:translateX(60px)}}
+#bg .hill{position:absolute;border-radius:50%;transition:background 6s ease}
+#bg .hill.a{left:-20%;right:35%;bottom:-17vh;height:36vh;background:#9bd67f}
+#bg .hill.b{left:30%;right:-25%;bottom:-21vh;height:38vh;background:#7cc463}
+body.night .sky.d{opacity:0}body.night .sky.n{opacity:1}
+body.night #bg .sun{opacity:0;transform:translateY(90px)}
+body.night #bg .moon{opacity:1;transform:none}
+body.night #bg .cloud{opacity:0}
+body.night #bg .hill.a{background:#2d4a63}body.night #bg .hill.b{background:#243c55}
+/* top bar */
+#journey{background:var(--sf);border:0;box-shadow:0 4px 0 var(--sh);backdrop-filter:none}
+.dot{background:color-mix(in srgb,var(--tx) 12%,transparent)}
+.dot.done::after{border-color:var(--sf)}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--sf);border:0;border-radius:999px;color:var(--tx);box-shadow:0 4px 0 var(--sh);backdrop-filter:none;font-weight:700;font-size:22px;padding:6px 16px 6px 10px}
+.chip .ic{color:#f5b316;font-size:28px}
+#gear{color:var(--tx);opacity:.3;font-size:30px;display:grid;place-items:center}
+#testChip,#skipBtn{display:none!important}
+body.test.pok #testChip,body.test.pok #skipBtn{display:inline-flex!important;align-items:center;gap:4px}
+/* hero + bubble */
+#bubble{background:var(--cream);color:var(--ink2);font-weight:600;border-radius:28px 28px 28px 10px;box-shadow:0 6px 0 var(--sh)}
+#bubble::before{border-right-color:var(--cream)}
+#again{display:grid;place-items:center;font-size:40px;color:#fff;background:var(--org);box-shadow:0 6px 0 var(--orgd)}
+#again:active{box-shadow:0 2px 0 var(--orgd)}
+#heroName{background:var(--cream);color:var(--ink2);font-weight:700;box-shadow:0 3px 0 var(--sh)}
+#heroWrap::before{background:radial-gradient(ellipse,#0003,transparent 70%)}
+body.night #heroWrap::before{background:radial-gradient(ellipse,#ffc83d99,transparent 70%)}
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--org);color:#fff;font-weight:700;border-radius:999px;box-shadow:0 8px 0 var(--orgd),0 14px 24px #0002}
+.btn:active{box-shadow:0 3px 0 var(--orgd)}
+.btn.small{box-shadow:0 5px 0 var(--orgd)}
+@keyframes glow{50%{box-shadow:0 8px 0 var(--orgd),0 0 40px #ffb04d}}
+.link{color:var(--mut)}
+.choice{background:var(--cream);box-shadow:0 8px 0 var(--chs),0 14px 22px #0002}
+.choice:active{box-shadow:0 3px 0 var(--chs)}
+.choice small{color:#5d5a80}
+.hab,.rw,.swi,.arr,.keypad button,.stk.have{background:var(--cream);box-shadow:0 7px 0 var(--chs)}
+.hab .t,.rw .t{font-weight:700}
+/* surfaces follow the theme */
+.card,.dcard,.node,.family,.grid,.bubwrap{background:var(--sf);border:0;box-shadow:0 6px 0 var(--sh);backdrop-filter:none}
+.item{background:var(--sf);border:0;color:var(--tx);box-shadow:0 5px 0 var(--sh)}
+.cell{background:color-mix(in srgb,var(--tx) 8%,transparent)}
+.plate,.slot,.pslot,.seqslot,.stk{border-color:var(--dash);background:color-mix(in srgb,var(--sf) 60%,transparent)}
+.prow .q,.pdisp,.off .mat,.train .car{background:var(--sf);border-color:var(--dash)}
+.off .pr{background:color-mix(in srgb,var(--tx) 10%,transparent)}
+.nc{background:var(--sf);color:var(--tx);box-shadow:0 4px 0 var(--sh)}
+.seg button{background:var(--sf);color:var(--tx);font-weight:700;box-shadow:0 5px 0 var(--sh);display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.seg button .ic{font-size:30px}
+.seg button.on{background:var(--org);color:#fff;box-shadow:0 6px 0 var(--orgd)}
+.ring .rbg{stroke:color-mix(in srgb,var(--tx) 15%,transparent)}
+.tracebox{background:#26305e;border:0;box-shadow:0 6px 0 #0003}
+.title{display:none}
+.ov{background:linear-gradient(180deg,#8fcdf0,#e4f4fa)}
+body.night .ov{background:radial-gradient(circle at 50% 30%,#3a2f9f,#0b1030)}
+.ov .sub,.ov .dots{color:var(--tx)}
+.family b{color:var(--org)}
+body.night .family b{color:var(--gold)}
+/* navigation tiles */
+.nb{background:var(--c1);box-shadow:0 7px 0 var(--c2),0 12px 20px #0002;font-weight:700;border-radius:30px}
+.nb:active{box-shadow:0 2px 0 var(--c2)}
+.nb .e{font-size:50px}
+.nb .badge{border-color:var(--sf);font-weight:700}
+.nb.start{--c1:var(--org);--c2:var(--orgd);color:#fff}
+/* v3.5 home */
+.hm{width:min(860px,100%);display:flex;flex-direction:column;gap:20px;align-items:stretch}
+.mstart{display:flex;align-items:center;gap:18px;min-height:120px;border:0;border-radius:999px;padding:0 16px 0 36px;background:var(--org);color:#fff;font-family:inherit;text-align:left;box-shadow:0 9px 0 var(--orgd),0 16px 28px #0002;animation:glow 2.2s ease-in-out infinite}
+.mstart:active{transform:translateY(6px);box-shadow:0 3px 0 var(--orgd)}
+.mstart .mt{flex:1;display:flex;flex-direction:column}
+.mstart b{font-size:clamp(32px,5.4vw,48px);font-weight:700;line-height:1}
+.mstart small{font-size:20px;font-weight:500;opacity:.95}
+.mstart .mi{width:92px;height:92px;flex:none;border-radius:50%;background:var(--cream);color:var(--org);display:grid;place-items:center;font-size:56px}
+.trail{display:flex;justify-content:space-between;align-items:center;min-height:84px;padding:0 4px;gap:4px}
+.trail span{width:50px;height:50px;flex:none;border-radius:50%;background:var(--sf);display:grid;place-items:center;font-size:26px;box-shadow:0 4px 0 var(--sh),inset 0 0 0 3px var(--c)}
+.ngrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.nb2{position:relative;min-height:124px;border:0;border-radius:30px;display:flex;align-items:center;gap:18px;padding:0 24px;color:#fff;font-family:inherit;text-align:left;background:var(--c1);box-shadow:0 7px 0 var(--c2),0 12px 20px #0002}
+.nb2:active{transform:translateY(5px);box-shadow:0 2px 0 var(--c2)}
+.nb2 .ic{font-size:58px}
+.nb2 .tx{display:flex;flex-direction:column;min-width:0}
+.nb2 b{font-size:clamp(24px,3.6vw,30px);font-weight:700;line-height:1.1}
+.nb2 small{font-size:18px;font-weight:500}
+.nb2 .badge{position:absolute;top:-8px;right:-4px;min-width:38px;height:38px;border-radius:99px;background:#ef4b4b;display:grid;place-items:center;font-size:20px;font-weight:700;border:4px solid var(--sf);padding:0 6px}
+.hstat{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center;background:var(--sf);border-radius:30px;padding:14px 20px;box-shadow:0 6px 0 var(--sh)}
+.hstat .me,.hstat .bx{display:flex;align-items:center;gap:12px;border:0;background:none;color:inherit;font-family:inherit;padding:0;text-align:left}
+.hstat .me .av{width:58px}
+.hstat .me .av svg{width:100%;height:auto;display:block}
+.hstat .nm{display:block;font-size:22px;font-weight:700;line-height:1.1}
+body.day .jar svg path[fill="none"]{stroke:#c9bfa8}
+body.day .jar svg rect[fill="#ffffff22"]{fill:#efe8d8}
+.hstat .mt2{display:flex;gap:10px;font-size:16px;color:var(--mut)}
+.hstat .mt2 span{display:inline-flex;align-items:center;gap:3px}
+.hstat .sbar{display:flex;flex-direction:column;gap:6px;border:0;background:none;color:inherit;font-family:inherit;padding:0;text-align:left}
+.hstat .sbar b{display:flex;align-items:center;gap:4px;font-size:20px;font-weight:700}
+.hstat .sbar i{display:block;height:14px;border-radius:99px;background:color-mix(in srgb,var(--tx) 12%,transparent);overflow:hidden}
+.hstat .sbar i em{display:block;height:100%;border-radius:99px;background:#f5b316}
+.hstat .bx .ic{font-size:46px;color:#b15fc9}
+.hstat .bx span{font-size:16px;line-height:1.2;max-width:140px;color:var(--mut)}
+.hstat .bx.ready .ic{animation:wobble 1.2s ease-in-out infinite;filter:drop-shadow(0 0 14px #ffc83d)}
+.hstat .bx.ready span{color:var(--tx);font-weight:700}
+.yel{color:#f5b316}.fire{color:#f0662c}
+.hill2{display:flex;justify-content:space-around;align-items:flex-end;margin-top:auto;padding-top:10px}
+.hill2 button{display:flex;flex-direction:column;align-items:center;gap:4px;border:0;background:none;padding:0;font-family:inherit;color:var(--ink2)}
+.hill2 .hs{width:clamp(70px,11vw,100px);animation:bob 3s ease-in-out infinite;filter:drop-shadow(0 8px 6px #0003)}
+.hill2 .hs.lead{width:clamp(90px,14vw,130px)}
+.hill2 .hs svg{width:100%;height:auto;display:block}
+.hill2 .hn{background:var(--cream);border-radius:99px;padding:0 12px;font-size:17px;font-weight:600;box-shadow:0 3px 0 #0002}
+@media (max-width:600px){.ngrid{grid-template-columns:1fr 1fr;gap:12px}.nb2{flex-direction:column;justify-content:center;gap:4px;padding:10px;text-align:center}.nb2 small{display:none}.hstat{grid-template-columns:1fr 1fr}.hstat .bx{grid-column:1/-1}.trail span{width:38px;height:38px;font-size:20px}}
 </style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap">
 </head>
 <body>
-<div id="bg"><div class="st"></div><div class="st b"></div><div class="moon"></div><div class="city"></div></div>
+<div id="bg"><div class="sky d"></div><div class="sky n"><div class="st"></div><div class="st b"></div></div><div class="sun"></div><div class="moon"></div><div class="cloud" style="left:8%;top:16%;width:120px"></div><div class="cloud" style="left:46%;top:9%;width:90px;animation-duration:90s"></div><div class="hill a"></div><div class="hill b"></div></div>
 <div id="app">
-  <div id="top"><span id="testChip">TEST</span><button id="skipBtn">Skip ⏭</button><div id="journey"></div><div id="stars" class="chip">⭐ 0</div><button id="gear" aria-label="parent">⚙️</button></div>
-  <div id="heroRow"><div id="heroWrap"><div id="heroFace"><div class="hp"></div></div><div id="heroName"></div></div><div id="bubble"></div><button id="again" aria-label="repeat">🔊</button></div>
+  <div id="top"><span id="testChip">TEST</span><button id="skipBtn">Skip</button><div id="journey"></div><div id="stars" class="chip">0</div><button id="gear" aria-label="parent"></button></div>
+  <div id="heroRow"><div id="heroWrap"><div id="heroFace"><div class="hp"></div></div><div id="heroName"></div></div><div id="bubble"></div><button id="again" aria-label="repeat"></button></div>
   <div id="stage"></div>
 </div>
 <div id="modal" hidden></div>
@@ -319,7 +443,51 @@ button.node{color:#fff;font-family:inherit;text-align:left}
   window.addEventListener('unhandledrejection',function(e){window.L('REJ '+(e.reason&&e.reason.message||e.reason))});
   window.L('boot');
 })();
-const APPV='3.4.0';
+const APPV='3.5.0';
+/* ---------- v3.5 chunky icons (inline, work offline) ---------- */
+const ICP={
+ star:'<path d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 7-6.3-3.4-6.3 3.4 1.3-7L1.9 9.1l7-.9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
+ home:'<path d="M12 2.5L1.5 11.5h3V21a1 1 0 0 0 1 1H10v-6.5h4V22h4.5a1 1 0 0 0 1-1v-9.5h3z"/>',
+ sound:'<path d="M3 9v6h4l5 5V4L7 9z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
+ gear:'<path d="M19.1 12.9a7.4 7.4 0 0 0 0-1.8l2-1.6a.5.5 0 0 0 .1-.6l-1.9-3.3a.5.5 0 0 0-.6-.2l-2.4 1a7 7 0 0 0-1.6-.9L14.4 3a.5.5 0 0 0-.5-.4h-3.8a.5.5 0 0 0-.5.4l-.3 2.5a7 7 0 0 0-1.6.9l-2.4-1a.5.5 0 0 0-.6.2L2.8 8.9a.5.5 0 0 0 .1.6l2 1.6a7.4 7.4 0 0 0 0 1.8l-2 1.6a.5.5 0 0 0-.1.6l1.9 3.3c.1.2.4.3.6.2l2.4-1c.5.4 1 .7 1.6.9l.3 2.5c0 .2.3.4.5.4h3.8c.2 0 .5-.2.5-.4l.3-2.5a7 7 0 0 0 1.6-.9l2.4 1c.2.1.5 0 .6-.2l1.9-3.3a.5.5 0 0 0-.1-.6zM12 15.6a3.6 3.6 0 1 1 0-7.2 3.6 3.6 0 0 1 0 7.2z"/>',
+ task:'<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.8 14.6L5.6 12l1.8-1.8 2.8 2.8 6.4-6.4 1.8 1.8z"/>',
+ check:'<path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>',
+ close:'<path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round"/>',
+ back:'<path d="M14.5 4.5L7 12l7.5 7.5" fill="none" stroke="currentColor" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/>',
+ bag:'<path d="M8 8V6.5a4 4 0 0 1 8 0V8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M4.2 7.5h15.6l-1 13a1.6 1.6 0 0 1-1.6 1.5H6.8a1.6 1.6 0 0 1-1.6-1.5z"/>',
+ shirt:'<path d="M8.5 2.8L2.3 6.4l2.3 4.4 2.3-1.1V21h10.2V9.7l2.3 1.1 2.3-4.4-6.2-3.6a3 3 0 0 1-7 0z"/>',
+ book:'<path d="M6 2h12a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm3 0v9l2.5-1.6L14 11V2z" fill-rule="evenodd"/>',
+ rocket:'<path d="M12 1.5c3.6 2.6 5.4 6.7 5 11.6l2.6 3.4v4.5l-3.7-2.2H8.1L4.4 21v-4.5L7 13.1C6.6 8.2 8.4 4.1 12 1.5zm0 6.2a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4z" fill-rule="evenodd"/><path d="M10 19.5h4l-2 3z"/>',
+ gift:'<path d="M3 8h18v4H3zM4.5 12h15v9a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1z"/><path d="M12 8v14" stroke="#fff" stroke-width="2.2" opacity=".7"/><path d="M12 8C10 3 6 3.5 6.5 6S11 8 12 8zm0 0c2-5 6-4.5 5.5-2S13 8 12 8z"/>',
+ medal:'<path d="M7 2h4l1.5 5-3 1.5zM17 2h-4l-1.5 5 3 1.5z"/><circle cx="12" cy="15" r="7"/><path d="M12 11l1.2 2.4 2.6.3-1.9 1.8.5 2.6-2.4-1.3-2.4 1.3.5-2.6-1.9-1.8 2.6-.3z" fill="#fff" opacity=".85"/>',
+ fire:'<path d="M13.5 1s.8 2.7.8 4.8c0 2.1-1.4 3.7-3.4 3.7S7.2 7.9 7.2 5.8v-.4C5.2 7.8 4 10.8 4 14a8 8 0 0 0 16 0c0-5.4-2.6-10.2-6.5-13zM12 19.5c-1.8 0-3.2-1.4-3.2-3.1 0-1.6 1-2.8 2.9-3.2 1.9-.4 3.8-1.3 4.9-2.8.4 1.4.6 2.8.6 4.3 0 2.7-2.3 4.8-5.2 4.8z"/>',
+ lock:'<path d="M17 9V7A5 5 0 0 0 7 7v2H5.5A1.5 1.5 0 0 0 4 10.5v10A1.5 1.5 0 0 0 5.5 22h13a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 18.5 9zM9.5 7a2.5 2.5 0 0 1 5 0v2h-5zM12 18a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>',
+ sun:'<circle cx="12" cy="12" r="5.2"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
+ moon:'<path d="M14.5 2.2A9.8 9.8 0 1 0 21.8 15a8 8 0 0 1-7.3-12.8z"/>',
+ play:'<path d="M7 4.5v15a1 1 0 0 0 1.5.9l12-7.5a1 1 0 0 0 0-1.8l-12-7.5A1 1 0 0 0 7 4.5z"/>',
+ skip:'<path d="M4 5v14l9-7zM13 5v14l9-7z"/>'
+};
+const IC=(k,c)=>`<svg class="ic${c?' '+c:''}" viewBox="0 0 24 24" aria-hidden="true">${ICP[k]||''}</svg>`;
+/* emoji used on UI buttons → icon; emoji inside activities stay as they are */
+const UIICON={'🏠':'home','✅':'task','🛍️':'bag','🦸':'shirt','📒':'book','🚀':'rocket','✔':'check','✔️':'check','✖':'close','⬅️':'back','🎁':'gift'};
+const uiIc=e=>UIICON[e]?IC(UIICON[e]):e;
+/* ---------- v3.5 day / night (parent sets the times) ---------- */
+function themeNow(){
+  const t=Object.assign({mode:'auto',day:'07:00',night:'19:00'},(()=>{try{return S.theme}catch(e){return null}})()||{});
+  if(t.mode==='day'||t.mode==='night')return t.mode;
+  const p=s=>{const [a,b]=String(s||'0:0').split(':').map(Number);return (a|0)*60+(b|0)};
+  const d=new Date(),m=d.getHours()*60+d.getMinutes(),dm=p(t.day),nm=p(t.night);
+  return (dm<nm?(m>=dm&&m<nm):(m>=dm||m<nm))?'day':'night';
+}
+function applyTheme(instant){
+  const b=document.body,n=themeNow()==='night';
+  if(b.classList.contains(n?'night':'day'))return;
+  if(instant)b.classList.add('noanim');
+  b.classList.toggle('night',n);b.classList.toggle('day',!n);
+  const mt=document.querySelector('meta[name=theme-color]');if(mt)mt.content=n?'#0f1438':'#8fcdf0';
+  if(instant)requestAnimationFrame(()=>requestAnimationFrame(()=>b.classList.remove('noanim')));
+}
+applyTheme(true);setInterval(()=>applyTheme(false),60000);
 
 /* ---------- helpers ---------- */
 const $=(s,r=document)=>r.querySelector(s);
@@ -363,7 +531,7 @@ const DEFAULT_REWARDS=[
 const LOOK_DEF={suit:'blue',cape:'red',mask:'gold',emblem:'bolt',extra:'none'};
 const OWN_DEF=['suit:blue','cape:none','cape:red','mask:gold','emblem:bolt','extra:none'];
 const DEF={v:3,name:'',day:1,stars:0,badges:[],history:[],reward:'',rewardEvery:5,oncePerDay:true,
-  win:{on:false,from:'15:00',to:'17:00'},content:{off:[],maxCount:0},
+  win:{on:false,from:'15:00',to:'17:00'},theme:{mode:'auto',day:'07:00',night:'19:00'},content:{off:[],maxCount:0},
   lock:{on:true,confirm:false,parent:true},sfx:true,school:null,fun:{},phone:{num:'',who:''},phoneOk:0,phoneBadge:false,ask:{n:'Mummy',h:'मम्मी'},grant:{date:'',extra:0,open:''},heroes:JSON.parse(JSON.stringify(HERO_DEF)),
   voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false,
   wallet:null,ledger:[],habits:JSON.parse(JSON.stringify(DEFAULT_HABITS)),habitLog:{},rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),look:Object.assign({},LOOK_DEF),owned:OWN_DEF.slice(),stickers:[],boxDate:'',haptics:true};
@@ -531,6 +699,7 @@ async function say(...parts){
 function stopVoice(){speakId++;try{speechSynthesis.cancel()}catch(e){}stopAudio()}
 function hero(display,parts){$('#bubble').textContent=display;LAST=parts||[display];return say(...LAST)}
 $('#again').onclick=()=>{SFX.tap();say(...LAST)};
+$('#again').innerHTML=IC('sound');$('#gear').innerHTML=IC('gear');$('#skipBtn').innerHTML=IC('skip')+'Skip';
 $('#stars').onclick=()=>{if(!SESS&&$('#modal').hidden)openShop()};
 function react(c){const hp=$('#heroFace .hp');if(!hp)return;hp.classList.remove('cheer','oops');void hp.offsetWidth;hp.classList.add(c)}
 
@@ -1799,7 +1968,7 @@ function streakDays(){
 function renderJourney(){
   const j=$('#journey');j.innerHTML='';
   if(SESS)SESS.blocks.forEach((b,i)=>j.appendChild(el('div','dot'+(i<SESS.i?' done':i===SESS.i?' cur':''),b.icon)));
-  $('#stars').textContent='⭐ '+(S.wallet|0);
+  $('#stars').innerHTML=IC('star')+(S.wallet|0);
   document.body.classList.toggle('test',!!S.test);
   const cur=$('.dot.cur',j);if(cur&&cur.scrollIntoView)try{cur.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}
 }
@@ -1889,9 +2058,71 @@ async function finishScreen(){
 }
 const SCREEN_NAME={home:'Home',habits:'Habits list',habit:'Doing a habit',shop:'Reward shop',dress:'Dress-up',stickers:'Sticker book',box:'Mystery box'};
 let SCREEN='home';
-function nbtn(parent,e,t,c1,c2,fn,badge){const b=el('button','nb',`<span class="e">${e}</span>${t}${badge?`<span class="badge">${badge}</span>`:''}`);b.style.setProperty('--c1',c1);b.style.setProperty('--c2',c2);b.onclick=()=>{SFX.tap();fn()};parent.appendChild(b);return b}
+function nbtn(parent,e,t,c1,c2,fn,badge){const b=el('button','nb',`<span class="e">${uiIc(e)}</span>${t}${badge?`<span class="badge">${badge}</span>`:''}`);b.style.setProperty('--c1',c1);b.style.setProperty('--c2',c2);b.onclick=()=>{SFX.tap();fn()};parent.appendChild(b);return b}
 function backHome(){const n=el('div','navbig');nbtn(n,'🏠','Home','#5c6bff','#3b3fb5',home);return n}
 function home(){
+  SESS=null;RUNID++;SCREEN='home';stopVoice();setLead('shivansh');renderJourney();applyTheme(false);
+  const stage=freshStage();
+  if(S.test){testHome(stage);return}
+  const nm=kidName(),st=streakDays(),ht=habitsToday(),w=S.wallet|0,goal=nextGoal(),td=today();
+  const last=S.history[S.history.length-1],g=S.grant||{};
+  const extraOK=g.date===td&&g.extra>0,openOK=g.open===td,doneToday=!!(last&&last.d===td);
+  let state='ok';
+  if(S.oncePerDay&&doneToday&&!extraOK)state='done';else if(!inWindow()&&!openOK)state='window';
+  const hm=el('div','hm');
+  if(state==='ok'){
+    const bl=buildBlocks(S.day),mins=bl.reduce((a,b)=>a+(b.min|0),0);
+    const go=el('button','mstart',`<span class="mt"><b>Start Mission ${S.day}</b><small>${bl.length} activities${mins?` · about ${mins} minutes`:''}</small></span><span class="mi">${IC('rocket')}</span>`);
+    go.onclick=()=>{SFX.tap();startSession(S.day,buildBlocks(S.day),false)};hm.appendChild(go);
+    const wave=[0,-12,-18,-12,0,12,18,12],tr=el('div','trail');
+    bl.forEach((b,i)=>{const s=el('span','',b.icon);s.style.setProperty('--c',(TEAM[b.lead]||{}).col||'#ffc83d');s.style.transform=`translateY(${wave[i%8]}px)`;tr.appendChild(s)});
+    hm.appendChild(tr);
+  }
+  const askBtn=(label,type,title,detail,grant)=>{
+    if(!liveOn())return;
+    const b=el('button','btn',label);
+    b.onclick=async()=>{
+      const r=await askMummy(type,title,detail,null);
+      if(r.status==='approved'){S.grant=Object.assign({date:'',extra:0,open:''},S.grant);grant();await save();home()}
+      else if(r.status==='denied')hero(`${AW().n} says: ${r.note||'Not now.'}`,[`${AW().h} कहती हैं —`,r.note||'अभी नहीं।']);
+      else if(r.status==='expired')hero(`${AW().n} did not answer yet.`,[`${AW().h} ने अभी जवाब नहीं दिया।`]);
+      else if(r.status==='offline')hero('No internet — ask a grown-up to help.',['Internet नहीं है — किसी बड़े से help माँगो।']);
+    };
+    hm.appendChild(b);
+  };
+  if(state==='done'){
+    $('#bubble').textContent=boxReady()?`Mission done! Your mystery box is ready, ${nm}!`:`Mission done for today! Now do your habits, ${nm}!`;
+    LAST=[boxReady()?'आज का mission हो गया! आपका mystery box तैयार है!':`आज का mission हो गया! अब अपनी habits पूरी करो, ${nm}!`];
+    askBtn(`Ask your ${AW().n} for one more mission`,'extra','wants one more mission today','Allow 1 extra mission today?',()=>{S.grant.date=td;S.grant.extra=(g.date===td?g.extra:0)+1});
+  }else if(state==='window'){
+    $('#bubble').textContent=`Missions open at ${S.win.from}. You can do habits now!`;LAST=['Mission बाद में खुलेगा। अभी habits कर सकते हो!'];
+    askBtn(`Ask your ${AW().n} to open now`,'open','wants to start a mission now','Allow starting outside the allowed time window today?',()=>{S.grant.open=td});
+  }else{
+    $('#bubble').textContent=`Hi ${nm}! Mission ${S.day} is ready. Shall we start?`;
+    LAST=[`नमस्ते ${nm}! आज का mission number ${S.day} ready है। चलो शुरू करें?`];
+  }
+  const ng=el('div','ngrid');
+  const tile=(ic,t,sub,c1,c2,fn,badge)=>{const b=el('button','nb2',`${IC(ic)}<span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span>${badge?`<span class="badge">${badge}</span>`:''}`);b.style.setProperty('--c1',c1);b.style.setProperty('--c2',c2);b.onclick=()=>{SFX.tap();fn()};ng.appendChild(b)};
+  tile('task','Habits',`${ht.done} of ${ht.total} done`,'#4fbf73','#2f8f52',()=>openHabits(),ht.total-ht.done||'');
+  tile('bag','Shop',goal&&goal.cost>w?`${goal.cost-w} more for ${esc(goal.name)}`:'Spend your stars','#ee6f5e','#b9473a',openShop);
+  tile('shirt','Dress up','','#5b8fe0','#3a64ad',()=>openDress());
+  tile('book','Stickers',`${new Set(S.stickers.map(x=>x.e)).size} of ${STICKERS.length}`,'#a865cf','#7a3fa0',openStickers);
+  hm.appendChild(ng);
+  const hs=el('div','hstat');
+  const me=el('button','me',`<span class="av">${myHeroSVG(S.look)}</span><span><span class="nm">${esc(nm)}</span><span class="mt2"><span>${IC('medal','yel')}${S.badges.length}</span>${st?`<span>${IC('fire','fire')}${st} days</span>`:''}</span></span>`);me.onclick=()=>{SFX.tap();openDress()};
+  const gc=goal?goal.cost:50,pct=Math.max(4,Math.min(100,Math.round(w/gc*100)));
+  const sb=el('button','sbar',`<b>${IC('star','yel')}${w}${goal?` / ${gc}`:''}</b><i><em style="width:${pct}%"></em></i>`);sb.onclick=()=>{SFX.tap();openShop()};
+  let bx;
+  if(boxReady()){bx=el('button','bx ready',`${IC('gift')}<span>Open your mystery box!</span>`);bx.onclick=()=>{SFX.tap();openBox()}}
+  else{const md=missionDoneToday();bx=el('div','bx',`${IC('gift')}<span>${md?'Mission done!':'Mission'} + habits ${ht.done}/${ht.total} opens the box</span>`)}
+  hs.append(me,sb,bx);hm.appendChild(hs);
+  if(('speechSynthesis' in window)&&VOICES.length&&!hasHi()&&!S.voice.hinglish)hm.appendChild(el('div','cap','⚠️ Hindi voice not found — a grown-up can fix this in ⚙️ → Voice'));
+  stage.appendChild(hm);
+  const hill=el('div','hill2');
+  ['snaya','aarav','shivansh','chiku','vidu'].filter(k=>TEAM[k]).forEach((k,i)=>{const b=el('button','',`<span class="hs${k==='shivansh'?' lead':''}">${heroSVG(k)}</span><span class="hn">${esc(HN(k))}</span>`);b.firstChild.style.animationDuration=(2.5+i*.4)+'s';b.onclick=()=>{SFX.tap();setLead(k);say(`मैं हूँ ${HH(k)}।`,TEAM[k].hp)};hill.appendChild(b)});
+  stage.appendChild(hill);
+}
+function homeV34(){
   SESS=null;RUNID++;SCREEN='home';stopVoice();setLead('shivansh');renderJourney();
   const stage=freshStage();
   stage.appendChild(el('div','title','HERO ACADEMY'));
@@ -1989,7 +2220,7 @@ function openHabits(slot){
   slot=slot||(new Date().getHours()<12?'morning':'evening');
   const stage=freshStage();
   const seg=el('div','seg');
-  [['morning','☀️ Morning'],['evening','🌙 Evening']].forEach(([k,t])=>{const b=el('button',k===slot?'on':'',t);b.onclick=()=>{SFX.tap();openHabits(k)};seg.appendChild(b)});
+  [['morning',IC('sun')+'Morning'],['evening',IC('moon')+'Evening']].forEach(([k,t])=>{const b=el('button',k===slot?'on':'',t);b.onclick=()=>{SFX.tap();openHabits(k)};seg.appendChild(b)});
   stage.appendChild(seg);
   const list=activeHabits().filter(h=>h.slot===slot||h.slot==='any');
   const g=el('div','hgrid');
@@ -2283,6 +2514,7 @@ function readRewardRows(root){return [...root.querySelectorAll('.edrow[data-rid]
 
 /* ---------- parent area ---------- */
 function openParent(firstRun){
+  document.body.classList.add('pok');
   const m=$('#modal');m.hidden=false;refreshVoices();
   let logs='';try{logs=(JSON.parse(localStorage.getItem('ha_log')||'[]')).slice(-25).reverse().join('\n')}catch(e){}
   const hist=S.history.slice(-14).reverse().map(h=>`<tr><td>${h.d}</td><td>${h.day}</td><td>${h.stars}</td><td>${h.mins??''}</td><td>${esc(h.mood||'')}</td><td>${esc(h.weak||'—')}</td></tr>`).join('')||'<tr><td colspan="6">No missions yet</td></tr>';
@@ -2300,6 +2532,8 @@ function openParent(firstRun){
     <div class="hn2"><div><label>Child asks … (name)</label><input type="text" id="pan" value="${esc(AW().n)}"></div><div><label>Hindi spelling (voice)</label><input type="text" id="pah" value="${esc(AW().h)}"></div></div>
     <label class="inl"><input type="checkbox" id="pwo" ${S.win.on?'checked':''}> Allow only between these times</label>
     <div class="row"><input type="time" id="pwf" value="${S.win.from}" style="width:45%"><input type="time" id="pwt" value="${S.win.to}" style="width:45%"></div>
+    <label>Day / night look</label><select id="pthm">${[['auto','Automatic — by the times below'],['day','Always day'],['night','Always night']].map(([v,t])=>`<option value="${v}" ${(S.theme||{}).mode===v?'selected':''}>${t}</option>`).join('')}</select>
+    <div class="hn2"><div><label>Day starts</label><input type="time" id="pthd" value="${esc((S.theme||{}).day||'07:00')}"></div><div><label>Night starts</label><input type="time" id="pthn" value="${esc((S.theme||{}).night||'19:00')}"></div></div>
   </details>
   <details><summary>🔒 Breaks & real-world activities</summary>
     <label class="inl"><input type="checkbox" id="plp" ${S.lock.parent!==false?'checked':''}> <span><b>Parent marks practical tasks done</b> — ON: only a grown-up can finish Move break, Hands-on maths and Notebook time (phone approval or PIN). OFF: the child presses Done himself.</span></label>
@@ -2396,6 +2630,7 @@ function openParent(firstRun){
   const readForm=()=>{
     S.name=$('#pn').value.trim();S.day=Math.max(1,parseInt($('#pd').value)||1);S.oncePerDay=$('#pod').checked;
     S.win={on:$('#pwo').checked,from:$('#pwf').value||'15:00',to:$('#pwt').value||'17:00'};
+    S.theme={mode:$('#pthm').value||'auto',day:$('#pthd').value||'07:00',night:$('#pthn').value||'19:00'};
     S.lock={on:$('#plk').checked,confirm:$('#plc').checked,parent:$('#plp').checked};
     S.content.off=[...m.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk);
     S.content.maxCount=Math.max(0,Math.min(20,parseInt($('#pmc').value)||0));
@@ -2454,7 +2689,7 @@ function openParent(firstRun){
 }
 
 /* ---------- LIVE link to the parent's phone ---------- */
-const PATCH_KEYS=['name','day','oncePerDay','win','lock','content','sfx','voice','reward','rewardEvery','heroes','grant','ask','habits','rewards','walletAdj','haptics','phone','school'];
+const PATCH_KEYS=['name','day','oncePerDay','win','theme','lock','content','sfx','voice','reward','rewardEvery','heroes','grant','ask','habits','rewards','walletAdj','haptics','phone','school'];
 const LIVE={timer:null,busy:false,paused:false,pending:{},asking:false,askIv:null};
 const liveOn=()=>!!(S.sync.url&&S.sync.token&&S.sync.live!==false);
 const AW=()=>S.ask||DEF.ask;
@@ -2496,7 +2731,7 @@ async function onLive(j){
   LIVE.role=j.test?'test':'main';
   let changed=false;
   for(const p of (j.patches||[])){applyPatch(p.set);LOCAL.lastPatch=Math.max(LOCAL.lastPatch|0,p.id);changed=true}
-  if(changed){await saveLocal();await DB.set('state',S);if(!S.test)save();toast(`⚙️ Settings updated by ${AW().n}`);if(SCREEN==='home'&&$('#modal').hidden&&!LIVE.asking)home()}
+  if(changed){applyTheme(false);await saveLocal();await DB.set('state',S);if(!S.test)save();toast(`⚙️ Settings updated by ${AW().n}`);if(SCREEN==='home'&&$('#modal').hidden&&!LIVE.asking)home()}
   const ctl=j.ctl||{};
   setPaused(!!ctl.paused);
   if(ctl.msg&&ctl.msg.id>(LOCAL.lastMsg|0)){LOCAL.lastMsg=ctl.msg.id;await saveLocal();showParentMsg(ctl.msg.text)}
@@ -2560,6 +2795,7 @@ async function askMummy(type,title,detail,onPin){
   const ri2=await DB.get('recIndex');if(Array.isArray(ri2))ri2.forEach(k=>RECS.add(k));
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(p=>L('persist '+p))}catch(e){}
   if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>L('sw '+e.message));
+  applyTheme(true);
   home();
   if(!S.sec.hash)setupWizard();
   if(S.sync.dirty)syncPush();

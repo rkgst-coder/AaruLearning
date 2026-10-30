@@ -1,5 +1,5 @@
 /* Hero Academy service worker — network-first so updates arrive, cache fallback for offline */
-const CACHE = 'hero-academy-v3.4.0';
+const CACHE = 'hero-academy-v3.5.0';
 const ASSETS = ['./', './index.html', './parent.html', './manifest.webmanifest', './parent.webmanifest', './icon-192.png', './icon-512.png', './parent-192.png', './parent-512.png'];
 
 self.addEventListener('install', e => {
