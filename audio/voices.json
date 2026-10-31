@@ -1,0 +1,17 @@
+{
+ "v": 2,
+ "voices": [
+  {
+   "id": "swara",
+   "name": "Swara - warm Hindi woman"
+  },
+  {
+   "id": "madhur",
+   "name": "Madhur - Hindi man"
+  },
+  {
+   "id": "neerja",
+   "name": "Neerja - Indian-English woman"
+  }
+ ]
+}

@@ -220,9 +220,11 @@ async function api(action,data){
   const r=await fetch(CFG.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:CFG.token,action,data})});
   const j=await r.json();if(!j.ok)throw new Error(j.error||'error');return j;
 }
-let busy=false,seenReq=new Set(),firstLoad=true,timer=null;
+let busy=false,again=false,seenReq=new Set(),firstLoad=true,timer=null;
 async function poll(force){
-  if(!CFG.url||!CFG.token||busy)return;busy=true;
+  if(!CFG.url||!CFG.token)return;
+  if(busy){again=true;return}
+  busy=true;
   try{
     const j=await api('pget',{sv:SV,force:!!force});
     NOW=j.now;HB=j.hb;CTL=j.ctl||CTL;REQS=j.reqs||[];PATCHES=j.patches||[];ERR='';
@@ -230,11 +232,11 @@ async function poll(force){
     else SV=j.sv;
     checkNew();render();
   }catch(e){ERR=e.message;L('poll '+e.message);renderConn()}
-  finally{busy=false}
+  finally{busy=false;if(again){again=false;poll(false)}}
 }
 function schedule(){
   clearTimeout(timer);
-  const d=document.visibilityState==='hidden'?20000:3000;
+  const d=document.visibilityState==='hidden'?20000:(REQS.some(r=>r.status==='pending')?1500:2200);
   timer=setTimeout(async()=>{await poll();schedule()},d);
 }
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){poll();schedule()}});
@@ -326,9 +328,13 @@ function bindReq(root){
     const id=+card.dataset.id;
     card.querySelectorAll('[data-note]').forEach(c=>c.onclick=()=>{card.querySelector('.rn').value=c.dataset.note});
     card.querySelectorAll('[data-dec]').forEach(b=>b.onclick=async()=>{
-      b.disabled=true;
-      try{await api('pdecide',{id,status:b.dataset.dec,note:(card.querySelector('.rn')||{}).value||''});toast(b.dataset.dec==='approved'?'Approved ✔':'Denied');await poll(false)}
-      catch(e){toast('⚠️ '+e.message);b.disabled=false;await poll(false)}
+      card.querySelectorAll('button').forEach(x=>x.disabled=true);
+      const st=b.dataset.dec,r=REQS.find(x=>x.id===id);
+      try{
+        const p=api('pdecide',{id,status:st,note:(card.querySelector('.rn')||{}).value||''});
+        if(r)r.status=st==='approved'?'approved':'denied';render();toast(st==='approved'?'Approved ✔':'Denied');
+        await p;await poll(false)}
+      catch(e){toast('⚠️ '+e.message);if(r)r.status='pending';render();await poll(false)}
     });
   });
 }
@@ -412,6 +418,7 @@ function renderCtl(){
     <label class="inl"><input type="checkbox" id="c_vo" ${e.voice&&e.voice.on?'checked':''}> Voice on</label>
     <label>Voice style</label><select id="c_vm"><option value="dual" ${e.voice&&e.voice.mode==='dual'?'selected':''}>Hindi teacher + English voice</option><option value="single" ${e.voice&&e.voice.mode==='single'?'selected':''}>One Hindi voice</option></select>
     <label>Speed: <span id="c_vrv">${e.voice&&e.voice.rate}</span></label><input type="range" id="c_vr" min="0.55" max="1.2" step="0.05" value="${e.voice&&e.voice.rate||0.85}" style="width:100%">
+    <label>Voice source</label><select id="c_vs"><option value="pack" ${!e.voice||e.voice.src!=='device'?'selected':''}>Natural voice pack (recommended)</option><option value="device" ${e.voice&&e.voice.src==='device'?'selected':''}>Tablet voice only</option></select>
     <label class="inl"><input type="checkbox" id="c_hg" ${e.voice&&e.voice.hinglish?'checked':''}> Read Hindi in English letters (Hinglish)</label>
     <label class="inl"><input type="checkbox" id="c_sf" ${e.sfx!==false?'checked':''}> Sound effects</label>
     <label class="inl"><input type="checkbox" id="c_hx" ${e.haptics!==false?'checked':''}> Vibration on success</label>
@@ -450,7 +457,7 @@ function applyCtl(){
     theme:{mode:g('c_thm').value||'auto',day:g('c_thd').value||'07:00',night:g('c_thn').value||'19:00'},
     lock:{on:g('c_lk').checked,confirm:g('c_lc').checked,parent:g('c_lp').checked},
     content:{off:[...document.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk),maxCount:Math.max(0,Math.min(20,parseInt(g('c_mc').value)||0))},
-    voice:{on:g('c_vo').checked,mode:g('c_vm').value,rate:parseFloat(g('c_vr').value)||0.85,hinglish:g('c_hg').checked},
+    voice:{on:g('c_vo').checked,mode:g('c_vm').value,rate:parseFloat(g('c_vr').value)||0.85,hinglish:g('c_hg').checked,src:g('c_vs').value||'pack'},
     phone:{num:g('c_ph').value.replace(/\D/g,'').slice(0,12),who:g('c_pw').value.trim()},
     sfx:g('c_sf').checked,haptics:g('c_hx').checked,habits:pReadHabits(),rewards:pReadRewards(),
     ask:{n:g('c_an').value.trim()||'Mummy',h:g('c_ah').value.trim()||'मम्मी'},heroes:{}

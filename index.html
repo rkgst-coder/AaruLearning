@@ -419,6 +419,56 @@ body.day .jar svg rect[fill="#ffffff22"]{fill:#efe8d8}
 .hill2 .hs svg{width:100%;height:auto;display:block}
 .hill2 .hn{background:var(--cream);border-radius:99px;padding:0 12px;font-size:17px;font-weight:600;box-shadow:0 3px 0 #0002}
 @media (max-width:600px){.ngrid{grid-template-columns:1fr 1fr;gap:12px}.nb2{flex-direction:column;justify-content:center;gap:4px;padding:10px;text-align:center}.nb2 small{display:none}.hstat{grid-template-columns:1fr 1fr}.hstat .bx{grid-column:1/-1}.trail span{width:38px;height:38px;font-size:20px}}
+
+/* ===== v3.6: smaller home/shop icons ===== */
+.nb2 .ic{font-size:44px}
+.nb2{min-height:112px}
+.hab .e,.rw .e{font-size:58px}
+.hab,.rw{min-height:168px}
+.swi .c{width:46px;height:46px;font-size:28px}
+.swi{min-height:100px}
+.stk{height:88px;font-size:44px}
+.dcard .chest{font-size:72px}
+/* ===== v3.6: parent area uses the parent-app theme (cream + orange, Fredoka) ===== */
+#modal{background:#33305acc}
+.panel{--ink:#33305a;--mut:#6b6788;--line:#e3dccd;--org:#f08a2c;--orgd:#b9601a;background:#fbf6ec;color:var(--ink);font-family:'Fredoka',ui-rounded,'Segoe UI',system-ui,Roboto,'Noto Sans Devanagari',sans-serif;box-shadow:0 20px 60px #0006}
+.panel h2{font-weight:600}
+.panel details{background:#fffdf8;border:0;box-shadow:0 3px 0 var(--line);border-radius:16px}
+.panel summary{font-weight:600}
+.panel input[type=text],.panel input[type=number],.panel input[type=password],.panel input[type=url],.panel input[type=time],.panel select{background:#fff;border:2px solid var(--line);color:var(--ink);font-family:inherit}
+.panel button{font-family:inherit;font-weight:600;background:#5b8fe0;box-shadow:0 4px 0 #3a64ad;border-radius:14px;padding:10px 16px}
+.panel button:active{transform:translateY(2px);box-shadow:0 2px 0 #3a64ad}
+.panel button.red{background:#ee6f5e;box-shadow:0 4px 0 #b9473a}
+.panel button.green{background:#4fbf73;box-shadow:0 4px 0 #2f8f52}
+.panel button.grey{background:#efe8d8;color:var(--ink);box-shadow:0 4px 0 #d9d0bd}
+.panel button.gold{background:var(--org);box-shadow:0 4px 0 var(--orgd)}
+.panel .note{color:var(--mut)}
+.panel pre{background:#efe8d8}
+.panel td,.panel th{border-color:var(--line)}
+.panel .edrow{background:#fffdf8;border:0;box-shadow:0 3px 0 var(--line)}
+.panel .pinpad button{background:#fffdf8;color:var(--ink);box-shadow:0 4px 0 var(--line);font-size:27px}
+.panel input[type=checkbox],.panel input[type=range]{accent-color:var(--org)}
+.panel.set{padding:0;width:min(720px,96%);height:min(94vh,920px);display:flex;flex-direction:column;overflow:hidden}
+.panel.set .sh{display:flex;align-items:center;gap:10px;padding:14px 16px 6px}
+.panel.set .sh h2{margin:0;flex:1;font-size:24px}
+.panel.set .sh small{font-size:12px;color:var(--mut);font-weight:500}
+.panel.set .sh .back{background:#efe8d8;color:var(--ink);box-shadow:0 3px 0 #d9d0bd;padding:8px 14px}
+.panel.set .sbody{flex:1;overflow:auto;padding:4px 14px 16px}
+.panel.set .sfoot{display:flex;gap:10px;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fffdf8;box-shadow:0 -4px 20px #0000000f}
+.panel.set .sfoot button{flex:1}
+.panel .grp{margin:14px 0 6px 6px;font-size:13px;font-weight:600;color:var(--mut);text-transform:uppercase;letter-spacing:1.1px}
+.panel .group{background:#fffdf8;border-radius:22px;box-shadow:0 4px 0 var(--line);overflow:hidden}
+.panel .set-row{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:none;box-shadow:none;border-radius:0;border-bottom:1px solid var(--line);color:var(--ink);padding:14px 16px;font-size:17px;font-weight:600}
+.panel .set-row:last-child{border-bottom:0}
+.panel .set-row:active{background:#f6efe0;transform:none;box-shadow:none}
+.panel .set-ic{width:40px;height:40px;border-radius:12px;background:#efe8d8;display:grid;place-items:center;font-size:22px;flex:none}
+.panel .set-row span:nth-child(2){flex:1;display:flex;flex-direction:column}
+.panel .set-row small{font-size:13px;font-weight:400;color:var(--mut)}
+.panel .set-row .v{color:var(--mut);font-size:24px;font-weight:400;flex:none}
+.panel .spage[hidden]{display:none}
+.panel .vrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);font-size:15px}
+.panel .bar{height:12px;background:#efe8d8;border-radius:99px;overflow:hidden;margin:8px 0}
+.panel .bar>i{display:block;height:100%;background:#f5b316;border-radius:99px;width:0}
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap">
@@ -443,7 +493,7 @@ body.day .jar svg rect[fill="#ffffff22"]{fill:#efe8d8}
   window.addEventListener('unhandledrejection',function(e){window.L('REJ '+(e.reason&&e.reason.message||e.reason))});
   window.L('boot');
 })();
-const APPV='3.5.0';
+const APPV='3.6.0';
 /* ---------- v3.5 chunky icons (inline, work offline) ---------- */
 const ICP={
  star:'<path d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 7-6.3-3.4-6.3 3.4 1.3-7L1.9 9.1l7-.9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
@@ -533,7 +583,7 @@ const OWN_DEF=['suit:blue','cape:none','cape:red','mask:gold','emblem:bolt','ext
 const DEF={v:3,name:'',day:1,stars:0,badges:[],history:[],reward:'',rewardEvery:5,oncePerDay:true,
   win:{on:false,from:'15:00',to:'17:00'},theme:{mode:'auto',day:'07:00',night:'19:00'},content:{off:[],maxCount:0},
   lock:{on:true,confirm:false,parent:true},sfx:true,school:null,fun:{},phone:{num:'',who:''},phoneOk:0,phoneBadge:false,ask:{n:'Mummy',h:'मम्मी'},grant:{date:'',extra:0,open:''},heroes:JSON.parse(JSON.stringify(HERO_DEF)),
-  voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false,
+  voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false,src:'pack'},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false,
   wallet:null,ledger:[],habits:JSON.parse(JSON.stringify(DEFAULT_HABITS)),habitLog:{},rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),look:Object.assign({},LOOK_DEF),owned:OWN_DEF.slice(),stickers:[],boxDate:'',haptics:true};
 let S=JSON.parse(JSON.stringify(DEF));
 let LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0,devId:'',devName:''}; /* device-only, never synced */
@@ -551,15 +601,19 @@ const saveLocal=()=>DB.set('local',LOCAL);
 
 /* ---------- cloud sync (Apps Script + Google Sheet) ---------- */
 function exportable(){const o=JSON.parse(JSON.stringify(S));delete o.sync;delete o.sec;o.test=false;return o}
-async function callSync(action,data){
-  const r=await fetch(S.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:S.sync.token,action,data,dev:LOCAL.devId,devName:LOCAL.devName})});
-  const j=await r.json();if(!j.ok)throw new Error(j.error||'sync error');return j;
+async function callSync(action,data,ms){
+  const ac=typeof AbortController!=='undefined'?new AbortController():null,to=ac?setTimeout(()=>ac.abort(),ms||20000):null;
+  try{
+    const r=await fetch(S.sync.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:S.sync.token,action,data,dev:LOCAL.devId,devName:LOCAL.devName}),signal:ac?ac.signal:undefined});
+    const j=await r.json();if(!j.ok)throw new Error(j.error||'sync error');return j;
+  }catch(e){if(e&&e.name==='AbortError')throw new Error('timed out');throw e}
+  finally{if(to)clearTimeout(to)}
 }
 let syncing=false;
 async function syncPush(){
   if(!S.sync.url||!S.sync.token||syncing||S.test)return false;
   syncing=true;
-  try{await callSync('push',exportable());S.sync.last=new Date().toISOString();S.sync.dirty=false;await DB.set('state',S);L('sync ok');return true}
+  try{await callSync('push',exportable(),45000);S.sync.last=new Date().toISOString();S.sync.dirty=false;await DB.set('state',S);L('sync ok');return true}
   catch(e){L('sync fail '+e.message);S.sync.dirty=true;await DB.set('state',S);return false}
   finally{syncing=false}
 }
@@ -680,20 +734,57 @@ function segsOf(parts){
   }
   return out;
 }
+/* ---------- v3.6 natural voice pack: pre-made teacher clips, tablet voice as fallback ---------- */
+const PACK={ok:false,clips:{},voice:'',base:'audio/'};
+const SEEN={};let seenTimer=null;
+function h53(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)}
+const normRun=t=>String(t).replace(/…|\.\.\./g,' ').replace(/\s+/g,' ').trim();
+const clipKey=t=>'c'+h53(normRun(t)).toString(36);
+async function loadPack(){try{const r=await fetch('audio/manifest.json',{cache:'no-cache'});if(!r.ok)throw new Error(r.status);const j=await r.json();PACK.clips=j.clips||{};PACK.voice=j.voice||'';PACK.ok=Object.keys(PACK.clips).length>0}catch(e){PACK.ok=false}}
+function noteSeen(t){const k=clipKey(t);if(!SEEN[k]){if(Object.keys(SEEN).length>4000)return;SEEN[k]={t:normRun(t),n:0}}SEEN[k].n++;clearTimeout(seenTimer);seenTimer=setTimeout(()=>DB.set('seen',SEEN),4000)}
+const clipURL={};
+async function clipAudio(key){const f=PACK.clips[key];if(!f)return null;if(!clipURL[key]){const r=await fetch(PACK.base+f);if(!r.ok)throw new Error('clip '+r.status);clipURL[key]=URL.createObjectURL(await r.blob())}return new Audio(clipURL[key])}
+function playClip(key,id){return new Promise(async res=>{
+  let a;try{a=await clipAudio(key)}catch(e){L('clip '+e.message);return res(false)}
+  if(!a)return res(false);
+  if(id!==speakId)return res(true);
+  curAudio=a;let done=false;const fin=ok=>{if(!done){done=true;res(ok)}};
+  a.onended=()=>fin(true);a.onerror=()=>fin(false);setTimeout(()=>fin(true),30000);
+  try{await a.play()}catch(e){fin(false)}
+  const iv=setInterval(()=>{if(done){clearInterval(iv);return}if(id!==speakId){clearInterval(iv);try{a.pause()}catch(e){}fin(true)}},120);
+})}
+function runsOf(parts){
+  const out=[];let cur=[];const flush=()=>{if(cur.length){out.push({items:cur});cur=[]}};
+  for(const p of parts){
+    if(typeof p==='string'||Array.isArray(p))cur.push(p);
+    else if(p&&p.pause){flush();out.push({pause:p.pause})}
+    else if(p&&p.fn){flush();out.push({fn:p.fn})}
+    else if(p&&p.rec){if(RECS.has(p.rec)){flush();out.push({rec:p.rec})}else cur.push(p.t)}
+  }
+  flush();return out;
+}
+const runText=items=>normRun(items.map(p=>typeof p==='string'?p:p[0]).join(' '));
 async function say(...parts){
   const id=++speakId;
   try{speechSynthesis.cancel()}catch(e){}
   stopAudio();
   await sleep(70);
   const romanAll=S.voice.hinglish||(!voiceFor('hi')&&'speechSynthesis' in window);
-  for(const sg of segsOf(parts)){
+  for(const run of runsOf(parts)){
     if(id!==speakId)return;
-    if(sg.pause){await sleep(sg.pause);continue}
-    if(sg.fn){try{sg.fn()}catch(e){}continue}
-    if(sg.rec){if(await playRec(sg.rec,id))continue}
-    const roman=sg.l==='hi'&&romanAll;
-    const text=roman?deva2rom(sg.t):sg.t,lang=(sg.l==='en'||roman)?'en':'hi';
-    for(const c of chunks(text)){if(id!==speakId)return;await say1(c,lang);await sleep(90)}
+    if(run.pause){await sleep(run.pause);continue}
+    if(run.fn){try{run.fn()}catch(e){}continue}
+    if(run.rec){await playRec(run.rec,id);continue}
+    if(S.voice.on&&S.voice.src!=='device'){
+      const text=runText(run.items);
+      if(text){noteSeen(text);const key=clipKey(text);if(PACK.clips[key]&&await playClip(key,id))continue}
+    }
+    for(const sg of segsOf(run.items)){
+      if(id!==speakId)return;
+      const roman=sg.l==='hi'&&romanAll;
+      const text=roman?deva2rom(sg.t):sg.t,lang=(sg.l==='en'||roman)?'en':'hi';
+      for(const c of chunks(text)){if(id!==speakId)return;await say1(c,lang);await sleep(90)}
+    }
   }
 }
 function stopVoice(){speakId++;try{speechSynthesis.cancel()}catch(e){}stopAudio()}
@@ -2513,6 +2604,43 @@ function readHabitRows(root){return [...root.querySelectorAll('.edrow[data-hid]'
 function readRewardRows(root){return [...root.querySelectorAll('.edrow[data-rid]')].map(r=>({id:r.dataset.rid,icon:fv(r,'icon').value.trim()||'🎁',name:fv(r,'name').value.trim()||'Reward',cost:Math.max(1,parseInt(fv(r,'cost').value)||1),on:fv(r,'on').checked}))}
 
 /* ---------- parent area ---------- */
+/* ---------- v3.6 settings: categories like the Register app, parent-app theme ---------- */
+let SET_PAGE=null;
+const SET_CFG=[
+ ['Child',[['👦','Child & schedule','Name, mission, time window, day / night'],['🏫','School Connect','Monthly letters, numbers, rhymes'],['📚','Content','Which activities appear'],['🦸','Hero names','Names and Hindi spelling']]],
+ ['Daily life',[['🔒','Breaks & real-world activities','Who marks practical tasks done'],['✅','Habits & routines','Daily checklist'],['🛍️','Reward shop & star wallet','Rewards, stars, star log']]],
+ ['Voice & sound',[['🎧','Natural voice pack','Teacher clips, offline download'],['🔊','Voice (Hindi teacher)','Tablet voice, speed, your own recordings']]],
+ ['Reports',[['📈','Report','Recent missions'],['😀','Interest meter','Which games he enjoys'],['🖨️','Print sheets','Daily sheets and learning plans']]],
+ ['Data & safety',[['☁️','Data & sync','Backup, live link to the phone, error log'],['🔐','Security','PIN, fingerprint / face'],['🧪','Test mode','Open every stage']]]];
+function settingsify(m){
+  const panel=$('.panel',m);panel.classList.add('set');
+  const kids=[...panel.children];
+  const h2=kids.find(x=>x.tagName==='H2'),note0=kids.find(x=>x.tagName==='P'&&x.classList.contains('note'));
+  const ds=kids.filter(x=>x.tagName==='DETAILS');
+  const foot=kids.find(x=>x.classList&&x.classList.contains('row')&&x.querySelector('#sv'));
+  const pages={};
+  ds.forEach(d=>{const sm=d.querySelector(':scope>summary'),t=sm.textContent.trim();const pg=el('div','spage');pg.hidden=true;[...d.childNodes].filter(n=>n!==sm).forEach(n=>pg.appendChild(n));pages[t]={pg,title:t}});
+  const sh=el('div','sh'),body=el('div','sbody'),sf=el('div','sfoot');
+  const root=el('div','spage');
+  if(note0)root.appendChild(note0);
+  const addRow=(grp,cfg)=>{const [ic,title,sub]=cfg;const key=Object.keys(pages).find(k=>k.startsWith(ic)&&k.includes(title.split(' ')[0]));if(!key)return;
+    const b=el('button','set-row',`<span class="set-ic">${ic}</span><span>${esc(title)}<small>${esc(sub)}</small></span><span class="v">›</span>`);b.onclick=()=>show(key);grp.appendChild(b);pages[key].used=true};
+  SET_CFG.forEach(([g,rows])=>{root.appendChild(el('div','grp',esc(g)));const grp=el('div','group');rows.forEach(r=>addRow(grp,r));root.appendChild(grp)});
+  Object.keys(pages).filter(k=>!pages[k].used).forEach(k=>{const grp=el('div','group');const b=el('button','set-row',`<span class="set-ic">⚙️</span><span>${esc(k)}</span><span class="v">›</span>`);b.onclick=()=>show(k);grp.appendChild(b);root.appendChild(grp)});
+  root.appendChild(el('div','grp','About'));root.appendChild(el('div','group',`<div class="set-row"><span style="flex:1">Version</span><span class="v" style="font-size:16px">${APPV}</span></div>`));
+  body.appendChild(root);Object.values(pages).forEach(o=>body.appendChild(o.pg));
+  const rs=foot&&foot.querySelector('#rs');
+  if(rs){const dk=Object.keys(pages).find(k=>k.startsWith('☁️'));if(dk){pages[dk].pg.appendChild(el('div','grp','Danger zone'));const r=el('div','row');r.appendChild(rs);pages[dk].pg.appendChild(r)}}
+  [...foot.children].forEach(c=>sf.appendChild(c));
+  const show=k=>{
+    SET_PAGE=k||null;root.hidden=!!k;Object.entries(pages).forEach(([t,o])=>o.pg.hidden=t!==k);body.scrollTop=0;
+    sh.innerHTML=k?`<button class="back">‹ Settings</button><h2>${esc(k.replace(/^\S+\s*/,''))}</h2>`:`<h2>⚙️ Parent area</h2><small>v${APPV}</small>`;
+    if(k)$('.back',sh).onclick=()=>show(null);
+  };
+  panel.innerHTML='';panel.append(sh,body,sf);
+  $('#sv',sf).addEventListener('click',()=>{SET_PAGE=null});$('#cl',sf).addEventListener('click',()=>{SET_PAGE=null});
+  show(SET_PAGE&&pages[SET_PAGE]?SET_PAGE:null);
+}
 function openParent(firstRun){
   document.body.classList.add('pok');
   const m=$('#modal');m.hidden=false;refreshVoices();
@@ -2565,6 +2693,14 @@ function openParent(firstRun){
   </details>
   <details><summary>📚 Content</summary>${blocks}
     <label>Max counting number (0 = automatic, grows from 10 to 20)</label><input type="number" id="pmc" min="0" max="20" value="${S.content.maxCount}">
+  </details>
+  <details><summary>🎧 Natural voice pack</summary>
+    <p class="note">Natural teacher clips (made once on a computer with free neural voices) play instead of the tablet's robotic voice. A line with no clip yet falls back to the tablet voice, and the tablet remembers every line it needed.</p>
+    <label>Voice source</label><select id="pvs"><option value="pack" ${S.voice.src!=='device'?'selected':''}>Natural voice pack (recommended)</option><option value="device" ${S.voice.src==='device'?'selected':''}>Tablet voice only</option></select>
+    <div class="note" id="vpStat" style="margin-top:10px">Checking…</div><div class="bar"><i id="vpBar"></i></div>
+    <div class="row"><button id="vpDl">⬇ Download all clips (offline)</button><button id="vpTest" class="green">▶ Play a sample clip</button></div>
+    <div class="row"><button class="grey" id="vpExp">Export lines still missing</button><button class="grey" id="vpClr">Clear the list</button></div>
+    <p class="note" id="vpMsg"></p>
   </details>
   <details><summary>🔊 Voice (Hindi teacher)</summary>
     <p class="note">Hindi voice on this tablet: <b>${hasHi()?'found ✅':'not found ❌'}</b> (${VOICES.length} voices). If missing: Settings → General management → Language → Text-to-speech → <b>Speech Services by Google</b> → install Hindi (India).</p>
@@ -2623,6 +2759,7 @@ function openParent(firstRun){
     <label class="inl"><input type="checkbox" id="ptm" ${S.test?'checked':''}> Test mode ON — open any day and any block, Skip button visible, locks off, nothing is saved</label>
   </details>
   <div class="row"><button id="sv">💾 Save & close</button><button class="grey" id="cl">Close</button><button class="red" id="rs">Reset everything</button></div></div>`;
+  settingsify(m);
   if(navigator.storage&&navigator.storage.persisted)navigator.storage.persisted().then(p=>{const x=$('#pst');if(x)x.textContent=p?'ON ✅':'not granted'});
   const msg=t=>{$('#smsg').textContent=t};
   $('#pvr').oninput=e=>{$('#prv').textContent=e.target.value};
@@ -2634,7 +2771,7 @@ function openParent(firstRun){
     S.lock={on:$('#plk').checked,confirm:$('#plc').checked,parent:$('#plp').checked};
     S.content.off=[...m.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk);
     S.content.maxCount=Math.max(0,Math.min(20,parseInt($('#pmc').value)||0));
-    S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.85,pitch:parseFloat($('#pvp').value)||1.1,hinglish:$('#phg').checked};
+    S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.85,pitch:parseFloat($('#pvp').value)||1.1,hinglish:$('#phg').checked,src:$('#pvs').value||'pack'};
     S.sfx=$('#psf').checked;
     LOCAL.hiVoice=$('#pvh').value;LOCAL.enVoice=$('#pve').value;saveLocal();
     m.querySelectorAll('[data-hn]').forEach(i=>{const k=i.dataset.hn;S.heroes[k].n=i.value.trim()||HERO_DEF[k].n});
@@ -2663,6 +2800,22 @@ function openParent(firstRun){
   $('#wApply').onclick=async()=>{const n=parseInt($('#wAmt').value)||0;if(!n)return;readForm();adjustWallet(n,$('#wNote').value.trim());await save();openParent()};
   $('#prb').onclick=()=>{m.hidden=true;printMissions(parseInt($('#prf').value)||1,parseInt($('#prt').value)||1)};
   $('#prw').onclick=()=>{const f=parseInt($('#prf').value)||1;m.hidden=true;printMissions(f,f+6)};
+  /* voice pack */
+  const vpUpdate=()=>{const seen=Object.values(SEEN),have=seen.filter(e=>PACK.clips[clipKey(e.t)]).length,n=Object.keys(PACK.clips).length;
+    $('#vpStat').innerHTML=PACK.ok?`Pack loaded: <b>${n}</b> clips${PACK.voice?' · voice '+esc(PACK.voice):''}.<br>Lines the tablet has spoken: ${seen.length} · with a clip: ${have} · <b>missing: ${seen.length-have}</b>`:`No voice pack on the website yet (<code>audio/manifest.json</code> not found). Build it with <b>make_voice_pack_v1.py</b> — see VOICE_PACK_README.txt. Until then the tablet voice is used. Lines heard so far: ${seen.length}.`;
+    $('#vpBar').style.width=(seen.length?Math.round(have/seen.length*100):0)+'%'};
+  vpUpdate();loadPack().then(vpUpdate);
+  $('#vpDl').onclick=async()=>{
+    const files=[...new Set(Object.values(PACK.clips))];if(!files.length){$('#vpMsg').textContent='No clips to download yet.';return}
+    let done=0,fail=0;const q=files.slice();
+    const work=async()=>{while(q.length){const f=q.pop();try{const r=await fetch(PACK.base+f);if(!r.ok)throw 0;await r.blob()}catch(e){fail++}done++;$('#vpMsg').textContent=`Downloading… ${done} / ${files.length}`;$('#vpBar').style.width=Math.round(done/files.length*100)+'%'}};
+    await Promise.all([work(),work(),work(),work()]);
+    $('#vpMsg').textContent=fail?`Done, but ${fail} clip(s) failed — press again when online.`:`✅ All ${files.length} clips are saved on this tablet for offline use.`;
+  };
+  $('#vpTest').onclick=async()=>{const ks=Object.keys(PACK.clips);if(!ks.length){$('#vpMsg').textContent='No clips yet.';return}const id=++speakId;stopAudio();const ok=await playClip(rnd(ks),id);if(!ok)$('#vpMsg').textContent='Could not play the clip — check the internet and try again.'};
+  $('#vpExp').onclick=()=>{const miss=Object.entries(SEEN).filter(([k])=>!PACK.clips[k]).map(([k,e])=>({key:k,text:e.t,n:e.n})).sort((a,b)=>b.n-a.n);
+    const blob=new Blob([JSON.stringify({app:'hero-academy',saved:new Date().toISOString(),lines:miss},null,1)],{type:'application/json'});const a=el('a');a.href=URL.createObjectURL(blob);a.download=`hero-missing-lines-${today()}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);$('#vpMsg').textContent=`${miss.length} missing line(s) exported. Give this file to make_voice_pack_v1.py (--extra).`};
+  $('#vpClr').onclick=async()=>{if(!confirm('Forget the list of spoken lines?'))return;for(const k in SEEN)delete SEEN[k];await DB.set('seen',SEEN);vpUpdate()};
   /* recordings */
   m.querySelectorAll('.recrow').forEach(row=>{
     const k=row.dataset.rk,st=$('[data-rs]',row),rb=$('[data-ra=rec]',row);
@@ -2738,16 +2891,17 @@ async function onLive(j){
   for(const id of Object.keys(LIVE.pending)){const r=j.reqs&&j.reqs[id];if(r&&r.status!=='pending'){const f=LIVE.pending[id];if(f)f(r)}}
 }
 async function liveTick(){
-  if(!liveOn()||LIVE.busy)return;
+  if(!liveOn())return;
+  if(LIVE.busy){LIVE.again=true;return}
   LIVE.busy=true;
-  try{const j=await callSync('sync',{hb:hbData(),lastPatch:LOCAL.lastPatch|0,reqIds:Object.keys(LIVE.pending).map(Number)});await onLive(j)}
+  try{const j=await callSync('sync',{hb:hbData(),lastPatch:LOCAL.lastPatch|0,reqIds:Object.keys(LIVE.pending).map(Number)},12000);await onLive(j)}
   catch(e){L('live '+e.message)}
-  finally{LIVE.busy=false}
+  finally{LIVE.busy=false;if(LIVE.again){LIVE.again=false;liveTick()}}
 }
 function liveSchedule(){
   clearTimeout(LIVE.timer);
   if(!liveOn())return;
-  const d=document.visibilityState==='hidden'?30000:(Object.keys(LIVE.pending).length?2000:4000);
+  const d=document.visibilityState==='hidden'?30000:(Object.keys(LIVE.pending).length?1200:4000);
   LIVE.timer=setTimeout(async()=>{await liveTick();liveSchedule()},d);
 }
 function kickLive(){clearTimeout(LIVE.timer);if(!liveOn())return;liveTick().finally(liveSchedule)}
@@ -2755,29 +2909,35 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 function showAsk(title,onCancel,onPin){
   hideAsk();
   const o=el('div','ov');o.id='askov';o.style.display='grid';
-  o.innerHTML=`<div class="ovc"><div>${heroSVG('snaya',170)}</div><div class="cap" style="font-size:36px">Ask your ${esc(AW().n)}! 🙋‍♀️</div><div class="sub">${esc(title)}</div><div class="dots">Waiting for ${esc(AW().n)} to say YES<span class="dd">.</span><span class="dd">.</span><span class="dd">.</span></div><div class="row"><button class="btn small" id="askC">Cancel</button>${onPin?'<button class="link" id="askP">Grown-up here? Use PIN</button>':''}</div></div>`;
+  o.innerHTML=`<div class="ovc"><div>${heroSVG('snaya',170)}</div><div class="cap" style="font-size:36px">Ask your ${esc(AW().n)}! 🙋‍♀️</div><div class="sub">${esc(title)}</div><div class="dots" id="askDots">Sending to ${esc(AW().n)}<span class="dd">.</span><span class="dd">.</span><span class="dd">.</span></div><div class="row"><button class="btn small" id="askC">Cancel</button>${onPin?'<button class="link" id="askP">Grown-up here? Use PIN</button>':''}</div></div>`;
   document.body.appendChild(o);
   $('#askC').onclick=onCancel;if(onPin)$('#askP').onclick=onPin;
   LIVE.asking=true;
   const sp=()=>say(`अपनी ${AW().h} से पूछो!`);
   sp();LIVE.askIv=setInterval(sp,25000);
 }
+function askWaiting(){const d=$('#askDots');if(d)d.innerHTML=`Waiting for ${esc(AW().n)} to say YES<span class="dd">.</span><span class="dd">.</span><span class="dd">.</span>`}
 function hideAsk(){clearInterval(LIVE.askIv);const o=$('#askov');if(o)o.remove();LIVE.asking=false}
+/* v3.6: the "Ask Mummy" screen appears INSTANTLY (before the network call), only one ask can be open at a time,
+   and the server also refuses a second pending request for the same task (it returns the first one). */
 async function askMummy(type,title,detail,onPin){
   if(!liveOn()||LIVE.role==='test')return {status:'offline'};
-  let id;
-  try{const j=await callSync('request',{type,title:`${kidName()}: ${title}`,detail});id=j.id}
-  catch(e){L('req '+e.message);return {status:'offline'}}
+  if(LIVE.asking)return {status:'busy'};
+  const cid='c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
   return new Promise(res=>{
+    let id=null,over=false;
     const finish=async r=>{
-      delete LIVE.pending[id];
+      if(over)return;over=true;
+      if(id!=null)delete LIVE.pending[id];
       if(r.status==='approved'){const c=$('#askov .ovc');if(c)c.innerHTML=`<div class="pic pop">🎉</div><div class="cap" style="font-size:36px">${esc(AW().n)} said YES!</div>`;SFX.win();say(`${AW().h} ने हाँ कहा! शाबाश!`);await sleep(1700)}
       hideAsk();res(r);
     };
-    LIVE.pending[id]=finish;
-    const cancel=()=>{callSync('cancel',{id}).catch(()=>{});finish({status:'cancelled'})};
+    const cancel=()=>{callSync('cancel',id!=null?{id,cid}:{cid},8000).catch(()=>{});finish({status:'cancelled'})};
     showAsk(title,cancel,onPin?()=>{cancel();onPin()}:null);
-    kickLive();
+    callSync('request',{type,title:`${kidName()}: ${title}`,detail,cid},15000).then(j=>{
+      if(over){callSync('cancel',{id:j.id,cid},8000).catch(()=>{});return}
+      id=j.id;LIVE.pending[id]=finish;askWaiting();kickLive();
+    }).catch(e=>{L('req '+e.message);if(!over){callSync('cancel',{cid},8000).catch(()=>{});finish({status:'offline'})}});
   });
 }
 
@@ -2796,6 +2956,8 @@ async function askMummy(type,title,detail,onPin){
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().then(p=>L('persist '+p))}catch(e){}
   if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'))navigator.serviceWorker.register('sw.js').catch(e=>L('sw '+e.message));
   applyTheme(true);
+  try{const sn=await DB.get('seen');if(sn&&typeof sn==='object')Object.assign(SEEN,sn)}catch(e){}
+  loadPack();
   home();
   if(!S.sec.hash)setupWizard();
   if(S.sync.dirty)syncPush();
