@@ -420,6 +420,13 @@ body.day .jar svg rect[fill="#ffffff22"]{fill:#efe8d8}
 .hill2 .hn{background:var(--cream);border-radius:99px;padding:0 12px;font-size:17px;font-weight:600;box-shadow:0 3px 0 #0002}
 @media (max-width:600px){.ngrid{grid-template-columns:1fr 1fr;gap:12px}.nb2{flex-direction:column;justify-content:center;gap:4px;padding:10px;text-align:center}.nb2 small{display:none}.hstat{grid-template-columns:1fr 1fr}.hstat .bx{grid-column:1/-1}.trail span{width:38px;height:38px;font-size:20px}}
 
+/* ===== v3.6: big Listen-again button, word highlight, no pull-to-refresh ===== */
+html,body{overscroll-behavior:none}
+#again{width:auto;min-width:84px;height:84px;border-radius:42px;padding:0 24px;display:flex;align-items:center;gap:10px;font-size:22px;font-weight:600;font-family:inherit}
+#again .ic{font-size:40px}
+@media (max-width:600px){#again span{display:none}#again{padding:0;width:84px;justify-content:center}}
+#bubble .w{border-radius:8px;padding:0 3px;transition:background .15s}
+#bubble .w.on{background:#ffd84a;color:#33305a}
 /* ===== v3.6: smaller home/shop icons ===== */
 .nb2 .ic{font-size:44px}
 .nb2{min-height:112px}
@@ -581,9 +588,9 @@ const DEFAULT_REWARDS=[
 const LOOK_DEF={suit:'blue',cape:'red',mask:'gold',emblem:'bolt',extra:'none'};
 const OWN_DEF=['suit:blue','cape:none','cape:red','mask:gold','emblem:bolt','extra:none'];
 const DEF={v:3,name:'',day:1,stars:0,badges:[],history:[],reward:'',rewardEvery:5,oncePerDay:true,
-  win:{on:false,from:'15:00',to:'17:00'},theme:{mode:'auto',day:'07:00',night:'19:00'},content:{off:[],maxCount:0},
+  win:{on:false,from:'15:00',to:'17:00'},theme:{mode:'auto',day:'07:00',night:'19:00'},content:{off:[],maxCount:0,sightFrom:27},
   lock:{on:true,confirm:false,parent:true},sfx:true,school:null,fun:{},phone:{num:'',who:''},phoneOk:0,phoneBadge:false,ask:{n:'Mummy',h:'मम्मी'},grant:{date:'',extra:0,open:''},heroes:JSON.parse(JSON.stringify(HERO_DEF)),
-  voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false,src:'pack'},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false,
+  voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false,src:'pack',pack:''},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false,kiosk:false,
   wallet:null,ledger:[],habits:JSON.parse(JSON.stringify(DEFAULT_HABITS)),habitLog:{},rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),look:Object.assign({},LOOK_DEF),owned:OWN_DEF.slice(),stickers:[],boxDate:'',haptics:true};
 let S=JSON.parse(JSON.stringify(DEF));
 let LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0,devId:'',devName:''}; /* device-only, never synced */
@@ -735,26 +742,55 @@ function segsOf(parts){
   return out;
 }
 /* ---------- v3.6 natural voice pack: pre-made teacher clips, tablet voice as fallback ---------- */
-const PACK={ok:false,clips:{},voice:'',base:'audio/'};
+const PACK={ok:false,clips:{},voice:'',base:'audio/',voices:[],id:''};
+const SAMPLE_LINE='नमस्ते! आज का letter है S। S for Sun! चलो apples गिनते हैं — one, two, three.';
 const SEEN={};let seenTimer=null;
 function h53(str){let h1=0xdeadbeef,h2=0x41c6ce57;for(let i=0;i<str.length;i++){const ch=str.charCodeAt(i);h1=Math.imul(h1^ch,2654435761);h2=Math.imul(h2^ch,1597334677)}h1=Math.imul(h1^(h1>>>16),2246822507);h1^=Math.imul(h2^(h2>>>13),3266489909);h2=Math.imul(h2^(h2>>>16),2246822507);h2^=Math.imul(h1^(h1>>>13),3266489909);return 4294967296*(2097151&h2)+(h1>>>0)}
 const normRun=t=>String(t).replace(/…|\.\.\./g,' ').replace(/\s+/g,' ').trim();
 const clipKey=t=>'c'+h53(normRun(t)).toString(36);
-async function loadPack(){try{const r=await fetch('audio/manifest.json',{cache:'no-cache'});if(!r.ok)throw new Error(r.status);const j=await r.json();PACK.clips=j.clips||{};PACK.voice=j.voice||'';PACK.ok=Object.keys(PACK.clips).length>0}catch(e){PACK.ok=false}}
+async function packManifest(id){const r=await fetch('audio/'+id+'/manifest.json',{cache:'no-cache'});if(!r.ok)throw new Error(r.status);return r.json()}
+async function loadPack(){
+  try{const r=await fetch('audio/voices.json',{cache:'no-cache'});if(r.ok)PACK.voices=(await r.json()).voices||[]}catch(e){}
+  PACK.clips={};PACK.ok=false;PACK.id='';PACK.voice='';
+  const id=S.voice&&S.voice.pack;if(!id)return;   /* no voice chosen yet -> nothing is applied, tablet voice stays */
+  try{const j=await packManifest(id);PACK.clips=j.clips||{};PACK.voice=j.voice||'';PACK.base='audio/'+id+'/';PACK.id=id;PACK.ok=Object.keys(PACK.clips).length>0}catch(e){L('pack '+e.message)}
+}
 function noteSeen(t){const k=clipKey(t);if(!SEEN[k]){if(Object.keys(SEEN).length>4000)return;SEEN[k]={t:normRun(t),n:0}}SEEN[k].n++;clearTimeout(seenTimer);seenTimer=setTimeout(()=>DB.set('seen',SEEN),4000)}
 const clipURL={};
 async function clipAudio(key){const f=PACK.clips[key];if(!f)return null;if(!clipURL[key]){const r=await fetch(PACK.base+f);if(!r.ok)throw new Error('clip '+r.status);clipURL[key]=URL.createObjectURL(await r.blob())}return new Audio(clipURL[key])}
-function playClip(key,id){return new Promise(async res=>{
+function playClip(key,id,onDur){return new Promise(async res=>{
   let a;try{a=await clipAudio(key)}catch(e){L('clip '+e.message);return res(false)}
   if(!a)return res(false);
   if(id!==speakId)return res(true);
   curAudio=a;let done=false;const fin=ok=>{if(!done){done=true;res(ok)}};
   a.onended=()=>fin(true);a.onerror=()=>fin(false);setTimeout(()=>fin(true),30000);
-  try{await a.play()}catch(e){fin(false)}
+  try{await a.play();if(onDur)onDur((isFinite(a.duration)&&a.duration>0?a.duration:2)*1000)}catch(e){fin(false)}
   const iv=setInterval(()=>{if(done){clearInterval(iv);return}if(id!==speakId){clearInterval(iv);try{a.pause()}catch(e){}fin(true)}},120);
 })}
+/* highlight: the words in the speech bubble light up while they are spoken - only when the bubble shows exactly what is spoken */
+let HLT=[];
+function hlStop(){HLT.forEach(clearTimeout);HLT=[];document.querySelectorAll('#bubble .w.on').forEach(e=>e.classList.remove('on'))}
+function hlStart(text,ms){
+  hlStop();const b=$('#bubble');if(!b)return;
+  const flat=t=>String(t).toLowerCase().replace(/[^\p{L}\p{M}\p{N}\s]/gu,'').replace(/\s+/g,' ').trim();
+  if(!flat(b.textContent)||flat(b.textContent)!==flat(text))return;
+  const ws=b.textContent.split(/\s+/).filter(Boolean);
+  b.innerHTML=ws.map(w=>`<span class="w">${esc(w)}</span>`).join(' ');
+  const sp=[...b.querySelectorAll('.w')],tot=ws.reduce((a,w)=>a+w.length+2,0);let t=0;
+  sp.forEach((x,i)=>{HLT.push(setTimeout(()=>{sp.forEach(y=>y.classList.remove('on'));x.classList.add('on')},t*ms/tot));t+=ws[i].length+2});
+  HLT.push(setTimeout(()=>sp.forEach(y=>y.classList.remove('on')),ms));
+}
+/* Mummy's own recordings (optional): a whole line, or one part of a line such as a praise word, is played from her recording */
+const partText=p=>normRun(typeof p==='string'?p:p[0]);
+const lineRec=t=>'ln_'+clipKey(t);
+function expandGroup(cur,out){
+  if(RECS.has(lineRec(runText(cur)))){out.push({rec:lineRec(runText(cur))});return}
+  let sub=[];
+  for(const it of cur){const k=lineRec(partText(it));if(RECS.has(k)){if(sub.length){out.push({items:sub});sub=[]}out.push({rec:k})}else sub.push(it)}
+  if(sub.length)out.push({items:sub});
+}
 function runsOf(parts){
-  const out=[];let cur=[];const flush=()=>{if(cur.length){out.push({items:cur});cur=[]}};
+  const out=[];let cur=[];const flush=()=>{if(cur.length){expandGroup(cur,out);cur=[]}};
   for(const p of parts){
     if(typeof p==='string'||Array.isArray(p))cur.push(p);
     else if(p&&p.pause){flush();out.push({pause:p.pause})}
@@ -767,7 +803,7 @@ const runText=items=>normRun(items.map(p=>typeof p==='string'?p:p[0]).join(' '))
 async function say(...parts){
   const id=++speakId;
   try{speechSynthesis.cancel()}catch(e){}
-  stopAudio();
+  stopAudio();hlStop();
   await sleep(70);
   const romanAll=S.voice.hinglish||(!voiceFor('hi')&&'speechSynthesis' in window);
   for(const run of runsOf(parts)){
@@ -777,20 +813,22 @@ async function say(...parts){
     if(run.rec){await playRec(run.rec,id);continue}
     if(S.voice.on&&S.voice.src!=='device'){
       const text=runText(run.items);
-      if(text){noteSeen(text);const key=clipKey(text);if(PACK.clips[key]&&await playClip(key,id))continue}
+      if(text){noteSeen(text);const key=clipKey(text);if(PACK.clips[key]&&await playClip(key,id,ms=>hlStart(text,ms))){hlStop();continue}}
     }
+    hlStart(runText(run.items),Math.max(800,runText(run.items).length*85/(S.voice.rate||.85)));
     for(const sg of segsOf(run.items)){
       if(id!==speakId)return;
       const roman=sg.l==='hi'&&romanAll;
       const text=roman?deva2rom(sg.t):sg.t,lang=(sg.l==='en'||roman)?'en':'hi';
       for(const c of chunks(text)){if(id!==speakId)return;await say1(c,lang);await sleep(90)}
     }
+    hlStop();
   }
 }
-function stopVoice(){speakId++;try{speechSynthesis.cancel()}catch(e){}stopAudio()}
+function stopVoice(){speakId++;try{speechSynthesis.cancel()}catch(e){}stopAudio();hlStop()}
 function hero(display,parts){$('#bubble').textContent=display;LAST=parts||[display];return say(...LAST)}
 $('#again').onclick=()=>{SFX.tap();say(...LAST)};
-$('#again').innerHTML=IC('sound');$('#gear').innerHTML=IC('gear');$('#skipBtn').innerHTML=IC('skip')+'Skip';
+$('#again').innerHTML=IC('sound')+'<span>Listen again</span>';$('#gear').innerHTML=IC('gear');$('#skipBtn').innerHTML=IC('skip')+'Skip';
 $('#stars').onclick=()=>{if(!SESS&&$('#modal').hidden)openShop()};
 function react(c){const hp=$('#heroFace .hp');if(!hp)return;hp.classList.remove('cheer','oops');void hp.offsetWidth;hp.classList.add(c)}
 
@@ -1328,10 +1366,11 @@ async function myselfGame(stage){
   stage.appendChild(el('div','card',`<div class="pic">🎤</div><div class="cap">Little speaker: “Myself”</div><div class="sub">Stand up, big smile, look at the grown-up!</div>`));
   await hero('Let us practise your “Myself” speech!',['चलो, अपनी Myself speech की practice करते हैं! खड़े हो जाओ और smile करो!']);
   await waitBtn(stage,'Ready ▶');
+  let firstLine=true;
   for(const [e,line] of L){
     stage.innerHTML='';
     stage.appendChild(el('div','scene',`<div class="pic pop">${e}</div><div class="bigL" style="font-size:clamp(30px,5vw,52px)">${esc(line)}</div>`));
-    await hero(line,['मेरे साथ बोलो —',{pause:200},[line,'en']]);
+    await hero(line,firstLine?['मेरे साथ बोलो —',{pause:200},[line,'en']]:[[line,'en']]);firstLine=false;
     await waitBtn(stage,'I said it! 🗣️');SFX.tap();
   }
   SFX.win();confetti(40);react('cheer');
@@ -1964,17 +2003,74 @@ async function blkValues(stage,done){
   done();
 }
 
+/* ===== v3.6: yesterday's review, sight words, weekly number story ===== */
+async function blkReview(stage,done){
+  const picks=[];
+  [letterOf(DAYV-1),DAYV>8?letterOf(DAYV-7):null,DAYV>3?letterOf(DAYV-3):null].forEach(x=>{if(x&&!picks.includes(x))picks.push(x)});
+  stage.appendChild(el('div','card',`<div class="pic">🔁</div><div class="cap">Yesterday's sounds</div><div class="sub">Let us remember!</div>`));
+  await hero("Let us remember yesterday's sounds!",['चलो, कल की sounds याद करते हैं!']);
+  await waitBtn(stage,'Ready ▶');
+  for(const target of picks){
+    stage.innerHTML='';
+    const others=shuffle(SEQ.filter(x=>x!==target&&!conflict(x,target))).slice(0,2);
+    const letters=shuffle([target,...others]);
+    await ask(stage,{q:`Which one starts with the ${SNDEN[target]} sound?`,sp:[sndP(target),'की आवाज़ से कौन सी चीज़ शुरू होती है?'],opts:letters.map(x=>`<span>${LW[x][1]}</span>`),os:letters.map(x=>[LW[x][0],'en']),correct:letters.indexOf(target),head:`<span class="bigL" style="font-size:80px">${target.toUpperCase()}</span>`});
+    await cheerSay(`${target.toUpperCase()} for ${LW[target][0]}`,[[`${target.toUpperCase()} for ${LW[target][0]}`,'en']]);
+  }
+  done();
+}
+const SIGHT=[['I','मैं','I am a hero.'],['a','एक','a cat'],['the','यह / वह','the sun'],['is','है','The sun is hot.'],['it','यह','It is red.'],['in','में','in the box'],['on','पर','on the table'],['to','को / तक','go to school'],['and','और','cat and dog'],['my','मेरा','my mummy'],['we','हम','we play'],['me','मुझे','give me a toy'],['you','तुम','you are kind'],['he','वह (लड़का)','he runs'],['she','वह (लड़की)','she sings']];
+async function blkSight(stage,done){
+  const from=Math.max(1,(S.content&&S.content.sightFrom)|0||27),n=SIGHT.length;
+  const idx=(((DAYV-from)%n)+n)%n,[w,hi,ex]=SIGHT[idx];
+  const learnedW=SIGHT.slice(0,idx).map(x=>x[0]).concat(DAYV-from>=n?SIGHT.map(x=>x[0]).filter(x=>x!==w):[]);
+  const card=el('div','card',`<div class="bigL" style="font-size:clamp(90px,18vw,170px)">${esc(w)}</div><div class="cap">${esc(ex)}</div>`);
+  stage.appendChild(card);
+  const play=()=>hero(`Today's sight word is "${w}".`,['आज का sight word है —',[w,'en'],'।',[w,'en'],'मतलब',hi,'।',[ex,'en']]);
+  card.onclick=play;await play();
+  await waitBtn(stage,"Let's play ▶");
+  const rounds=[w,...shuffle(learnedW).slice(0,2)];
+  for(const target of rounds){
+    stage.innerHTML='';
+    const pool=SIGHT.map(x=>x[0]).filter(x=>x!==target);
+    const opts=shuffle([target,...shuffle(pool).slice(0,2)]);
+    await ask(stage,{q:`Find the word "${target}"`,sp:['शब्द ढूँढो —',[target,'en']],opts:opts.map(x=>`<span style="font-size:54px;font-weight:700">${esc(x)}</span>`),os:opts.map(x=>[x,'en']),correct:opts.indexOf(target)});
+    await cheerSay(target,[[target,'en']]);
+  }
+  done();
+}
+const NSTORIES=[['🍎','apples','सेब'],['🎈','balloons','गुब्बारे'],['⭐','stars','तारे'],['🥭','mangoes','आम'],['🚗','cars','गाड़ियाँ'],['🐟','fish','मछलियाँ'],['🌼','flowers','फूल'],['🍪','biscuits','बिस्किट']];
+async function blkNumStory(stage,done){
+  const wk=Math.floor(DAYV/7),[e,en,hi]=NSTORIES[wk%NSTORIES.length],a=1+(wk%4),b=wk<4?1:2,tot=a+b,nm=kidName();
+  const row=k=>Array.from({length:k},()=>e).join(' ');
+  stage.appendChild(el('div','scene',`<div class="pic">📖</div><div class="cap">Number story</div><div class="pic" style="font-size:clamp(44px,8vw,76px)">${row(a)}</div>`));
+  await hero(`${nm} has ${a} ${en}.`,[nm,'के पास',[`${NUM[a]} ${en}`,'en'],'हैं।']);
+  await waitBtn(stage,'Next ▶');
+  stage.innerHTML='';
+  stage.appendChild(el('div','scene',`<div class="pic" style="font-size:clamp(44px,8vw,76px)">${row(a)} ➕ <span class="pop">${row(b)}</span></div>`));
+  await hero(`${AW().n} gives ${b} more!`,[`${AW().h} ने`,[`${NUM[b]} more`,'en'],'दिए!']);
+  await waitBtn(stage,'Next ▶');
+  stage.innerHTML='';
+  const nums=shuffle([tot,Math.max(1,tot-1),tot+1].filter((x,i,arr)=>arr.indexOf(x)===i));
+  await ask(stage,{q:'How many now?',sp:['अब कुल कितने हैं?'],opts:nums.map(n=>`<span>${n}</span>`),os:nums.map(n=>[NUM[n],'en']),correct:nums.indexOf(tot),head:`<span style="font-size:clamp(40px,7vw,64px)">${row(a)} ➕ ${row(b)}</span>`});
+  await cheerSay(`${a} and ${b} more is ${tot}!`,[[`${NUM[a]} and ${NUM[b]} more is ${NUM[tot]}!`,'en']]);
+  done();
+}
 /* ---------- block list ---------- */
 function allBlocks(day){
   const lv=varLogic(day),wv=varWord(day),dv=varDisc(day),sv=varStory(day),mv=OFF.move(day);
   const LI={'logic:maze':'🧭','logic:sort':'🎯','logic:story':'📖','logic:fmaze':'🐶'},WI={'word:build':'🧩','word:pop':'🫧','word:rhyme':'🎵'},DI={'disc:animals':'🦁','disc:weather':'🌦️','disc:vehicles':'🚒','disc:riddle':'❓','disc:daytime':'🌅','disc:wdress':'☂️','disc:animalsort':'🐾','disc:aquatic':'🐬','disc:festivals':'🪔','disc:calendar':'📅'},SI={'st:feel':'💛','st:safe':'🛡️','st:waste':'♻️','st:tale':'📚','st:myself':'🎤','st:rhyme':'🎵'};
   const hd=OFF.hands(day),pp=OFF.paper(day);
+  const sf=Math.max(1,(S.content&&S.content.sightFrom)|0||27);
   return [
+    {k:'review',icon:'🔁',title:'Yesterday’s sounds',min:2,lead:'vidu',run:blkReview,skip:day<2},
     {k:'mood',icon:'😊',title:'Feelings + hero word',min:3,lead:'snaya',run:blkMood},
     {k:'letter',icon:'🔤',title:'Letter sound',min:6,lead:'vidu',run:blkLetter},
+    {k:'sight',icon:'👀',title:'Sight word',min:3,lead:'vidu',run:blkSight,skip:day<sf},
     {k:'word',icon:WI[wv],title:VAR_NAMES[wv],min:5,lead:'vidu',run:blkWord},
     {k:'move',icon:mv.traffic?'🚦':'🏃',title:mv.title,min:mv.min,lead:'shivansh',run:(s,d)=>{setVar(mv.traffic?'move:traffic':'move');offline(s,d,OFF.move(day))}},
     {k:'count',icon:'🔢',title:day>=10?'Counting + adding':'Counting',min:6,lead:'shivansh',run:blkCount},
+    {k:'numstory',icon:'📖',title:'Number story',min:3,lead:'shivansh',run:blkNumStory,skip:day%7!==0},
     {k:'hands',icon:'🧱',title:'Hands-on maths',min:hd.min,lead:'shivansh',run:(s,d)=>{setVar('hands');offline(s,d,OFF.hands(day))}},
     {k:'pattern',icon:'🚂',title:'Pattern train',min:3,lead:'aarav',run:blkPattern},
     {k:'logic',icon:LI[lv],title:VAR_NAMES[lv],min:5,lead:lv==='logic:fmaze'?'chiku':'aarav',run:blkLogic},
@@ -1984,7 +2080,7 @@ function allBlocks(day){
     {k:'story',icon:SI[sv],title:VAR_NAMES[sv],min:4,lead:'snaya',run:blkStory},
     {k:'values',icon:'🏡',title:'Family values',min:5,lead:'snaya',run:blkValues}];
 }
-const buildBlocks=day=>allBlocks(day).filter(b=>!S.content.off.includes(b.k));
+const buildBlocks=day=>allBlocks(day).filter(b=>!b.skip&&!S.content.off.includes(b.k));
 
 /* ---------- printable sheets (real-world tasks + hand-off notes) ---------- */
 function dotRow(txt){
@@ -2048,7 +2144,21 @@ function printMissions(from,to){
 }
 
 /* ---------- session engine ---------- */
-let TESTDAY=1;
+let TESTDAY=1,RESUME=null;
+/* v3.6: the mission is saved at every activity, so minimising, a crashed tab or the Back button never loses it */
+function saveResume(){
+  if(!SESS||S.test||SESS.single)return;
+  RESUME={day:DAYV,keys:SESS.blocks.map(b=>b.k),i:SESS.i,stars:SESS.stars,elapsed:Date.now()-SESS.start,wrong:SESS.wrong,mood:SESS.mood,vars:SESS.vars,rate:SESS.rate,useGrant:SESS.useGrant,saved:Date.now()};
+  DB.set('resume',RESUME);
+}
+function clearResume(){RESUME=null;DB.set('resume',null)}
+function resumeSession(rs){
+  const all=allBlocks(rs.day),blocks=rs.keys.map(k=>all.find(b=>b.k===k)).filter(Boolean);
+  if(!blocks.length||rs.i>=blocks.length){clearResume();startSession(S.day,buildBlocks(S.day),false);return}
+  RUNID++;DAYV=rs.day;
+  SESS={blocks,i:rs.i,stars:rs.stars||0,start:Date.now()-(rs.elapsed||0),wrong:rs.wrong||{},mood:rs.mood||'',single:false,vars:rs.vars||{},rate:rs.rate||[],useGrant:!!rs.useGrant};
+  runBlock();
+}
 function streakDays(){
   const set=new Set(S.history.map(h=>h.d));let n=0;const d=new Date();
   const f=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');
@@ -2082,7 +2192,7 @@ function runBlock(){
   CURKEY=b.k;SCREEN='mission';if(!SESS.vars[SESS.i])SESS.vars[SESS.i]=b.k;setLead(b.lead);renderJourney();
   const stage=freshStage();
   let once=false;
-  L('block '+b.k+' day '+DAYV+(S.test?' TEST':''));
+  L('block '+b.k+' day '+DAYV+(S.test?' TEST':''));saveResume();
   try{b.run(stage,()=>{if(once||myRun!==RUNID||!SESS||SESS.i!==myI)return;once=true;blockDone()})}
   catch(e){L('blockerr '+b.k+' '+e.message);blockDone()}
 }
@@ -2121,6 +2231,7 @@ async function blockDone(){
 }
 async function finishScreen(){
   const stage=freshStage();setLead('snaya');
+  if(!S.test&&!SESS.single)clearResume();
   const mins=Math.round((Date.now()-SESS.start)/60000);
   const titles=Object.fromEntries(allBlocks(DAYV).map(b=>[b.k,b.title]));
   const weak=Object.entries(SESS.wrong).filter(([k,v])=>v>=2).map(([k,v])=>`${titles[k]||k} (${v})`).join(', ');
@@ -2163,8 +2274,10 @@ function home(){
   const hm=el('div','hm');
   if(state==='ok'){
     const bl=buildBlocks(S.day),mins=bl.reduce((a,b)=>a+(b.min|0),0);
-    const go=el('button','mstart',`<span class="mt"><b>Start Mission ${S.day}</b><small>${bl.length} activities${mins?` · about ${mins} minutes`:''}</small></span><span class="mi">${IC('rocket')}</span>`);
-    go.onclick=()=>{SFX.tap();startSession(S.day,buildBlocks(S.day),false)};hm.appendChild(go);
+    const rs=RESUME&&RESUME.day===S.day&&RESUME.i<RESUME.keys.length?RESUME:null;
+    const go=el('button','mstart',rs?`<span class="mt"><b>Continue Mission ${S.day}</b><small>activity ${rs.i+1} of ${rs.keys.length} · your stars are saved</small></span><span class="mi">${IC('rocket')}</span>`:`<span class="mt"><b>Start Mission ${S.day}</b><small>${bl.length} activities${mins?` · about ${mins} minutes`:''}</small></span><span class="mi">${IC('rocket')}</span>`);
+    go.onclick=()=>{SFX.tap();if(rs)resumeSession(rs);else startSession(S.day,buildBlocks(S.day),false)};hm.appendChild(go);
+    if(rs){const sb=el('button','link','Start this mission again from the beginning');sb.onclick=()=>{clearResume();home()};hm.appendChild(sb)}
     const wave=[0,-12,-18,-12,0,12,18,12],tr=el('div','trail');
     bl.forEach((b,i)=>{const s=el('span','',b.icon);s.style.setProperty('--c',(TEAM[b.lead]||{}).col||'#ffc83d');s.style.transform=`translateY(${wave[i%8]}px)`;tr.appendChild(s)});
     hm.appendChild(tr);
@@ -2574,6 +2687,8 @@ gear.addEventListener('click',()=>{
 });
 
 /* ---------- voice recording (parent's own voice) ---------- */
+const LINE_TEXTS=['कोई बात नहीं, फिर से try करो!','अरे, लगभग! एक बार और!','थोड़ा और सोचो!','You can do it! फिर से try करो!','ध्यान से सुनो और फिर से चुनो!','एक और star!','Star collected!','Jar के लिए एक और star!','Shining star!','शाबाश!','वाह! Super!','कमाल कर दिया!','बहुत बढ़िया!','एकदम सही!','ज़बरदस्त!','कितने smart हो आप!','Hero team को आप पर बहुत गर्व है!','मेरे साथ बोलो —','सबसे पहले क्या होता है? सोचो!','अपने परिवार के बारे में सोचो। किस बात से उन्हें खुशी होगी?'];
+const LINE_ITEMS=LINE_TEXTS.map(t=>({k:lineRec(t),label:t,hint:'Say exactly this line, warmly, in your own voice.'}));
 const REC_ITEMS_X=0;const REC_ITEMS=[
   ...SEQ.map(c=>({k:'snd_'+c,label:`Sound of “${c.toUpperCase()}”`,hint:`Say only the sound (${SNDEN[c]}) — not the letter name. Keep it short and crisp.`})),
   ...Object.keys(PH).map(k=>({k:'ph_'+k,label:PH[k],hint:'Say it warmly, like a teacher.'}))
@@ -2649,6 +2764,7 @@ function openParent(firstRun){
   const blocks=allBlocks(1).map(b=>`<label class="inl"><input type="checkbox" data-blk="${b.k}" ${S.content.off.includes(b.k)?'':'checked'}> ${b.icon} ${b.title}</label>`).join('');
   const vopt=(prefix,uri)=>VOICES.filter(v=>nl(v.lang).startsWith(prefix)).map(v=>`<option value="${esc(v.voiceURI)}" ${v.voiceURI===uri?'selected':''}>${esc(v.name)} (${esc(v.lang)})${v.localService?' · offline':' · online'}</option>`).join('');
   const heroRows=Object.keys(HERO_DEF).map(k=>`<div class="hn2"><div><label>${TEAM[k].power}</label><input type="text" data-hn="${k}" value="${esc(HN(k))}"></div><div><label>Hindi spelling (for the voice)</label><input type="text" data-hh="${k}" value="${esc(HH(k))}"></div></div>`).join('');
+  const lineRows=LINE_ITEMS.map(it=>`<div class="recrow" data-rk="${it.k}"><div>${esc(it.label)}<small>${esc(it.hint)}</small></div><div class="row" style="margin:0"><button data-ra="rec">● Record</button><button data-ra="play" class="green">▶</button><button data-ra="del" class="grey">🗑</button><span data-rs>${RECS.has(it.k)?'✅':''}</span></div></div>`).join('');
   const recRows=REC_ITEMS.map(it=>`<div class="recrow" data-rk="${it.k}"><div>${esc(it.label)}<small>${esc(it.hint)}</small></div><div class="row" style="margin:0"><button data-ra="rec">● Record</button><button data-ra="play" class="green">▶</button><button data-ra="del" class="grey">🗑</button><span data-rs>${RECS.has(it.k)?'✅':''}</span></div></div>`).join('');
   m.innerHTML=`<div class="panel"><h2>⚙️ Parent area <small style="font-size:12px;color:#888">v${APPV}</small></h2>
   ${firstRun?'<p class="note">PIN saved. Fill in the child\'s name, then press Save.</p>':''}
@@ -2692,13 +2808,17 @@ function openParent(firstRun){
     <div class="row"><button id="plW">📅 Next week (7)</button><button id="plM">📅 Next month (30)</button><button id="plQ">📅 Next quarter (90)</button></div>
   </details>
   <details><summary>📚 Content</summary>${blocks}
+    <label>Sight words start from mission (after the 26 letter sounds = 27)</label><input type="number" id="psw" min="1" max="60" value="${S.content.sightFrom|0||27}">
     <label>Max counting number (0 = automatic, grows from 10 to 20)</label><input type="number" id="pmc" min="0" max="20" value="${S.content.maxCount}">
   </details>
   <details><summary>🎧 Natural voice pack</summary>
     <p class="note">Natural teacher clips (made once on a computer with free neural voices) play instead of the tablet's robotic voice. A line with no clip yet falls back to the tablet voice, and the tablet remembers every line it needed.</p>
+    <label>Teacher voice</label><select id="pvk"><option value="">— Not chosen yet (tablet voice is used) —</option>${S.voice.pack?`<option value="${esc(S.voice.pack)}" selected>${esc(S.voice.pack)}</option>`:''}</select>
+    <div class="row"><button id="vpTest" class="green">▶ Hear this voice</button></div>
+    <p class="note">Pick a voice, press “Hear this voice” to listen, then Save &amp; close to apply it. Nothing changes until you choose one.</p>
     <label>Voice source</label><select id="pvs"><option value="pack" ${S.voice.src!=='device'?'selected':''}>Natural voice pack (recommended)</option><option value="device" ${S.voice.src==='device'?'selected':''}>Tablet voice only</option></select>
     <div class="note" id="vpStat" style="margin-top:10px">Checking…</div><div class="bar"><i id="vpBar"></i></div>
-    <div class="row"><button id="vpDl">⬇ Download all clips (offline)</button><button id="vpTest" class="green">▶ Play a sample clip</button></div>
+    <div class="row"><button id="vpDl">⬇ Download all clips (offline)</button></div>
     <div class="row"><button class="grey" id="vpExp">Export lines still missing</button><button class="grey" id="vpClr">Clear the list</button></div>
     <p class="note" id="vpMsg"></p>
   </details>
@@ -2717,6 +2837,10 @@ function openParent(firstRun){
     <details><summary style="font-size:15px">🎙 My voice — record the sounds & phrases yourself (best quality)</summary>
       <p class="note">Your recording replaces the tablet voice for that line. Record in a quiet room, hold the tablet ~20 cm away, up to 7 seconds each. Start with the 20 letter sounds. Recordings stay on this tablet (not in the cloud backup).</p>
       <div id="recList">${recRows}</div>
+    </details>
+    <details><summary style="font-size:15px">🎙 Mummy's own voice for the 20 most repeated lines (optional)</summary>
+      <p class="note">Praise and “try again” lines the child hears most. Record only the ones you like — each recorded line plays in your voice, every other line keeps using the natural voice. Delete (🗑) a recording to go back to the natural voice. Nothing here is compulsory.</p>
+      <div id="lineList">${lineRows}</div>
     </details>
   </details>
   <details><summary>🦸 Hero names</summary>${heroRows}<p class="note">Change a name here and it updates everywhere in the app.</p></details>
@@ -2753,6 +2877,8 @@ function openParent(firstRun){
     <details><summary style="font-size:14px">Error log</summary><pre>${esc(logs)}</pre></details>
   </details>
   <details><summary>🔐 Security</summary>
+    <label class="inl"><input type="checkbox" id="pkl" ${S.kiosk?'checked':''}> <span><b>🔒 Child lock</b> — full screen, screen stays on, and the Back button cannot leave the app.</span></label>
+    <p class="note">A web app cannot block the Home / Recents swipe by itself. For a real lock use Android <b>Pin window</b> (screen pinning): Samsung tablet → Settings → Security and privacy → More security settings → <b>Pin windows</b> → On (and “Ask for PIN before unpinning”). Then open Hero Academy → Recents (three lines) → tap the app icon → <b>Pin this app</b>. To leave, hold Back + Recents and enter your PIN.</p>
     <div class="row"><button id="cPin">Change PIN</button>${bioAvail()?`<button id="bioR">${LOCAL.bioId?'Re-register':'Add'} fingerprint / face</button>${LOCAL.bioId?'<button class="grey" id="bioX">Remove fingerprint / face</button>':''}`:'<span class="note">Fingerprint/face needs the app opened from its https website (GitHub Pages) in Chrome.</span>'}</div>
   </details>
   <details><summary>🧪 Test mode (for building & checking)</summary>
@@ -2770,8 +2896,8 @@ function openParent(firstRun){
     S.theme={mode:$('#pthm').value||'auto',day:$('#pthd').value||'07:00',night:$('#pthn').value||'19:00'};
     S.lock={on:$('#plk').checked,confirm:$('#plc').checked,parent:$('#plp').checked};
     S.content.off=[...m.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk);
-    S.content.maxCount=Math.max(0,Math.min(20,parseInt($('#pmc').value)||0));
-    S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.85,pitch:parseFloat($('#pvp').value)||1.1,hinglish:$('#phg').checked,src:$('#pvs').value||'pack'};
+    S.content.maxCount=Math.max(0,Math.min(20,parseInt($('#pmc').value)||0));S.content.sightFrom=Math.max(1,Math.min(60,parseInt($('#psw').value)||27));S.kiosk=$('#pkl').checked;
+    S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.85,pitch:parseFloat($('#pvp').value)||1.1,hinglish:$('#phg').checked,src:$('#pvs').value||'pack',pack:$('#pvk').value||''};
     S.sfx=$('#psf').checked;
     LOCAL.hiVoice=$('#pvh').value;LOCAL.enVoice=$('#pve').value;saveLocal();
     m.querySelectorAll('[data-hn]').forEach(i=>{const k=i.dataset.hn;S.heroes[k].n=i.value.trim()||HERO_DEF[k].n});
@@ -2802,9 +2928,10 @@ function openParent(firstRun){
   $('#prw').onclick=()=>{const f=parseInt($('#prf').value)||1;m.hidden=true;printMissions(f,f+6)};
   /* voice pack */
   const vpUpdate=()=>{const seen=Object.values(SEEN),have=seen.filter(e=>PACK.clips[clipKey(e.t)]).length,n=Object.keys(PACK.clips).length;
-    $('#vpStat').innerHTML=PACK.ok?`Pack loaded: <b>${n}</b> clips${PACK.voice?' · voice '+esc(PACK.voice):''}.<br>Lines the tablet has spoken: ${seen.length} · with a clip: ${have} · <b>missing: ${seen.length-have}</b>`:`No voice pack on the website yet (<code>audio/manifest.json</code> not found). Build it with <b>make_voice_pack_v1.py</b> — see VOICE_PACK_README.txt. Until then the tablet voice is used. Lines heard so far: ${seen.length}.`;
+    $('#vpStat').innerHTML=PACK.ok?`Pack loaded: <b>${n}</b> clips${PACK.voice?' · voice '+esc(PACK.voice):''}.<br>Lines the tablet has spoken: ${seen.length} · with a clip: ${have} · <b>missing: ${seen.length-have}</b>`:`${PACK.voices.length?'No voice chosen yet — the tablet voice is used.':'No voice packs on the website yet (<code>audio/voices.json</code> not found). Build them with <b>make_voice_pack_v2.py</b> — see VOICE_PACK_README.txt.'} Lines heard so far: ${seen.length}.`;
     $('#vpBar').style.width=(seen.length?Math.round(have/seen.length*100):0)+'%'};
-  vpUpdate();loadPack().then(vpUpdate);
+  const fillVoices=()=>{const sel=$('#pvk'),cur=sel.value||S.voice.pack||'';sel.innerHTML='<option value="">— Not chosen yet (tablet voice is used) —</option>'+PACK.voices.map(v=>`<option value="${esc(v.id)}">${esc(v.name)}</option>`).join('')+(cur&&!PACK.voices.some(v=>v.id===cur)?`<option value="${esc(cur)}">${esc(cur)}</option>`:'');sel.value=cur};
+  vpUpdate();loadPack().then(()=>{fillVoices();vpUpdate()});
   $('#vpDl').onclick=async()=>{
     const files=[...new Set(Object.values(PACK.clips))];if(!files.length){$('#vpMsg').textContent='No clips to download yet.';return}
     let done=0,fail=0;const q=files.slice();
@@ -2812,7 +2939,10 @@ function openParent(firstRun){
     await Promise.all([work(),work(),work(),work()]);
     $('#vpMsg').textContent=fail?`Done, but ${fail} clip(s) failed — press again when online.`:`✅ All ${files.length} clips are saved on this tablet for offline use.`;
   };
-  $('#vpTest').onclick=async()=>{const ks=Object.keys(PACK.clips);if(!ks.length){$('#vpMsg').textContent='No clips yet.';return}const id=++speakId;stopAudio();const ok=await playClip(rnd(ks),id);if(!ok)$('#vpMsg').textContent='Could not play the clip — check the internet and try again.'};
+  $('#vpTest').onclick=async()=>{const id=$('#pvk').value;if(!id){$('#vpMsg').textContent='Choose a voice in the list first.';return}
+    try{const j=await packManifest(id),k=clipKey(SAMPLE_LINE),f=(j.clips||{})[k];if(!f)throw new Error('sample missing');
+      const r=await fetch('audio/'+id+'/'+f);const a=new Audio(URL.createObjectURL(await r.blob()));stopVoice();curAudio=a;await a.play();$('#vpMsg').textContent=''}
+    catch(e){$('#vpMsg').textContent='Could not play this voice yet — is it uploaded? ('+e.message+')'}};
   $('#vpExp').onclick=()=>{const miss=Object.entries(SEEN).filter(([k])=>!PACK.clips[k]).map(([k,e])=>({key:k,text:e.t,n:e.n})).sort((a,b)=>b.n-a.n);
     const blob=new Blob([JSON.stringify({app:'hero-academy',saved:new Date().toISOString(),lines:miss},null,1)],{type:'application/json'});const a=el('a');a.href=URL.createObjectURL(blob);a.download=`hero-missing-lines-${today()}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);$('#vpMsg').textContent=`${miss.length} missing line(s) exported. Give this file to make_voice_pack_v1.py (--extra).`};
   $('#vpClr').onclick=async()=>{if(!confirm('Forget the list of spoken lines?'))return;for(const k in SEEN)delete SEEN[k];await DB.set('seen',SEEN);vpUpdate()};
@@ -2827,7 +2957,7 @@ function openParent(firstRun){
     $('[data-ra=play]',row).onclick=async()=>{const a=await recAudio(k);if(a){stopAudio();curAudio=a;a.play().catch(()=>{})}else alert('Nothing recorded yet')};
     $('[data-ra=del]',row).onclick=async()=>{await delRec(k);st.textContent=''};
   });
-  $('#sv').onclick=async()=>{readForm();await DB.set('state',S);if(!S.test)save();m.hidden=true;home();kickLive()};
+  $('#sv').onclick=async()=>{readForm();await DB.set('state',S);if(!S.test)save();await loadPack();m.hidden=true;home();kickLive()};
   $('#cl').onclick=()=>{m.hidden=true};
   $('#sTest').onclick=async()=>{readForm();msg('Testing…');try{await callSync('ping');msg('✅ Connected to the Google Sheet');await DB.set('state',S)}catch(e){msg('❌ '+e.message)}};
   $('#sNow').onclick=async()=>{readForm();await DB.set('state',S);msg('Syncing…');const was=S.test;S.test=false;const ok=await syncPush();S.test=was;msg(ok?'✅ Synced':'❌ Sync failed — see error log')};
@@ -2941,6 +3071,19 @@ async function askMummy(type,title,detail,onPin){
   });
 }
 
+/* ---------- v3.6: Back button / gesture never loses progress; optional child lock ---------- */
+const pushH=()=>{try{history.pushState({ha:1},'')}catch(e){}};
+pushH();
+window.addEventListener('popstate',()=>{
+  if(!$('#modal').hidden){$('#modal').hidden=true;pushH();return}
+  if(SCREEN!=='home'){saveResume();pushH();home();toast('🏠 Back at Home — your mission is saved');return}
+  if(S.kiosk){pushH();toast('🔒 Ask a grown-up to leave the app');return}
+});
+document.addEventListener('pointerdown',()=>{if(S.kiosk&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{})},{passive:true});
+let WAKE=null;
+async function keepAwake(){try{if(S.kiosk&&navigator.wakeLock&&document.visibilityState==='visible')WAKE=await navigator.wakeLock.request('screen')}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveResume();else keepAwake()});
+window.addEventListener('pagehide',saveResume);
 /* ---------- boot ---------- */
 (async function boot(){
   await DB.open();
@@ -2958,6 +3101,7 @@ async function askMummy(type,title,detail,onPin){
   applyTheme(true);
   try{const sn=await DB.get('seen');if(sn&&typeof sn==='object')Object.assign(SEEN,sn)}catch(e){}
   loadPack();
+  try{const rsv=await DB.get('resume');RESUME=rsv&&rsv.keys&&Date.now()-rsv.saved<3*864e5?rsv:null}catch(e){}
   home();
   if(!S.sec.hash)setupWizard();
   if(S.sync.dirty)syncPush();

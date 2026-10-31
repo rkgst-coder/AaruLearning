@@ -19,7 +19,7 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (e.request.method !== 'GET' || url.origin !== location.origin) return; // never touch Apps Script calls
   /* v3.6: voice clips never change once made -> cache first (instant + works offline). The manifest stays network-first. */
-  if (url.pathname.includes('/audio/') && !url.pathname.endsWith('manifest.json')) {
+  if (url.pathname.includes('/audio/') && !url.pathname.endsWith('.json')) {
     e.respondWith(caches.open(AUDIO).then(ac => ac.match(e.request).then(hit => hit || fetch(e.request).then(r => {
       if (r.status === 200) { const copy = r.clone(); ac.put(e.request, copy).catch(() => {}); }
       return r;

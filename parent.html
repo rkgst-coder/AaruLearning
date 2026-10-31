@@ -381,7 +381,7 @@ function pReadHabits(){return [...document.querySelectorAll('#habEd .edrow')].ma
 function pReadRewards(){return [...document.querySelectorAll('#rwEd .edrow')].map(r=>({id:r.dataset.rid,icon:pf(r,'icon').value.trim()||'🎁',name:pf(r,'name').value.trim()||'Reward',cost:Math.max(1,parseInt(pf(r,'cost').value)||1),on:pf(r,'on').checked}))}
 
 /* control */
-const BLOCKS=[['mood','😊 Feelings check'],['letter','🔤 Letter sound'],['word','🧩 Build a word'],['move','🏃 Move break'],['count','🔢 Counting'],['hands','🧱 Hands-on maths'],['pattern','🎨 Patterns'],['logic','🧭 Maze / colour & shape'],['trace','✏️ Finger tracing'],['paper','📒 Notebook time'],['discover','🌍 Discover the world'],['story','💛 Feelings & habits'],['values','🏡 Family values']];
+const BLOCKS=[['review','🔁 Yesterday’s sounds'],['mood','😊 Feelings check'],['letter','🔤 Letter sound'],['sight','👀 Sight words'],['word','🧩 Build a word'],['move','🏃 Move break'],['count','🔢 Counting'],['numstory','📖 Number story (weekly)'],['hands','🧱 Hands-on maths'],['pattern','🎨 Patterns'],['logic','🧭 Maze / colour & shape'],['trace','✏️ Finger tracing'],['paper','📒 Notebook time'],['discover','🌍 Discover the world'],['story','💛 Feelings & habits'],['values','🏡 Family values']];
 const HEROES=[['shivansh','Red flyer'],['aarav','Blue flying suit'],['chiku','Green vine swinger'],['vidu','Purple super hearing'],['snaya','Girl hero — kindness']];
 let ctlBuilt=false,BASE=null;
 function renderCtl(){
