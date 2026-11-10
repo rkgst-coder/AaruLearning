@@ -123,6 +123,7 @@ svg text{fill:var(--mut)}
   <main>
     <!-- LIVE -->
     <section class="tab on" id="t-live">
+      <div class="card" id="glance"><h3>Today at a glance</h3><div id="glBody" class="sub"></div><div class="btn-row"><button id="glHol">🌴 Start holiday mode</button></div></div>
       <div class="card"><h3>Right now</h3>
         <div class="big" id="lvTitle">Waiting for the tablet…</div><div class="sub" id="lvSub"></div>
         <div class="bar"><i id="lvBar" style="width:0%"></i></div><div class="sub" id="lvBarT"></div>
@@ -154,6 +155,8 @@ svg text{fill:var(--mut)}
     <!-- REPORT -->
     <section class="tab" id="t-rep">
       <div class="grid2" id="repTiles"></div>
+      <div class="card"><h3>This week</h3><pre id="repWeek" style="white-space:pre-wrap;font-family:inherit;color:#e9ebff;margin:0;font-size:14px"></pre><div class="btn-row"><button class="btn-gold" id="wkCopy">📋 Copy / share summary</button></div></div>
+      <div class="card"><h3>Note for a day</h3><input type="date" id="nDate"><input type="text" id="nTxt" maxlength="300" placeholder="e.g. He found counting hard today"><div class="btn-row"><button class="btn-gold" id="nSave">Save note</button></div><div class="note">Shown in the weekly summary and the mission list.</div></div>
       <div class="card"><h3>Last 14 missions</h3><div id="repChart"></div><div class="note">Bars = stars, line = minutes</div></div>
       <div class="card"><h3>Needs practice</h3><div id="repWeak" class="note">Nothing yet.</div></div>
       <div class="card"><h3>Interest meter</h3><div id="repFun" class="note">No ratings yet.</div></div>
@@ -272,7 +275,7 @@ function effective(){ /* state + patches the tablet has not applied yet */
 }
 function ago(ms){const s=Math.max(0,Math.round(ms/1000));if(s<60)return s+' s ago';const m=Math.round(s/60);if(m<60)return m+' min ago';const h=Math.round(m/60);if(h<48)return h+' h ago';return Math.round(h/24)+' days ago'}
 function streak(hist){const set=new Set((hist||[]).map(h=>h.d));let n=0;const d=new Date();const f=x=>x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0')+'-'+String(x.getDate()).padStart(2,'0');if(!set.has(f(d)))d.setDate(d.getDate()-1);while(set.has(f(d))){n++;d.setDate(d.getDate()-1)}return n}
-const TYPE_ICON0={};const TYPE_ICON={check:'✅',skip:'⏭️',extra:'➕',open:'⏰',habit:'🧹',reward:'🎁',other:'🙋'};
+const TYPE_ICON0={};const TYPE_ICON={repeat:'🔁',check:'✅',skip:'⏭️',extra:'➕',open:'⏰',habit:'🧹',reward:'🎁',other:'🙋'};
 
 /* render */
 function renderConn(){
@@ -291,8 +294,8 @@ function renderLive(){
   else if(!on){$('#lvTitle').textContent=`${childName()} is offline`;$('#lvSub').textContent=`Last seen ${ago(age)}`+(hb.block&&hb.block!=='Home'?` · was on “${hb.block}”`:'');$('#lvBar').style.width='0%';$('#lvBarT').textContent=''}
   else{
     const doing=hb.bi>=0;
-    $('#lvTitle').textContent=hb.asking?`🙋 Asking you for something`:doing?`${childName()} is doing: ${hb.block}`:`${childName()} is on the home screen`;
-    $('#lvSub').textContent=(doing?`Mission ${hb.mission} · ⭐ ${hb.stars} this session`:`Next: mission ${hb.mission}`)+(hb.test?' · TEST MODE':'');
+    $('#lvTitle').textContent=hb.rest?`😴 ${childName()} is resting`:hb.asking?`🙋 Asking you for something`:doing?`${childName()} is doing: ${hb.block}`:`${childName()} is on the home screen`;
+    $('#lvSub').textContent=(doing?`Mission ${hb.mission} · ⭐ ${hb.stars} this session`:`Next: mission ${hb.mission}`)+(hb.test?' · TEST MODE':'')+(hb.restN?` · rests today: ${hb.restN}`:'')+(hb.off?` · offline voice: ${({green:'🟢 ready',amber:'🟠 partly',red:'🔴 not ready',grey:'⚪ n/a'})[hb.off]||''}`:'');
     const pct=doing&&hb.bn?Math.round(hb.bi/hb.bn*100):0;
     $('#lvBar').style.width=pct+'%';$('#lvBarT').textContent=doing?`Step ${hb.bi+1} of ${hb.bn}`:'';
   }
@@ -306,6 +309,12 @@ function renderLive(){
   $('#tHab').textContent=hd?`${hd.done} / ${hd.total}`:'–';
   $('#tStk').textContent=ST?'📒 '+new Set((ST.stickers||[]).map(x=>x.e)).size:'–';
   $('#qPause').textContent=CTL.paused?'▶ Resume app':'⏸ Pause app';
+  {const st=ST||{},hh=st.history||[],last=hh.filter(x=>x.d===today()).slice(-1)[0],onl=HB&&(NOW-HB.srv<15000);
+   const hol=HB&&HB.hol!=null?!!HB.hol:!!(st.holiday&&st.holiday.on);
+   let s;if(hol)s='🌴 Holiday mode — missions are paused';else if(last)s=`✅ Mission ${last.day} done today${last.mins?' · '+last.mins+' min':''}${last.n?' · '+last.n+' tasks':''}`;else if(onl&&HB.bi>=0)s=`▶ In progress: step ${HB.bi+1} of ${HB.bn}${HB.mins?' · '+HB.mins+' min so far':''}`;else s='⏳ Not started yet today';
+   const ch=[];if(HB){ch.push(`🔥 ${HB.streak!=null?HB.streak:streak(hh)}-day streak`);ch.push(`⭐ ${HB.wallet|0} stars`);if(HB.restN)ch.push(`😴 ${HB.restN} rest${HB.restN>1?'s':''} today`);if(HB.hard)ch.push(`💪 ${HB.hard} to practise`)}
+   $('#glBody').innerHTML=`<div class="big" style="font-size:20px">${s}</div><div style="margin-top:6px">${ch.join(' &nbsp;·&nbsp; ')||'Waiting for the tablet…'}</div>`;
+   $('#glHol').textContent=hol?'▶ End holiday mode':'🌴 Start holiday mode';$('#glHol').dataset.hol=hol?'1':'';}
 }
 function reqHtml(r,withBtns){
   const note=withBtns?`<input type="text" class="rn" placeholder="Note to ${esc(childName())} (optional)" maxlength="200"><div class="chips">${['Do it once more','Not now','After dinner','Well done!'].map(t=>`<span class="chip" data-note="${esc(t)}">${esc(t)}</span>`).join('')}</div><div class="btn-row"><button class="btn-ok" data-dec="approved">✔ Approve</button><button class="btn-no" data-dec="denied">✖ Deny</button></div>`:'';
@@ -350,6 +359,7 @@ function renderReport(){
   const tot=h.length,stars=h.reduce((a,x)=>a+(x.stars||0),0),mins=h.filter(x=>x.mins!=null).map(x=>x.mins);
   const avg=mins.length?Math.round(mins.reduce((a,b)=>a+b,0)/mins.length):0;
   const wk=h.filter(x=>(new Date(today())-new Date(x.d))/864e5<7).length;
+  $('#repWeek').textContent=weeklyReport(ST||{});
   $('#repTiles').innerHTML=[['Missions done',tot],['Last 7 days',wk+' / 7'],['Avg minutes',avg||'–'],['Badges',(ST&&ST.badges||[]).length]].map(([a,b])=>`<div class="tile"><b>${b}</b><span>${a}</span></div>`).join('');
   const last=h.slice(-14);
   if(!last.length)$('#repChart').innerHTML='<div class="note">No missions yet.</div>';
@@ -370,7 +380,7 @@ function renderReport(){
   $('#repFun').innerHTML=fun.length?`<table><tr><th>Game</th><th>😀</th><th>😐</th><th>😴</th><th></th></tr>${fun.map(([k,f])=>`<tr><td>${esc(VN[k]||k)}</td><td>${f.u|0}</td><td>${f.m|0}</td><td>${f.d|0}</td><td>${f.rest>Date.now()?'💤 resting':''}</td></tr>`).join('')}</table><div class="note" style="margin-top:6px">A game marked 😴 three times rests for 7 days automatically.</div>`:'No ratings yet — he rates 3 random games each day.';
   const led=(ST&&ST.ledger||[]).slice(-15).reverse();
   $('#repLed').innerHTML=led.length?led.map(x=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #ffffff14;color:#e9ebff"><span>${esc(x.d)} · ${esc(x.type)}: ${esc(x.item)}</span><b style="color:${x.amt>0?'#2ecc71':'#ff8a80'}">${x.amt>0?'+':''}${x.amt} → ${x.bal}</b></div>`).join(''):'No transactions yet.';
-  $('#repTable').innerHTML='<tr><th>Date</th><th>#</th><th>⭐</th><th>Min</th><th>Mood</th><th>Struggled with</th></tr>'+h.slice(-14).reverse().map(x=>`<tr><td>${esc(x.d)}</td><td>${x.day}</td><td>${x.stars}</td><td>${x.mins??''}</td><td>${esc(x.mood||'')}</td><td>${esc(x.weak||'—')}</td></tr>`).join('');
+  $('#repTable').innerHTML='<tr><th>Date</th><th>#</th><th>⭐</th><th>Min</th><th>Tasks</th><th>Rests</th><th>Mood</th><th>Struggled with</th><th>Note</th></tr>'+h.slice(-14).reverse().map(x=>`<tr><td>${esc(x.d)}</td><td>${x.day}</td><td>${x.stars}</td><td>${x.mins??''}</td><td>${x.n||''}</td><td>${x.rest||0}</td><td>${esc(x.mood||'')}</td><td>${esc(x.weak||'—')}</td><td>${esc((ST.notes||{})[x.d]||'')}</td></tr>`).join('');
 }
 
 /* control: habit & reward editors */
@@ -381,7 +391,7 @@ function pReadHabits(){return [...document.querySelectorAll('#habEd .edrow')].ma
 function pReadRewards(){return [...document.querySelectorAll('#rwEd .edrow')].map(r=>({id:r.dataset.rid,icon:pf(r,'icon').value.trim()||'🎁',name:pf(r,'name').value.trim()||'Reward',cost:Math.max(1,parseInt(pf(r,'cost').value)||1),on:pf(r,'on').checked}))}
 
 /* control */
-const BLOCKS=[['review','🔁 Yesterday’s sounds'],['mood','😊 Feelings check'],['letter','🔤 Letter sound'],['sight','👀 Sight words'],['word','🧩 Build a word'],['move','🏃 Move break'],['count','🔢 Counting'],['numstory','📖 Number story (weekly)'],['hands','🧱 Hands-on maths'],['pattern','🎨 Patterns'],['logic','🧭 Maze / colour & shape'],['trace','✏️ Finger tracing'],['paper','📒 Notebook time'],['discover','🌍 Discover the world'],['story','💛 Feelings & habits'],['values','🏡 Family values']];
+const BLOCKS=[['review','🔁 Yesterday’s sounds + spaced review'],['mood','😊 Feelings + hero word'],['letter','🔤 Letter sound'],['sight','👀 Sight words'],['blend','🔗 Blend the sounds'],['word','🧩 Build a word'],['move','🏃 Move break'],['count','🔢 Counting'],['numsense','🔟 Ten-frames & number sense'],['numstory','📖 Number story (weekly)'],['shapes','🔷 Shapes & colours'],['hands','🧱 Hands-on maths'],['opp','↔️ Opposites'],['pattern','🎨 Patterns'],['teach','🎓 You are the teacher'],['logic','🧭 Maze / colour & shape'],['trace','✏️ Finger tracing'],['paper','📒 Notebook time'],['time','📅 Days, months & seasons'],['body','🧍 Body, senses & helpers'],['whisper','🤫 Whisper, normal, LOUD'],['discover','🌍 Discover the world'],['sent','💬 Simple sentences'],['calm','🌬️ Feelings check-in & calm'],['story','💛 Feelings & habits'],['festival','🪔 Festival story'],['safety','🛡️ Safety basics'],['family','👪 My family'],['homew','🏠 Home words'],['ptime','🗣️ Your turn, my turn'],['gallery','🎨 My gallery (photo)'],['storytime','📖 Story time'],['values','🏡 Family values'],['varna','🇮🇳 Hindi varnamala'],['ordinals','🏁 First, second, third'],['sorting','🧺 Sort it out'],['puppet','🧸 Teach the puppet'],['movebreak','🕺 Movement break'],['nature','🌍 Nature & simple science'],['instr','👂 Listen and do'],['memory','🧠 Memory game'],['respect','🙏 Respect for elders'],['honesty','🤝 Honesty story'],['care','🏡 Looking after things'],['jar','🫙 Saving jar'],['scav','🔎 House scavenger hunt'],['showtell','🧸 Show and tell'],['rhymes','🎵 Rhymes with actions']];
 const HEROES=[['shivansh','Red flyer'],['aarav','Blue flying suit'],['chiku','Green vine swinger'],['vidu','Purple super hearing'],['snaya','Girl hero — kindness']];
 let ctlBuilt=false,BASE=null;
 function renderCtl(){
@@ -397,7 +407,7 @@ function renderCtl(){
   <details open><summary>👦 Child & schedule</summary>
     <label>Child's name (used for tracing)</label><input type="text" id="c_name" value="${esc(e.name)}">
     <label>Next mission number</label><input type="number" id="c_day" min="1" value="${e.day}">
-    <label class="inl"><input type="checkbox" id="c_once" ${e.oncePerDay?'checked':''}> Only one mission per day</label>
+    <label>Missions per day (0 = no limit)</label><input type="number" id="c_pd" min="0" max="6" value="${e.perDay==null?1:e.perDay}">
     <label class="inl"><input type="checkbox" id="c_win" ${e.win&&e.win.on?'checked':''}> Allow only between these times</label>
     <div class="row2"><input type="time" id="c_wf" value="${esc(e.win&&e.win.from||'15:00')}"><input type="time" id="c_wt" value="${esc(e.win&&e.win.to||'17:00')}"></div>
     <label>Day / night look on the tablet</label><select id="c_thm">${[['auto','Automatic — by the times below'],['day','Always day'],['night','Always night']].map(([v,t])=>`<option value="${v}" ${((e.theme||{}).mode||'auto')===v?'selected':''}>${t}</option>`).join('')}</select>
@@ -413,6 +423,8 @@ function renderCtl(){
   <details><summary>📚 Content</summary>
     ${BLOCKS.map(([k,t])=>`<label class="inl"><input type="checkbox" data-blk="${k}" ${(e.content&&e.content.off||[]).includes(k)?'':'checked'}> ${t}</label>`).join('')}
     <label>Max counting number (0 = automatic)</label><input type="number" id="c_mc" min="0" max="20" value="${e.content&&e.content.maxCount||0}">
+    <label>Letter and sound quizzes</label><select id="c_dl">${[['easy','Easy — 2 choices'],['normal','Normal — 3 choices'],['harder','Harder — 4 choices']].map(([v,x])=>`<option value="${v}" ${((e.diff||{}).letters||'normal')===v?'selected':''}>${x}</option>`).join('')}</select>
+    <label>Counting and number games</label><select id="c_dn">${[['easy','Easy'],['normal','Normal — automatic'],['harder','Harder (5 more, up to 20)']].map(([v,x])=>`<option value="${v}" ${((e.diff||{}).numbers||'normal')===v?'selected':''}>${x}</option>`).join('')}</select>
   </details>
   <details><summary>🔊 Voice & sound</summary>
     <label class="inl"><input type="checkbox" id="c_vo" ${e.voice&&e.voice.on?'checked':''}> Voice on</label>
@@ -422,6 +434,13 @@ function renderCtl(){
     <label class="inl"><input type="checkbox" id="c_hg" ${e.voice&&e.voice.hinglish?'checked':''}> Read Hindi in English letters (Hinglish)</label>
     <label class="inl"><input type="checkbox" id="c_sf" ${e.sfx!==false?'checked':''}> Sound effects</label>
     <label class="inl"><input type="checkbox" id="c_hx" ${e.haptics!==false?'checked':''}> Vibration on success</label>
+    <label class="inl"><input type="checkbox" id="c_hol" ${e.holiday&&e.holiday.on?'checked':''}> 🌴 Holiday / travel mode (pauses the mission number)</label>
+    <label>Back to missions on (optional)</label><input type="date" id="c_hu" value="${esc((e.holiday||{}).until||'')}">
+    <label>Voice volume: <span id="c_vvv">${(e.vol||{}).voice??100}</span>%</label><input type="range" id="c_vv" min="0" max="100" step="5" value="${(e.vol||{}).voice??100}" oninput="document.getElementById('c_vvv').textContent=this.value">
+    <label>Effects volume: <span id="c_vfv">${(e.vol||{}).fx??100}</span>%</label><input type="range" id="c_vf" min="0" max="100" step="5" value="${(e.vol||{}).fx??100}" oninput="document.getElementById('c_vfv').textContent=this.value">
+    <label>Volume cap: <span id="c_vcv">${(e.vol||{}).cap??100}</span>%</label><input type="range" id="c_vc" min="30" max="100" step="5" value="${(e.vol||{}).cap??100}" oninput="document.getElementById('c_vcv').textContent=this.value">
+    <label>Text size on the tablet</label><select id="c_ts"><option value="normal" ${e.tsize!=='large'?'selected':''}>Normal</option><option value="large" ${e.tsize==='large'?'selected':''}>Large</option></select>
+    <label class="inl"><input type="checkbox" id="c_tf" ${e.tapfx!==false?'checked':''}> Tap feedback (tiny vibration + tick)</label>
   </details>
   <details><summary>✅ Habits & routines</summary>
     <div class="note">Icon = any emoji · voice line = what the Hindi voice says · ⏳ timer minutes (0 = none) · “needs OK” = he must ask you.</div>
@@ -452,13 +471,15 @@ function renderCtl(){
 function applyCtl(){
   const g=id=>$('#'+id);
   const nv={
-    name:g('c_name').value.trim(),day:Math.max(1,parseInt(g('c_day').value)||1),oncePerDay:g('c_once').checked,
+    name:g('c_name').value.trim(),day:Math.max(1,parseInt(g('c_day').value)||1),perDay:(isNaN(parseInt(g('c_pd').value))?1:Math.max(0,Math.min(6,parseInt(g('c_pd').value)))),
     win:{on:g('c_win').checked,from:g('c_wf').value||'15:00',to:g('c_wt').value||'17:00'},
     theme:{mode:g('c_thm').value||'auto',day:g('c_thd').value||'07:00',night:g('c_thn').value||'19:00'},
     lock:{on:g('c_lk').checked,confirm:g('c_lc').checked,parent:g('c_lp').checked},
     content:{off:[...document.querySelectorAll('[data-blk]')].filter(x=>!x.checked).map(x=>x.dataset.blk),maxCount:Math.max(0,Math.min(20,parseInt(g('c_mc').value)||0))},
     voice:{on:g('c_vo').checked,mode:g('c_vm').value,rate:parseFloat(g('c_vr').value)||0.85,hinglish:g('c_hg').checked,src:g('c_vs').value||'pack'},
     phone:{num:g('c_ph').value.replace(/\D/g,'').slice(0,12),who:g('c_pw').value.trim()},
+    diff:{letters:g('c_dl').value,numbers:g('c_dn').value},
+    holiday:{on:g('c_hol').checked,until:g('c_hol').checked?(g('c_hu').value||''):''},vol:{voice:+g('c_vv').value,fx:+g('c_vf').value,cap:+g('c_vc').value},tsize:g('c_ts').value,tapfx:g('c_tf').checked,
     sfx:g('c_sf').checked,haptics:g('c_hx').checked,habits:pReadHabits(),rewards:pReadRewards(),
     ask:{n:g('c_an').value.trim()||'Mummy',h:g('c_ah').value.trim()||'मम्मी'},heroes:{}
   };
@@ -467,7 +488,7 @@ function applyCtl(){
   const set={};
   for(const k in nv){
     const a=JSON.stringify(nv[k]);
-    if(k==='voice'||k==='win'||k==='lock'||k==='content'||k==='ask'||k==='heroes'||k==='phone'){ /* send only changed sub-keys */
+    if(k==='voice'||k==='holiday'||k==='vol'||k==='diff'||k==='win'||k==='lock'||k==='content'||k==='ask'||k==='heroes'||k==='phone'){ /* send only changed sub-keys */
       const sub={};for(const s in nv[k]){if(JSON.stringify(nv[k][s])!==JSON.stringify((BASE&&BASE[k]||{})[s]))sub[s]=nv[k][s]}
       if(Object.keys(sub).length)set[k]=sub;
     }else if(a!==JSON.stringify(BASE&&BASE[k]))set[k]=nv[k];
@@ -479,7 +500,41 @@ async function sendSet(set,msg){
   try{await api('pset',{set});toast(msg||'Sent to the tablet ✔');ctlBuilt=false;await poll(true)}catch(e){toast('⚠️ '+e.message)}
 }
 
+function weeklyReport(st){
+  const td=new Date((()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')})()),h=((st&&st.history)||[]).filter(x=>(td-new Date(x.d))/864e5<7);
+  const L=['Hero Academy — last 7 days'];
+  if(!h.length){L.push('No missions yet this week.')}
+  else{
+    const mins=h.filter(x=>x.mins!=null).map(x=>x.mins),avg=mins.length?Math.round(mins.reduce((a,b)=>a+b,0)/mins.length):0;
+    const tasks=h.reduce((a,x)=>a+(x.n|0),0),rests=h.reduce((a,x)=>a+(x.rest|0),0),rsec=h.reduce((a,x)=>a+(x.rs|0),0);
+    L.push(`Missions done: ${h.length} of 7`);
+    if(tasks)L.push(`Tasks completed: ${tasks}`);
+    if(avg)L.push(`Average time per mission: ${avg} min`);
+    if(rests)L.push(`Rest breaks pressed: ${rests} (about ${Math.max(1,Math.round(rsec/60))} min in all)`);
+    let sp=0,at=0;h.forEach(x=>{const m=String(x.sp||'').match(/^(\d+)\/(\d+)$/);if(m){sp+=+m[1];at+=+m[2]}});
+    if(at)L.push(`Spoke aloud: ${sp} of ${at} tries (${Math.round(sp/at*100)}%) — the tablet only hears that a voice was made`);
+    const weak={};h.forEach(x=>{String(x.weak||'').replace(/([^,()]+?) \((\d+)\)/g,(m,a,n)=>{a=a.trim();weak[a]=(weak[a]||0)+(+n)})});
+    const wl=Object.entries(weak).sort((a,b)=>b[1]-a[1]).slice(0,4);
+    L.push('Needs practice: '+(wl.length?wl.map(([a,n])=>`${a} (${n})`).join(', '):'nothing repeated'));
+    const mo={};h.forEach(x=>{if(x.mood)mo[x.mood]=(mo[x.mood]||0)+1});
+    if(Object.keys(mo).length)L.push('Feelings he picked: '+Object.entries(mo).map(([a,n])=>`${a} ×${n}`).join(', '));
+  }
+  const fr=((st&&st.frus)||[]).filter(x=>(td-new Date(x.d))/864e5<7).length;
+  if(fr)L.push(`Calm-down prompts shown (wild tapping, many wrong answers or going quiet): ${fr}`);
+  if(st&&st.holiday&&st.holiday.on)L.push('Holiday mode is ON — missions are paused'+(st.holiday.until?' until '+st.holiday.until:''));
+  const srs=Object.keys((st&&st.srs)||{});
+  if(srs.length)L.push('Coming back for review: '+srs.slice(0,8).map(k=>{const [t,v]=[k[0],k.slice(2)];return t==='L'?`sound ${v.toUpperCase()}`:t==='S'?`word “${v}”`:`“${v}”`}).join(', ')+(srs.length>8?` +${srs.length-8} more`:''));
+  const nt=Object.entries((st&&st.notes)||{}).filter(([d,t])=>t&&(td-new Date(d))/864e5<7).sort();
+  if(nt.length){L.push('Parent notes:');nt.forEach(([d,t])=>L.push(`  ${d}: ${t}`))}
+  L.push('Last backup file: '+((st&&st.lastBackup)||'none yet — please download one'));
+  return L.join('\n');
+}
+
 /* quick actions */
+$('#nDate').value=today();
+$('#glHol').onclick=()=>{const on=!$('#glHol').dataset.hol;sendSet({holiday:{on,until:''}},on?'Holiday mode on':'Holiday mode off')};
+$('#nSave').onclick=()=>{const d=$('#nDate').value||today(),t=$('#nTxt').value.trim();sendSet({notes:{[d]:t}},t?'Note saved ✔':'Note cleared')};
+$('#wkCopy').onclick=()=>{const x=$('#repWeek').textContent;if(navigator.share)navigator.share({text:x}).catch(()=>{});else{try{navigator.clipboard.writeText(x);toast('Copied ✔')}catch(e){toast('Select and copy the text')}}};
 $('#qPause').onclick=async()=>{try{await api('ppause',{paused:!CTL.paused});toast(!CTL.paused?'Paused ⏸':'Resumed ▶');await poll(false)}catch(e){toast('⚠️ '+e.message)}};
 $('#qExtra').onclick=()=>{const e=effective();const g=e.grant||{};sendSet({grant:{date:today(),extra:(g.date===today()?g.extra|0:0)+1}},'1 extra mission allowed today ➕')};
 $('#qOpen').onclick=()=>sendSet({grant:{open:today()}},'Time window open for today ⏰');

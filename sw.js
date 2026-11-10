@@ -1,5 +1,5 @@
 /* Hero Academy service worker — network-first so updates arrive, cache fallback for offline */
-const CACHE = 'hero-academy-v3.6.0';
+const CACHE = 'hero-academy-v3.8.0';
 const AUDIO = 'hero-audio-v1'; // survives app updates so downloaded voice clips are kept
 const ASSETS = ['./', './index.html', './parent.html', './manifest.webmanifest', './parent.webmanifest', './icon-192.png', './icon-512.png', './parent-192.png', './parent-512.png'];
 
