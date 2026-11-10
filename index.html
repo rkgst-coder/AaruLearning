@@ -384,7 +384,7 @@ body.night .family b{color:var(--gold)}
 .mstart b{font-size:clamp(32px,5.4vw,48px);font-weight:700;line-height:1}
 .mstart small{font-size:20px;font-weight:500;opacity:.95}
 .mstart .mi{width:92px;height:92px;flex:none;border-radius:50%;background:var(--cream);color:var(--org);display:grid;place-items:center;font-size:56px}
-.trail{display:flex;justify-content:space-between;align-items:center;min-height:84px;padding:0 4px;gap:4px}
+.trail{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;min-height:84px;padding:14px 4px;gap:4px;row-gap:26px}
 .trail span{width:50px;height:50px;flex:none;border-radius:50%;background:var(--sf);display:grid;place-items:center;font-size:26px;box-shadow:0 4px 0 var(--sh),inset 0 0 0 3px var(--c)}
 .ngrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .nb2{position:relative;min-height:124px;border:0;border-radius:30px;display:flex;align-items:center;gap:18px;padding:0 24px;color:#fff;font-family:inherit;text-align:left;background:var(--c1);box-shadow:0 7px 0 var(--c2),0 12px 20px #0002}
@@ -507,7 +507,6 @@ html,body{overscroll-behavior:none}
 .blendrow{display:flex;gap:22px;justify-content:center}
 .bl{display:inline-block;transition:.2s}.bl.lit{color:#ffe45c;transform:scale(1.25)}
 
-.exroad{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px;margin:6px 0 12px;font-size:28px}.exs{display:inline-block;min-width:40px;text-align:center;opacity:.7}.exs.c{opacity:1;font-size:40px;transform:translateY(-3px)}.exl{display:inline-block;width:18px;border-top:4px dotted #0006}
 .mgrid{display:grid;gap:12px;justify-content:center;margin:14px auto}
 .mcard{aspect-ratio:1;border:0;border-radius:16px;background:linear-gradient(#7c6cff,#4b3fd1);color:#fff;font-size:clamp(34px,6vw,56px);box-shadow:0 5px 0 #2f2796;font-family:inherit}
 .mcard.up{background:#fff;color:#000}.mcard.done{opacity:.35;pointer-events:none}
@@ -538,7 +537,7 @@ table.wk{width:100%;border-collapse:collapse;font-size:13px}table.wk th{text-ali
   window.addEventListener('unhandledrejection',function(e){window.L('REJ '+(e.reason&&e.reason.message||e.reason))});
   window.L('boot');
 })();
-const APPV='3.8.0';
+const APPV='3.8.1';
 /* ---------- v3.5 chunky icons (inline, work offline) ---------- */
 const ICP={
  star:'<path d="M12 1.8l3.1 6.4 7 .9-5.1 4.9 1.3 7-6.3-3.4-6.3 3.4 1.3-7L1.9 9.1l7-.9z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>',
@@ -587,7 +586,10 @@ applyTheme(true);setInterval(()=>applyTheme(false),60000);
 /* ---------- helpers ---------- */
 const $=(s,r=document)=>r.querySelector(s);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+let STAGEGEN=0;
+const rawSleep=ms=>new Promise(r=>setTimeout(r,ms));
+/* v3.8.1: a wait that started on an earlier screen never finishes, so an activity the child has left cannot wake up and talk over the new screen */
+const sleep=ms=>{const g=STAGEGEN;return new Promise(r=>setTimeout(()=>{if(g===STAGEGEN)r()},ms))};
 const rnd=a=>a[Math.floor(Math.random()*a.length)];
 const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
@@ -640,13 +642,13 @@ const DEF={v:3,name:'',day:1,stars:0,badges:[],history:[],reward:'',rewardEvery:
   win:{on:false,from:'15:00',to:'17:00'},theme:{mode:'auto',day:'07:00',night:'19:00'},content:{off:[],pause:{},maxCount:0,sightFrom:27},
   lock:{on:true,confirm:false,parent:true},sfx:true,school:null,fun:{},phone:{num:'',who:''},phoneOk:0,phoneBadge:false,ask:{n:'Mummy',h:'मम्मी'},grant:{date:'',extra:0,open:''},heroes:JSON.parse(JSON.stringify(HERO_DEF)),
   voice:{on:true,mode:'dual',rate:0.85,pitch:1.1,hinglish:false,src:'pack',pack:''},sec:{salt:'',hash:''},sync:{url:'',token:'',last:'',dirty:false,live:true},test:false,kiosk:false,
-  wallet:null,ledger:[],habits:JSON.parse(JSON.stringify(DEFAULT_HABITS)),habitLog:{},rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),look:Object.assign({},LOOK_DEF),owned:OWN_DEF.slice(),stickers:[],boxDate:'',haptics:true,diff:{letters:'normal',numbers:'normal'},srs:{},rests:[],notes:{},gal:[],lastBackup:'',v38:false,exp:{on:false,pick:'',dest:'',stamps:[]},prog:{},holiday:{on:false,until:''},hdays:[],frus:[],vol:{voice:100,fx:100,cap:100},tsize:'normal',tapfx:true,frusOff:false,fh:[]};
+  wallet:null,ledger:[],habits:JSON.parse(JSON.stringify(DEFAULT_HABITS)),habitLog:{},rewards:JSON.parse(JSON.stringify(DEFAULT_REWARDS)),look:Object.assign({},LOOK_DEF),owned:OWN_DEF.slice(),stickers:[],boxDate:'',haptics:true,diff:{letters:'normal',numbers:'normal'},srs:{},rests:[],notes:{},gal:[],lastBackup:'',v38:false,prog:{},holiday:{on:false,until:''},hdays:[],frus:[],vol:{voice:100,fx:100,cap:100},tsize:'normal',tapfx:true,frusOff:false,fh:[]};
 let S=JSON.parse(JSON.stringify(DEF));
 let LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0,devId:'',devName:''}; /* device-only, never synced */
 const HN=k=>(S.heroes[k]&&S.heroes[k].n)||HERO_DEF[k].n;
 const HH=k=>(S.heroes[k]&&S.heroes[k].h)||HERO_DEF[k].h;
 const fillN=(s,sp)=>String(s).replace(/\[(\w+)\]/g,(m,k)=>HERO_DEF[k]?(sp?HH(k):HN(k)):m);
-function merge(base,over){for(const k in over){if(over[k]&&typeof over[k]==='object'&&!Array.isArray(over[k])&&base[k]&&typeof base[k]==='object')merge(base[k],over[k]);else base[k]=over[k]}return base}
+function merge(base,over){for(const k in over){if(k==='__proto__'||k==='constructor'||k==='prototype')continue;if(over[k]&&typeof over[k]==='object'&&!Array.isArray(over[k])&&base[k]&&typeof base[k]==='object')merge(base[k],over[k]);else base[k]=over[k]}return base}
 let pushTimer=null;
 async function save(){
   await DB.set('state',S);
@@ -678,6 +680,7 @@ async function syncPull(){
   if(!j.data)throw new Error('No saved data in the Sheet yet');
   const keep={sync:S.sync,sec:S.sec};
   S=merge(JSON.parse(JSON.stringify(DEF)),j.data);S.sync=keep.sync;S.sec=keep.sec;S.test=false;
+  if(S.wallet==null)S.wallet=S.stars|0;if(!S.school)S.school=JSON.parse(JSON.stringify(SCHOOL_DEF));clearResume();regFamilyHeroes();applyTextSize();
   await DB.set('state',S);
 }
 window.addEventListener('online',()=>{if(S.sync.dirty)syncPush()});
@@ -849,30 +852,52 @@ function runsOf(parts){
   flush();return out;
 }
 const runText=items=>normRun(items.map(p=>typeof p==='string'?p:p[0]).join(' '));
+/* v3.8.1: "Rest" and the parent's "Pause" really hold the lesson.
+   Before, they only cut the voice: the activity took that as "finished speaking" and carried on underneath the Rest screen.
+   Now a line that is cut by a rest/pause is said again afterwards, and nothing new is spoken while the hold is on. */
+let HOLDN=0,HOLDTAIL=false,HOLDCUT=0;
+const HOLD=()=>{try{return REST.on||LIVE.paused||HOLDTAIL}catch(e){return false}};
+const holdWait=()=>new Promise(r=>{const iv=setInterval(()=>{if(!HOLD()){clearInterval(iv);r()}},200)});
+function holdEndSay(...parts){HOLDTAIL=true;return Promise.race([sayNow(...parts),rawSleep(6000)]).then(()=>{HOLDTAIL=false})}
 async function say(...parts){
+  const gen=STAGEGEN;
+  /* if the screen changed while this was waiting or being spoken, the caller belongs to the old screen -> never resume it */
+  const never=()=>new Promise(()=>{});
+  for(;;){
+    if(HOLD())await holdWait();
+    if(gen!==STAGEGEN)return never();
+    const h0=HOLDN,whole=await sayNow(...parts);
+    if(!whole&&(HOLD()||HOLDN!==h0)){HOLDCUT++;continue}
+    break;
+  }
+  if(gen!==STAGEGEN)return never();
+}
+async function sayNow(...parts){
   const id=++speakId;
   try{speechSynthesis.cancel()}catch(e){}
   stopAudio();hlStop();
-  await sleep(70);
+  await rawSleep(70);
   const romanAll=S.voice.hinglish||(!voiceFor('hi')&&'speechSynthesis' in window);
   for(const run of runsOf(parts)){
-    if(id!==speakId)return;
-    if(run.pause){await sleep(run.pause);continue}
+    if(id!==speakId)return false;
+    if(run.pause){await rawSleep(run.pause);continue}
     if(run.fn){try{run.fn()}catch(e){}continue}
     if(run.rec){await playRec(run.rec,id);continue}
     if(S.voice.on&&S.voice.src!=='device'){
       const text=runText(run.items);
       if(text){noteSeen(text);const key=clipKey(text);if(PACK.clips[key]&&await playClip(key,id,ms=>hlStart(text,ms))){hlStop();continue}}
     }
+    if(id!==speakId)return false;
     hlStart(runText(run.items),Math.max(800,runText(run.items).length*85/(S.voice.rate||.85)));
     for(const sg of segsOf(run.items)){
-      if(id!==speakId)return;
+      if(id!==speakId)return false;
       const roman=sg.l==='hi'&&romanAll;
       const text=roman?deva2rom(sg.t):sg.t,lang=(sg.l==='en'||roman)?'en':'hi';
-      for(const c of chunks(text)){if(id!==speakId)return;await say1(c,lang);await sleep(90)}
+      for(const c of chunks(text)){if(id!==speakId)return false;await say1(c,lang);await rawSleep(90)}
     }
     hlStop();
   }
+  return id===speakId;
 }
 function stopVoice(){speakId++;try{speechSynthesis.cancel()}catch(e){}stopAudio();hlStop()}
 function hero(display,parts){$('#bubble').textContent=display;LAST=parts||[display];return say(...LAST)}
@@ -1014,6 +1039,7 @@ function noteWrong(){if(SESS&&CURKEY)SESS.wrong[CURKEY]=(SESS.wrong[CURKEY]||0)+
 
 /* ---------- generic multiple choice ---------- */
 function ask(stage,{q,sp,opts,correct,cls,head,wrongMsg,os,item}){
+  if(!document.body.contains(stage))return new Promise(()=>{});   /* v3.8.1: a question for a screen that is gone is never asked */
   return new Promise(res=>{
     if(head)stage.appendChild(el('div','prow',head));
     const wrap=el('div','choices qwait');let wrong=0,locked=false,ready=false;
@@ -1032,8 +1058,10 @@ function ask(stage,{q,sp,opts,correct,cls,head,wrongMsg,os,item}){
         if(locked)return;if(!ready){b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400);return}hl(-1);
         if(correct==null||i===correct){locked=true;FG();if(item&&wrong===0)srsHit(item);b.classList.add('ok');SFX.ok();react('cheer');confetti(10);stopVoice();res({i,wrong})}
         else{
-          wrong++;noteWrong();FG.wrong();if(item)srsMiss(item);SFX.no();react('oops');b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),500);
-          if(wrongMsg)hero(wrongMsg[0],wrongMsg[1]);else{const [d,pp]=pickFrom('try',TRYAG);hero(d,pp)}
+          wrong++;noteWrong();$('#bubble').textContent=q;LAST=[...(sp||[q])];FG.wrong();if(item)srsMiss(item);SFX.no();react('oops');b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),500);
+          if(!$('#frusov')){const fb=wrongMsg||pickFrom('try',TRYAG),qp=[...(sp||[q])];   /* v3.8.1: say "try again", then the question again */
+           $('#bubble').textContent=fb[0];
+           say(...(fb[1]||[fb[0]]),{pause:450},{fn:()=>{if(!locked&&document.body.contains(wrap))$('#bubble').textContent=q}},...qp)}
           if(wrong>=2&&wrap.children[correct])wrap.children[correct].classList.add('hint');
         }
       };
@@ -1042,7 +1070,7 @@ function ask(stage,{q,sp,opts,correct,cls,head,wrongMsg,os,item}){
   });
 }
 /* swap in a brand-new stage so any unfinished block from the previous screen can never draw on the new one */
-function freshStage(){const o=$('#stage');const n=o.cloneNode(false);o.replaceWith(n);return n}
+function freshStage(){STAGEGEN++;const o=$('#stage');const n=o.cloneNode(false);o.replaceWith(n);return n}
 const waitBtn=(stage,label)=>new Promise(r=>{const b=el('button','btn glow',label);b.onclick=()=>{SFX.tap();r()};stage.appendChild(b)});
 
 /* ===== Feelings check ===== */
@@ -2136,6 +2164,7 @@ const ECHO_CUE=[['अब आप बोलो!'],['आपकी turn! बोल�
 async function echoTurn(stage,word,cue){
   const mode=(S.echo&&S.echo.mode)||'listen';
   if(mode==='off'||!word)return null;
+  if(!document.body.contains(stage))return new Promise(()=>{});
   const rid=RUNID;
   const chip=el('div','turn',`<div class="tw">${esc(word)}</div><div class="tt">🗣️ Your turn! Say it out loud</div><div class="meter"><i></i></div>`);
   stage.appendChild(chip);try{chip.scrollIntoView({block:'end',behavior:'smooth'})}catch(e){}
@@ -2790,7 +2819,7 @@ async function parentGate(type,title,detail,onOk){
     else if(r.status==='expired')hero(`${AW().n} did not answer yet.`,[`${AW().h} ने अभी जवाब नहीं दिया।`]);
   }else parentConfirm(onOk,'Grown-up: '+title);
 }
-function repeatBlock(){if(!SESS)return;RUNID++;runBlock()}
+function repeatBlock(){if(!SESS)return;RUNID++;SESS.doneI=-1;runBlock()}
 function repeatMission(){
   const last=[...S.history].reverse().find(h=>h.d===today()),dd=last?last.day:Math.max(1,S.day-1);
   startSession(dd,buildBlocks(dd),true,{rep:true});
@@ -2804,13 +2833,13 @@ $('#repBtn').onclick=()=>{
 const REST={on:false,t0:0,iv:null};
 function startRest(){
   if(REST.on||!SESS)return;
-  REST.on=true;REST.t0=Date.now();stopVoice();
+  REST.on=true;REST.t0=Date.now();HOLDN++;HOLDCUT=0;stopVoice();
   const o=el('div','ov');o.id='restov';o.style.display='grid';
   o.innerHTML=`<div class="ovc"><div class="pic">😴</div><div class="cap" style="font-size:38px">Resting… take a break!</div><div class="sub">Drink some water and stretch.<br>${esc(AW().n)} can see that you are resting.</div><div class="cap" id="restT">0:00</div><button class="btn glow" id="restGo">▶ I am ready</button></div>`;
   document.body.appendChild(o);
   REST.iv=setInterval(()=>{const s=Math.round((Date.now()-REST.t0)/1000),x=$('#restT');if(x)x.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},1000);
   $('#restGo').onclick=endRest;
-  say('ठीक है, थोड़ा rest कर लो। जब तैयार हो जाओ तो बटन दबाओ।');
+  sayNow('ठीक है, थोड़ा rest कर लो। जब तैयार हो जाओ तो बटन दबाओ।');
   kickLive();
 }
 function endRest(){
@@ -2819,7 +2848,7 @@ function endRest(){
   if(SESS){SESS.start+=ms;SESS.rests=(SESS.rests|0)+1;SESS.restSec=(SESS.restSec|0)+secs}
   if(!S.test){S.rests=(S.rests||[]).concat({d:today(),s:secs,b:SESS?SESS.blocks[SESS.i].title:''}).slice(-60);save()}
   const o=$('#restov');if(o)o.remove();
-  say('चलो, फिर से शुरू करते हैं!');kickLive();
+  {const g=STAGEGEN;holdEndSay('चलो, फिर से शुरू करते हैं!').then(()=>{if(SESS&&g===STAGEGEN&&!HOLDCUT&&!HOLD())say(...LAST)})}kickLive();
 }
 $('#restBtn').onclick=startRest;
 
@@ -3335,21 +3364,23 @@ function frusGuard(wrap){
 }
 function frusPrompt(why){
   const n=Date.now();
-  if(!SESS||REST.on||n-FR.last<240000||(SESS.frusN|0)>=3)return;
+  if(!SESS||REST.on||LIVE.paused||n-FR.last<240000||(SESS.frusN|0)>=3)return;
   FR.last=n;SESS.frusN=(SESS.frusN|0)+1;
   if(!S.test){S.frus=(S.frus||[]).concat({d:today(),w:why}).slice(-60);save()}
   stopVoice();
-  const o=el('div','ov');o.style.display='grid';
+  const o=el('div','ov');o.id='frusov';o.style.display='grid';
   o.innerHTML=`<div class="ovc"><div class="pic">🌬️</div><div class="cap" style="font-size:36px">Let us take a breath</div><div class="sub" id="frS">Breathe in… and out…</div><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:16px"><button class="btn" id="frB">🌬️ Breathe with me</button><button class="btn" id="frR">😴 Rest</button><button class="btn grey" id="frK">Keep going ▶</button></div></div>`;
   document.body.appendChild(o);
+  const keepB=$('#bubble').textContent,keepL=LAST,keepG=STAGEGEN;
+  const back=sayIt=>{if(keepG!==STAGEGEN)return;$('#bubble').textContent=keepB;LAST=keepL;if(sayIt)say(...keepL)};   /* v3.8.1: put the question back */
   hero('Let us take a breath, '+kidName()+'.',['चलो, एक गहरी साँस लेते हैं।']);
   const q=s=>o.querySelector(s);
-  q('#frK').onclick=()=>{stopVoice();o.remove()};
-  q('#frR').onclick=()=>{o.remove();startRest()};
+  q('#frK').onclick=()=>{stopVoice();o.remove();back(true)};
+  q('#frR').onclick=()=>{stopVoice();o.remove();back(false);startRest()};
   q('#frB').onclick=async()=>{
     q('#frB').disabled=true;const c=q('#frS');
-    for(let i=0;i<3;i++){if(!document.body.contains(o))return;c.textContent='Breathe IN… 🌬️';await sleep(4000);if(!document.body.contains(o))return;c.textContent='Breathe OUT… 💨';await sleep(4000)}
-    o.remove();hero('Well done. Let us go on!',['शाबाश! चलो आगे बढ़ते हैं!']);
+    for(let i=0;i<3;i++){if(!document.body.contains(o))return;c.textContent='Breathe IN… 🌬️';await rawSleep(4000);if(!document.body.contains(o))return;c.textContent='Breathe OUT… 💨';await rawSleep(4000)}
+    o.remove();if(keepG!==STAGEGEN)return;$('#bubble').textContent=keepB;LAST=keepL;say('शाबाश! चलो आगे बढ़ते हैं!',{pause:400},...keepL);
   };
 }
 
@@ -3390,6 +3421,7 @@ document.addEventListener('pointerdown',e=>{
 
 /* ---------- T9: what's new + version ---------- */
 const WHATS_NEW=[
+ ['🛠️','v3.8.1 fixes: an activity he leaves no longer keeps talking on Home · Rest and Pause really hold the lesson and the teacher repeats her line afterwards · after a wrong answer the question is asked again · Home refreshes by itself the next day · a broken activity can no longer freeze the mission.'],
  ['🚀','One mission a day, about 22–26 short activities (it was two missions of about 13).'],
  ['🔁','Yesterday’s sounds + spaced review: a wrong answer comes back after 1, 3 and 7 days.'],
  ['🆕','New activities: blending, ten-frames, shapes, time, body, sentences, whisper/loud, calm breathing, festivals, safety, story time, gallery.'],
@@ -3504,125 +3536,6 @@ function weekPlanHTML(){
   return `<table class="wk"><tr><th>Mission</th><th>Date</th><th>Tasks</th><th>Min</th><th>Activities (dotted = with a grown-up, no screen)</th></tr>${rows}</table>`;
 }
 
-
-/* ===================== v3.8 part 4: Expeditions (parallel test mode; the normal mission is untouched) ===================== */
-const EXPS=[
- {id:'safari',e:'🦁',name:'Wildlife Safari',veh:'🚙',bg:'linear-gradient(#ffe9a8,#f4b95a)',pit:'⛽ Jeep rest stop',dest:'Safari camp',items:[['🦁','lions'],['🐘','elephants'],['🦒','giraffes'],['🦓','zebras'],['🐒','monkeys'],['🐊','crocodiles']],places:['🌳 The big tree','💧 The waterhole','🌾 The tall grass','⛰️ Lion Rock','🌉 The river bridge','🏕️ The lookout','🌅 Sunset hill']},
- {id:'road',e:'🚗',name:'Family Road Trip',veh:'🚗',bg:'linear-gradient(#bfe6ff,#8cc4f0)',pit:'⛽ Petrol pump',dest:'Nani’s house',items:[['🚗','cars'],['🚌','buses'],['🚚','trucks'],['🏍️','bikes'],['🚲','cycles'],['🚑','ambulances']],places:['🛣️ The highway','🌉 The bridge','🍽️ The dhaba','🏞️ The hills','🚧 The toll gate','🌇 The city','🌳 The shady road']},
- {id:'space',e:'🚀',name:'Rocket to Space',veh:'🚀',bg:'linear-gradient(#2b2a6e,#5b3f9b)',pit:'🛰️ Space station',dest:'Star Land',items:[['⭐','stars'],['🪐','planets'],['🌙','moons'],['🚀','rockets'],['☄️','comets'],['👽','aliens']],places:['🌍 The launch pad','☁️ The clouds','🌙 The Moon','🪐 Saturn','☄️ Comet lane','👽 Alien town','🌠 Shooting-star road']},
- {id:'sea',e:'🐠',name:'Under the Sea',veh:'🚢',bg:'linear-gradient(#9be7ff,#2a8fd0)',pit:'🏝️ Little island',dest:'Dolphin cove',items:[['🐠','fish'],['🦀','crabs'],['🐢','turtles'],['🐙','octopuses'],['🐳','whales'],['🐡','puffer fish']],places:['🏝️ The beach','🪸 The coral reef','🐢 Turtle bay','🐙 Octopus cave','🐳 Whale water','⚓ The sunken ship','🌊 The big wave']},
- {id:'train',e:'🚂',name:'Train Journey',veh:'🚂',bg:'linear-gradient(#ffd9b3,#e59a63)',pit:'☕ Chai stop',dest:'The last station',items:[['🚂','trains'],['🚉','stations'],['🎫','tickets'],['🧳','bags'],['🚦','signals'],['🌉','bridges']],places:['🚉 Station A','🌾 The green fields','🌉 The long bridge','⛰️ The tunnel','🏙️ The big city','🌄 The hill station','🌧️ The rainy track']},
- {id:'bazaar',e:'🛒',name:'Market Day',veh:'🛺',bg:'linear-gradient(#ffe0e0,#f7a8a8)',pit:'🥤 Juice stall',dest:'Home with full bags',items:[['🍎','apples'],['🍌','bananas'],['🥭','mangoes'],['🥕','carrots'],['🍅','tomatoes'],['🍇','grapes']],places:['🏪 The fruit stall','🥛 The dairy shop','🥬 The vegetable market','🧵 The cloth shop','🍬 The sweet shop','💰 The money corner','🎈 The toy stall']},
- {id:'farm',e:'🚜',name:'Farm Day',veh:'🚜',bg:'linear-gradient(#e3f5c0,#9ccf6a)',pit:'🥛 Milk break',dest:'The farmhouse',items:[['🐄','cows'],['🐔','hens'],['🐑','sheep'],['🐴','horses'],['🦆','ducks'],['🐖','pigs']],places:['🏡 The farm gate','🐄 The cow shed','🐔 The hen house','🌽 The corn field','🍎 The orchard','🦆 The duck pond','🌾 The barn']},
- {id:'dino',e:'🦖',name:'Dinosaur Land',veh:'🦕',bg:'linear-gradient(#e8f0b8,#8fb35a)',pit:'🌴 Fern shade',dest:'Dino island',items:[['🦖','dinosaurs'],['🥚','eggs'],['🦴','bones'],['🌴','palm trees'],['🌋','volcanoes'],['🐾','footprints']],places:['🌋 Volcano valley','🥚 The egg nest','🌴 The fern forest','🦴 Bone hill','🦕 Long-neck lake','🐾 Footprint trail','🪨 The cave']},
- {id:'diwali',e:'🪔',name:'Diwali Preparation',veh:'🛵',bg:'linear-gradient(#ffd27a,#e0782f)',pit:'🍬 Sweet break',dest:'The rooftop',items:[['🪔','diyas'],['🌸','flowers'],['✨','sparkles'],['🍬','sweets'],['🎆','fireworks'],['🎁','gifts']],places:['🧹 Cleaning the house','🌸 The flower market','🪔 The diya corner','🎨 The rangoli patch','🍬 The sweet kitchen','👪 The family circle','🎁 The gift shelf']},
- {id:'treasure',e:'🗺️',name:'Treasure Hunt',veh:'🥾',bg:'linear-gradient(#f3e0b0,#c99a55)',pit:'🏕️ Camp rest',dest:'The treasure spot',items:[['🗝️','keys'],['🪙','coins'],['💎','gems'],['🗺️','maps'],['📦','chests'],['🦜','parrots']],places:['🌴 The palm tree','🪨 The big rock','🌊 The stream','🕳️ The secret cave','🌉 The rope bridge','🧭 Compass hill','🏴‍☠️ Pirate cove']},
- {id:'home',e:'🏠',name:'Home Explorer',veh:'🔍',bg:'linear-gradient(#fff0c8,#e8c98a)',pit:'🥛 Snack break',dest:'Home sweet home',items:[['🛋️','sofas'],['🛏️','beds'],['🚪','doors'],['🪑','chairs'],['💡','lights'],['🧸','toys']],places:['🚪 The front door','🛋️ The living room','🍳 The kitchen','🛏️ The bedroom','🚿 The bathroom','🧸 The toy corner','📚 The book shelf']},
- {id:'camp',e:'🥋',name:'Hero Training Camp',veh:'🏃',bg:'linear-gradient(#ffd0d0,#e5646b)',pit:'💧 Water break',dest:'The Hero Hall',items:[['💪','muscles'],['👟','shoes'],['🏅','medals'],['⭐','stars'],['🎯','targets'],['🛡️','shields']],places:['🏕️ The camp gate','🏃 The running track','🤸 The jumping mat','🧗 The climbing wall','🎯 The target range','🧘 The calm corner','🏅 The medal stand']}
-];
-const expS=()=>{if(!S.exp||typeof S.exp!=='object')S.exp={on:false,pick:'',dest:'',stamps:[]};if(!Array.isArray(S.exp.stamps))S.exp.stamps=[];return S.exp};
-function expTheme(){const X=expS(),t=EXPS.find(x=>x.id===X.pick);if(t)return t;const w=Math.floor(Date.parse(weekId())/6048e5);return EXPS[((w%EXPS.length)+EXPS.length)%EXPS.length]}
-const pName=p=>p.slice(p.indexOf(' ')+1),pEm=p=>p.slice(0,p.indexOf(' '));
-
-async function blkSpot(stage,done){
-  const rid=RUNID,th=SESS.exp.th;setVar('spot');
-  intro(stage,th.e,'Spot and count',esc(th.name));
-  await hero(`Let us spot and count! Welcome to ${th.name}.`,['चलो, ढूँढें और गिनें!']);
-  for(let r=0;r<2;r++){
-    if(gone(rid))return;stage.innerHTML='';
-    const [te,tn]=th.items[(RIX()+r)%th.items.length],others=th.items.filter(x=>x[0]!==te),N=r?ri(5,8):ri(3,5);
-    const tiles=shuffle([...Array(N).fill(te),...Array(ri(4,6)).fill(0).map(()=>rnd(others)[0])]);
-    let got=0;const info=el('div','cap',`Tap all the ${tn}! Count out loud.`),tray=el('div','field');
-    stage.append(info,tray);
-    hero(`Tap all the ${tn} and count them!`,['सारे',[tn,'en'],'को touch करो और गिनो!']);
-    await new Promise(res=>{
-      tiles.forEach(e=>{
-        const b=el('button','item',e);tray.appendChild(b);
-        b.onclick=()=>{
-          if(b.dataset.in)return;
-          if(e===te){b.dataset.in=1;b.style.opacity='.25';got++;SFX.tap();say([NUM[Math.min(got,20)],'en']);if(got===N)setTimeout(res,600)}
-          else{noteWrong();SFX.no();b.classList.add('shake');setTimeout(()=>b.classList.remove('shake'),400)}
-        };
-      });
-    });
-    if(gone(rid))return;stage.innerHTML='';
-    const nums=shuffle([N,...shuffle([N-1,N+1,N+2].filter(x=>x>0)).slice(0,2)]);
-    await ask(stage,{q:`How many ${tn}?`,sp:['कितने',[tn,'en'],'थे?'],opts:nums.map(x=>`<span class="ltr">${x}</span>`),os:nums.map(x=>[NUM[x],'en']),correct:nums.indexOf(N),head:`<span style="font-size:60px">${te.repeat(Math.min(N,8))}</span>`});
-    await cheerSay(`${N} ${tn}!`,[[`${NUM[N]} ${tn}`,'en']]);
-  }
-  done();
-}
-async function blkBoss(stage,done){
-  const rid=RUNID;setVar('boss');
-  intro(stage,'👑','Boss challenge','Show what you remember this week!');
-  await hero('Boss challenge! Show me what you remember!',['Boss challenge! दिखाओ कि आपको क्या याद है!']);
-  const ls=[...new Set([1,2,3,4,5,6].map(k=>DAYV-k).filter(d=>d>=1).map(letterOf))].slice(0,5);
-  for(const t of ls){if(gone(rid))return;await letterQ(stage,t)}
-  const due=Object.keys(S.srs||{}).filter(k=>k[0]==='H'||k[0]==='S').slice(0,2);
-  for(const k of due){if(gone(rid))return;if(k[0]==='S')await sightQ(stage,k.slice(2));else await hinQ(stage,k.slice(2))}
-  done();
-}
-function openExpeditions(){
-  SESS=null;RUNID++;SCREEN='home';stopVoice();setLead('shivansh');renderJourney();
-  const stage=freshStage(),th=expTheme(),X=expS(),n=X.stamps.filter(s=>s.id===th.id).length;
-  stage.appendChild(el('div','title','EXPEDITIONS (test)'));
-  const c=el('div','card',`<div class="pic">${th.e}</div><div class="cap">${esc(th.name)}</div><div class="sub">This week’s expedition · ${th.veh} · ${n} stamp${n===1?'':'s'}</div><div style="font-size:15px;max-width:620px;margin:8px auto">${th.places.map(p=>esc(p)).join(' → ')} → 🏁 ${esc(X.dest||th.dest)}</div>`);
-  c.style.background=th.bg;c.style.color='#222';stage.appendChild(c);
-  const go=el('button','btn glow','🚀 Start the expedition');go.onclick=()=>{SFX.tap();startExpedition(th)};
-  const pb=el('button','btn','🛂 My passport');pb.onclick=()=>{SFX.tap();openPassport()};
-  const hb=el('button','link','Back to Home');hb.onclick=home;
-  stage.append(go,pb,hb);
-  hero(`This week we go on the ${th.name} expedition!`,['इस हफ़्ते हम',[th.name,'en'],'expedition पर चलेंगे!']);
-}
-function openPassport(){
-  SESS=null;RUNID++;stopVoice();const stage=freshStage(),X=expS();
-  stage.appendChild(el('div','title','MY PASSPORT'));
-  const g=el('div','ngrid');
-  EXPS.forEach(t=>{const n=X.stamps.filter(s=>s.id===t.id).length;g.appendChild(el('div','dcard',`<div style="font-size:54px;${n?'':'filter:grayscale(1);opacity:.35'}">${t.e}</div><div class="lbl">${esc(t.name)}</div><div class="tiny">${n?'🛂 ×'+n:'not visited yet'}</div>`))});
-  stage.appendChild(g);
-  const hb=el('button','btn','Back');hb.onclick=openExpeditions;stage.appendChild(hb);
-}
-function startExpedition(th){
-  const day=S.day,X=expS();
-  let B=buildBlocks(day);
-  B=[{k:'spot',icon:th.e,title:'Spot and count',min:3,lead:'shivansh',run:blkSpot},...B];
-  if(new Date().getDay()===0)B.push({k:'boss',icon:'👑',title:'Boss challenge',min:3,lead:'vidu',run:blkBoss});
-  const groups=[];for(let i=0;i<B.length;i+=3)groups.push(B.slice(i,i+3));
-  if(groups.length>1&&groups[groups.length-1].length<2){const l=groups.pop();groups[groups.length-1].push(...l)}
-  const dest=X.dest||th.dest,stopAt={},stops=[];let idx=0;
-  groups.forEach((g,k)=>{
-    const last=k===groups.length-1,pit=g.some(b=>b.k==='move'||b.k==='movebreak');
-    const p=last?`🏁 ${dest}`:pit?th.pit:th.places[k%th.places.length];
-    stops.push({em:pEm(p),place:pName(p),titles:g.map(b=>b.title),pit,last});stopAt[idx]=k;idx+=g.length;
-  });
-  startSession(day,B,true,{rep:true,exp:{th,stops,stopAt,shown:-1}});
-}
-function expGate(){
-  const E=SESS&&SESS.exp;if(!E)return false;
-  const k=E.stopAt[SESS.i];if(k===undefined||E.shown===SESS.i)return false;
-  E.shown=SESS.i;expMap(k,()=>{if(SESS)runBlock()});return true;
-}
-function expMap(k,go){
-  const E=SESS.exp,th=E.th,st=E.stops[k],stage=freshStage();setLead('shivansh');renderJourney();
-  stage.style.cssText='background:'+th.bg+';border-radius:26px;padding:18px;color:#222';
-  const road=E.stops.map((s,j)=>`<span class="exs${j===k?' c':''}">${j===k?th.veh:j<k?'✔':s.em}</span>`).join('<i class="exl"></i>');
-  stage.appendChild(el('div','exroad',road));
-  stage.appendChild(el('div','card',`<div class="pic">${st.em}</div><div class="cap">${st.pit?'Pit stop: ':st.last?'':'Stop '+(k+1)+': '}${esc(st.place)}</div><div class="sub">Here we practise: ${st.titles.map(esc).join(' · ')}</div>`));
-  const b=el('button','btn glow','Go ▶');b.onclick=()=>{SFX.tap();stopVoice();go()};stage.appendChild(b);
-  hero(`${st.last?'We have arrived at':'Welcome to'} ${st.place}! Here we practise: ${st.titles.join(', ')}.`,[`${st.place} में स्वागत है! यहाँ हम सीखेंगे।`]);
-}
-async function expFinish(){
-  const E=SESS.exp,th=E.th,X=expS(),stage=freshStage();setLead('snaya');
-  X.stamps.push({id:th.id,d:today()});X.stamps=X.stamps.slice(-200);await save();
-  const dest=X.dest||th.dest;
-  stage.append(el('div','rays',`<div class="bigL pop">${th.e}</div>`),el('div','cap',`Expedition complete! ${esc(th.name)}`),el('div','cap',`🛂 New passport stamp ${th.e}`),el('div','family',`🏁 You arrived at <b>${esc(dest)}</b>!`));
-  confetti(60);SFX.win();
-  const b=el('button','btn glow','Home 🏠');b.onclick=home;const pb=el('button','btn','🛂 My passport');pb.onclick=openPassport;stage.append(b,pb);
-  SESS=null;RUNID++;renderJourney();
-  hero(`You arrived at ${dest}! Great expedition, ${kidName()}!`,[`आप पहुँच गए! बहुत बढ़िया expedition, ${kidName()}!`]);
-}
-WHATS_NEW.push(['🧭','Expeditions (test): a themed map version of the same learning, switched on in the grown-up area. The normal mission is unchanged.']);
-
 const buildBlocks=day=>allBlocks(day).filter(b=>!b.skip&&!S.content.off.includes(b.k)&&!pausedNow(b.k));
 
 /* ---------- printable sheets (real-world tasks + hand-off notes) ---------- */
@@ -3691,7 +3604,7 @@ let TESTDAY=1,RESUME=null;
 /* v3.6: the mission is saved at every activity, so minimising, a crashed tab or the Back button never loses it */
 function saveResume(){
   if(!SESS||S.test||SESS.single)return;
-  RESUME={day:DAYV,keys:SESS.blocks.map(b=>b.k),i:SESS.i,stars:SESS.stars,elapsed:Date.now()-SESS.start,wrong:SESS.wrong,mood:SESS.mood,vars:SESS.vars,rate:SESS.rate,useGrant:SESS.useGrant,saved:Date.now()};
+  RESUME={day:DAYV,keys:SESS.blocks.map(b=>b.k),i:SESS.i,stars:SESS.stars,elapsed:Date.now()-SESS.start,wrong:SESS.wrong,mood:SESS.mood,vars:SESS.vars,rate:SESS.rate,useGrant:SESS.useGrant,rests:SESS.rests|0,restSec:SESS.restSec|0,echo:SESS.echo||null,frusN:SESS.frusN|0,saved:Date.now()};
   DB.set('resume',RESUME);
 }
 function clearResume(){RESUME=null;DB.set('resume',null)}
@@ -3699,7 +3612,7 @@ function resumeSession(rs){
   const all=allBlocks(rs.day),blocks=rs.keys.map(k=>all.find(b=>b.k===k)).filter(Boolean);
   if(!blocks.length||rs.i>=blocks.length){clearResume();startSession(S.day,buildBlocks(S.day),false);return}
   RUNID++;DAYV=rs.day;
-  SESS={blocks,i:rs.i,stars:rs.stars||0,start:Date.now()-(rs.elapsed||0),wrong:rs.wrong||{},mood:rs.mood||'',single:false,vars:rs.vars||{},rate:rs.rate||[],useGrant:!!rs.useGrant};
+  SESS={blocks,i:rs.i,stars:rs.stars||0,start:Date.now()-(rs.elapsed||0),wrong:rs.wrong||{},mood:rs.mood||'',single:false,vars:rs.vars||{},rate:rs.rate||[],useGrant:!!rs.useGrant,repAll:false,rests:rs.rests|0,restSec:rs.restSec|0,echo:rs.echo||undefined,frusN:rs.frusN|0};
   runBlock();
 }
 function streakDays(){
@@ -3724,7 +3637,7 @@ function renderJourney(){
     }
     const pct=n>0?(SESS.i/n*100):0;
     p.querySelector('.pfill').style.width=pct+'%';
-    const ph=p.querySelector('.phero');ph.style.left=Math.min(pct,97)+'%';ph.innerHTML=SESS.exp?`<span style="font-size:36px;line-height:1">${SESS.exp.th.veh}</span>`:heroSVG(SESS.blocks[i].lead||'shivansh',44);
+    const ph=p.querySelector('.phero');ph.style.left=Math.min(pct,97)+'%';ph.innerHTML=heroSVG(SESS.blocks[i].lead||'shivansh',44);
     p.querySelectorAll('.pms').forEach(m=>m.classList.toggle('on',SESS.i>=+m.dataset.k));
     p.querySelector('.pcnt').textContent=(i+1)+' / '+n;
   }else{j.innerHTML='';delete j.dataset.k}
@@ -3740,22 +3653,24 @@ function inWindow(){
   return m>=fh*60+fm&&m<=th*60+tm;
 }
 function startSession(day,blocks,single,opt){
+  if(!blocks||!blocks.length){toast('No activities are switched on — a grown-up can check ⚙️ → Content',false,6000);return}
   RUNID++;DAYV=day;
   const last=S.history[S.history.length-1];
   const OFFK=['move','hands','paper'],cand=blocks.map((b,i)=>OFFK.includes(b.k)?-1:i).filter(i=>i>=0);
-  SESS={blocks,i:0,stars:0,start:Date.now(),wrong:{},mood:'',single:!!single,vars:{},rate:shuffle(cand).slice(0,3),useGrant:!!(!single&&!S.test&&perDay()>0&&doneCountToday()>=perDay()),repAll:!!(opt&&opt.rep),exp:(opt&&opt.exp)||null,rests:0,restSec:0};
+  SESS={blocks,i:0,stars:0,start:Date.now(),wrong:{},mood:'',single:!!single,vars:{},rate:shuffle(cand).slice(0,3),useGrant:!!(!single&&!S.test&&perDay()>0&&doneCountToday()>=perDay()),repAll:!!(opt&&opt.rep),rests:0,restSec:0};
   runBlock();
 }
 function runBlock(){
   stopVoice();
-  if(expGate())return;
   const myRun=RUNID,myI=SESS.i,b=SESS.blocks[SESS.i];
   CURKEY=b.k;SCREEN='mission';if(!SESS.vars[SESS.i])SESS.vars[SESS.i]=b.k;setLead(b.lead);renderJourney();
   const stage=freshStage();
   let once=false;
   L('block '+b.k+' day '+DAYV+(S.test?' TEST':''));saveResume();
-  try{b.run(stage,()=>{if(once||myRun!==RUNID||!SESS||SESS.i!==myI)return;once=true;blockDone()})}
-  catch(e){L('blockerr '+b.k+' '+e.message);blockDone()}
+  const fin=()=>{if(once||myRun!==RUNID||!SESS||SESS.i!==myI)return;once=true;blockDone()};
+  const bad=e=>{L('blockerr '+b.k+' '+(e&&e.message||e));fin()};
+  try{const r=b.run(stage,fin);if(r&&typeof r.then==='function')r.catch(bad)}   /* v3.8.1: activities are async - catch late errors too */
+  catch(e){bad(e)}
 }
 function askFun(v){
   return new Promise(res=>{
@@ -3779,6 +3694,7 @@ function rateFun(v,r){
   S.fun[v]=f;save();
 }
 async function blockDone(){
+  if(!SESS||SESS.doneI===SESS.i)return;SESS.doneI=SESS.i;   /* v3.8.1: one "done" per activity (double tap on Skip, late callbacks) */
   const myRun=RUNID,i=SESS.i,v=SESS.vars[i]||SESS.blocks[i].k;
   const rep=!!SESS.repAll;
   if(!SESS.single&&!rep&&SESS.rate.includes(i)&&!S.test){await askFun(v);if(myRun!==RUNID||!SESS)return}
@@ -3791,7 +3707,6 @@ async function blockDone(){
   setTimeout(()=>{if(myRun!==RUNID||!SESS)return;SESS.i++;if(SESS.i>=SESS.blocks.length)finishScreen();else runBlock()},1500);
 }
 async function finishScreen(){
-  if(SESS&&SESS.exp)return expFinish();
   const stage=freshStage();setLead('snaya');
   if(!S.test&&!SESS.single)clearResume();
   const mins=Math.round((Date.now()-SESS.start)/60000);
@@ -3824,8 +3739,17 @@ const SCREEN_NAME={gallery:'Gallery',home:'Home',habits:'Habits list',habit:'Doi
 let SCREEN='home';
 function nbtn(parent,e,t,c1,c2,fn,badge){const b=el('button','nb',`<span class="e">${uiIc(e)}</span>${t}${badge?`<span class="badge">${badge}</span>`:''}`);b.style.setProperty('--c1',c1);b.style.setProperty('--c2',c2);b.onclick=()=>{SFX.tap();fn()};parent.appendChild(b);return b}
 function backHome(){const n=el('div','navbig');nbtn(n,'🏠','Home','#5c6bff','#3b3fb5',home);return n}
+const homeKey=()=>today()+'|'+(inWindow()?1:0)+'|'+(holidayOn()?1:0);
+let HOMEKEY='';
+function homeRefresh(){
+  if(SCREEN!=='home'||SESS||S.test||HOMEKEY===homeKey())return;
+  if(!$('#modal').hidden||[...document.querySelectorAll('.ov')].some(o=>o.style.display!=='none'))return;   /* never under an open dialog */
+  L('home refresh');home();HOMEKEY=homeKey();
+}
+setInterval(homeRefresh,30000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')homeRefresh()});
 function home(){
-  SESS=null;RUNID++;SCREEN='home';stopVoice();setLead('shivansh');renderJourney();applyTheme(false);
+  SESS=null;RUNID++;SCREEN='home';stopVoice();setLead('shivansh');renderJourney();applyTheme(false);HOMEKEY=homeKey();
   const stage=freshStage();
   if(S.test){testHome(stage);return}
   const nm=kidName(),st=streakDays(),ht=habitsToday(),w=S.wallet|0,goal=nextGoal(),td=today();
@@ -3840,7 +3764,7 @@ function home(){
     const rs=RESUME&&RESUME.day===S.day&&RESUME.i<RESUME.keys.length?RESUME:null;
     const go=el('button','mstart',rs?`<span class="mt"><b>Continue Mission ${S.day}</b><small>activity ${rs.i+1} of ${rs.keys.length} · your stars are saved</small></span><span class="mi">${IC('rocket')}</span>`:`<span class="mt"><b>Start Mission ${S.day}</b><small>${bl.length} activities${mins?` · about ${mins} minutes`:''}</small></span><span class="mi">${IC('rocket')}</span>`);
     go.onclick=()=>{SFX.tap();if(rs)resumeSession(rs);else startSession(S.day,buildBlocks(S.day),false)};hm.appendChild(go);
-    if(rs){const sb=el('button','link','Start this mission again from the beginning');sb.onclick=()=>{clearResume();home()};hm.appendChild(sb)}
+    if(rs){const sb=el('button','link','Grown-up: start this mission again from the beginning');sb.onclick=()=>parentGate('repeat','Start mission '+S.day+' again','Start today’s mission again from the first activity?',()=>{clearResume();home()});hm.appendChild(sb)}
     const wave=[0,-12,-18,-12,0,12,18,12],tr=el('div','trail');
     bl.forEach((b,i)=>{const s=el('span','',b.icon);s.style.setProperty('--c',(TEAM[b.lead]||{}).col||'#ffc83d');s.style.transform=`translateY(${wave[i%8]}px)`;tr.appendChild(s)});
     hm.appendChild(tr);
@@ -3879,7 +3803,6 @@ function home(){
   tile('shirt','Dress up','','#5b8fe0','#3a64ad',()=>openDress());
   tile('book','Stickers',`${new Set(S.stickers.map(x=>x.e)).size} of ${STICKERS.length}`,'#a865cf','#7a3fa0',openStickers);
   tile('book','Gallery',`${(S.gal||[]).length} drawings`,'#26a69a','#00796b',openGallery);{const gt=ng.lastChild,ic=gt.querySelector('.ic');if(ic)ic.outerHTML='<span class="ic" style="font-size:50px;line-height:1">🖼️</span>';gt.style.gridColumn='1/-1'}
-  if(expS().on)tile('rocket','Expeditions (test)','A themed map adventure','#ff9800','#e65100',openExpeditions);
   hm.appendChild(ng);
   if(hardCount()>0){const hb2=el('button','btn','💪 Practice what was hard');hb2.onclick=()=>{SFX.tap();startHard()};hm.appendChild(hb2)}
   const hs=el('div','hstat');
@@ -4300,7 +4223,7 @@ function readRewardRows(root){return [...root.querySelectorAll('.edrow[data-rid]
 /* ---------- v3.6 settings: categories like the Register app, parent-app theme ---------- */
 let SET_PAGE=null;
 const SET_CFG=[
- ['Child',[['📋','Coming week','The next 7 missions, task by task'],['👦','Child & schedule','Name, mission, time window, day / night'],['🏫','School Connect','Monthly letters, numbers, rhymes'],['📚','Content','Which activities appear, pause one for a while'],['🦸','Hero names','Names and Hindi spelling'],['👪','Family','Names, relations, photos'],['👨‍👩‍👧','Family heroes','Extra heroes — use or hide'],['🧭','Expeditions (test)','Themed map version of the same learning'],['🌴','Holiday, sound & display','Holiday mode, volume, text size, reset one activity']]],
+ ['Child',[['📋','Coming week','The next 7 missions, task by task'],['👦','Child & schedule','Name, mission, time window, day / night'],['🏫','School Connect','Monthly letters, numbers, rhymes'],['📚','Content','Which activities appear, pause one for a while'],['🦸','Hero names','Names and Hindi spelling'],['👪','Family','Names, relations, photos'],['👨‍👩‍👧','Family heroes','Extra heroes — use or hide'],['🌴','Holiday, sound & display','Holiday mode, volume, text size, reset one activity']]],
  ['Daily life',[['🔒','Breaks & real-world activities','Who marks practical tasks done'],['✅','Habits & routines','Daily checklist'],['🛍️','Reward shop & star wallet','Rewards, stars, star log']]],
  ['Voice & sound',[['🎧','Natural voice pack','Teacher clips, offline download'],['🗣️','Speak-back (child repeats)','Microphone check, sensitivity'],['🔊','Voice (Hindi teacher)','Tablet voice, speed, your own recordings']]],
  ['Reports',[['📈','Report','Recent missions'],['😀','Interest meter','Which games he enjoys'],['🖨️','Print sheets','Daily sheets and learning plans']]],
@@ -4395,12 +4318,6 @@ function openParent(firstRun){
       <div class="hn2"><div><label>Name</label><input type="text" data-q="n" maxlength="20" value="${esc(f.n)}"></div><div><label>Hindi spelling (for the voice)</label><input type="text" data-q="h" maxlength="24" value="${esc(f.h)}"></div></div>
       <div class="hn2"><div><label>Special power</label><input type="text" data-q="power" maxlength="40" value="${esc(f.power)}"></div><div><label>Catch line (Hindi)</label><input type="text" data-q="hp" maxlength="80" value="${esc(f.hp)}"></div></div>
       <label>Colour</label><input type="color" data-q="col" value="${esc(f.col)}"></div>`).join('')}
-  </details>
-  <details><summary>🧭 Expeditions (test)</summary>
-    <p class="note">A parallel, themed version of the same learning: a map with stops, a vehicle that moves, and a passport stamp at the end. It does not change the mission number, stars or history. Switch it on to show an “Expeditions” tile on the home screen.</p>
-    <label class="inl"><input type="checkbox" id="pexon" ${expS().on?'checked':''}> <span><b>Show Expeditions on the home screen</b></span></label>
-    <label>This week’s expedition</label><select id="pexth"><option value="">Automatic — a new one each week</option>${EXPS.map(x=>`<option value="${x.id}" ${expS().pick===x.id?'selected':''}>${x.e} ${esc(x.name)}</option>`).join('')}</select>
-    <label>Real destination at the end of the map (optional, e.g. Nani’s house)</label><input type="text" id="pexd" maxlength="40" value="${esc(expS().dest||'')}">
   </details>
   <details><summary>🌴 Holiday, sound & display</summary>
     <label class="inl"><input type="checkbox" id="phol" ${(S.holiday||{}).on?'checked':''}> <span><b>Holiday / travel mode</b> — missions pause and the mission number stays put. The streak is kept.</span></label>
@@ -4537,7 +4454,6 @@ function openParent(firstRun){
     S.voice={on:$('#pvo').checked,mode:$('#pvm').value,rate:parseFloat($('#pvr').value)||0.85,pitch:parseFloat($('#pvp').value)||1.1,hinglish:$('#phg').checked,src:$('#pvs').value||'pack',pack:$('#pvk').value||''};
     {const on=$('#phol').checked;S.holiday={on,until:on?($('#phu').value||''):''};holidayMark();S.vol={voice:+$('#pvv').value,fx:+$('#pvf').value,cap:+$('#pvc').value};S.tsize=$('#ptsz').value;S.tapfx=$('#ptfx').checked;S.frusOff=!$('#pfg').checked;applyTextSize();
      S.fh=[...m.querySelectorAll('[data-fh]')].map((r,i)=>{const q=n=>r.querySelector('[data-q="'+n+'"]');return {k:'f'+(i+1),on:q('on').checked,n:q('n').value.trim(),h:q('h').value.trim(),power:q('power').value.trim(),hp:q('hp').value.trim(),col:q('col').value}});regFamilyHeroes()}
-    {const X=expS();X.on=$('#pexon').checked;X.pick=$('#pexth').value;X.dest=$('#pexd').value.trim()}
     S.echo={mode:$('#pem').value||'listen',sens:$('#pes').value||'normal'};
     S.family=[...m.querySelectorAll('.edrow[data-fk]')].map(r=>{const q=n=>r.querySelector('[data-f="'+n+'"]');const d=FAMILY_DEF.find(x=>x.k===r.dataset.fk);return {k:r.dataset.fk,on:q('on').checked,lab:q('lab').value.trim()||d.lab,rel:q('rel').value.trim()||d.rel,hi:q('hi').value.trim()||d.hi,nm:q('nm').value.trim()}});
     S.sfx=$('#psf').checked;
@@ -4587,7 +4503,7 @@ function openParent(firstRun){
       const r=await fetch('audio/'+id+'/'+f);const a=new Audio(URL.createObjectURL(await r.blob()));stopVoice();curAudio=a;await a.play();$('#vpMsg').textContent=''}
     catch(e){$('#vpMsg').textContent='Could not play this voice yet — is it uploaded? ('+e.message+')'}};
   $('#vpExp').onclick=()=>{const miss=Object.entries(SEEN).filter(([k])=>!PACK.clips[k]).map(([k,e])=>({key:k,text:e.t,n:e.n})).sort((a,b)=>b.n-a.n);
-    const blob=new Blob([JSON.stringify({app:'hero-academy',saved:new Date().toISOString(),lines:miss},null,1)],{type:'application/json'});const a=el('a');a.href=URL.createObjectURL(blob);a.download=`hero-missing-lines-${today()}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);$('#vpMsg').textContent=`${miss.length} missing line(s) exported. Give this file to make_voice_pack_v1.py (--extra).`};
+    const blob=new Blob([JSON.stringify({app:'hero-academy',saved:new Date().toISOString(),lines:miss},null,1)],{type:'application/json'});const a=el('a');a.href=URL.createObjectURL(blob);a.download=`hero-missing-lines-${today()}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);$('#vpMsg').textContent=`${miss.length} missing line(s) exported. Give this file to make_voice_pack_v2.py (--extra).`};
   $('#vpClr').onclick=async()=>{if(!confirm('Forget the list of spoken lines?'))return;for(const k in SEEN)delete SEEN[k];await DB.set('seen',SEEN);vpUpdate()};
   /* recordings */
   m.querySelectorAll('.recrow').forEach(row=>{
@@ -4607,11 +4523,11 @@ function openParent(firstRun){
   $('#sPull').onclick=async()=>{readForm();if(!confirm('Replace progress on this tablet with the copy saved in the Google Sheet?'))return;msg('Restoring…');try{await syncPull();msg('✅ Restored');setTimeout(()=>{m.hidden=true;home()},800)}catch(e){msg('❌ '+e.message)}};
   $('#bExp').onclick=()=>{S.lastBackup=today();DB.set('state',S);const blob=new Blob([JSON.stringify({app:'hero-academy',v:APPV,saved:new Date().toISOString(),data:exportable()},null,1)],{type:'application/json'});const a=el('a');a.href=URL.createObjectURL(blob);a.download=`hero-academy-backup-${today()}.json`;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)};
   $('#bImpB').onclick=()=>$('#bImp').click();
-  $('#bImp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.app!=='hero-academy'||!j.data)throw new Error('Not a Hero Academy backup');if(!confirm('Replace progress with this backup file?'))return;const keep={sync:S.sync,sec:S.sec};S=merge(JSON.parse(JSON.stringify(DEF)),j.data);S.sync=keep.sync;S.sec=keep.sec;await save();msg('✅ Restored from file');setTimeout(()=>{m.hidden=true;home()},800)}catch(err){msg('❌ '+err.message)}};
+  $('#bImp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const j=JSON.parse(await f.text());if(j.app!=='hero-academy'||!j.data)throw new Error('Not a Hero Academy backup');if(!confirm('Replace progress with this backup file?'))return;const keep={sync:S.sync,sec:S.sec};S=merge(JSON.parse(JSON.stringify(DEF)),j.data);S.sync=keep.sync;S.sec=keep.sec;S.test=false;if(S.wallet==null)S.wallet=S.stars|0;if(!S.school)S.school=JSON.parse(JSON.stringify(SCHOOL_DEF));clearResume();regFamilyHeroes();applyTextSize();await save();msg('✅ Restored from file');setTimeout(()=>{m.hidden=true;home()},800)}catch(err){msg('❌ '+err.message)}};
   $('#cPin').onclick=()=>pinPad('New PIN',async(p)=>{S.sec.salt=b64(crypto.getRandomValues(new Uint8Array(12)));S.sec.hash=await hashPin(p,S.sec.salt);await save();openParent()},{note:'4–6 digits',onCancel:()=>openParent()});
   if($('#bioR'))$('#bioR').onclick=async()=>{try{await bioRegister();alert('Fingerprint / face added ✅');openParent()}catch(e){alert('Could not add: '+e.message);L('bioreg '+e.message)}};
   if($('#bioX'))$('#bioX').onclick=async()=>{LOCAL.bioId='';await saveLocal();openParent()};
-  $('#rs').onclick=async()=>{if(!confirm('Erase ALL progress and settings on this tablet? (Cloud copy is not touched.)'))return;S=JSON.parse(JSON.stringify(DEF));LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0};await DB.set('state',S);await saveLocal();location.reload()};
+  $('#rs').onclick=async()=>{if(!confirm('Erase ALL progress and settings on this tablet? (Cloud copy is not touched.)'))return;S=JSON.parse(JSON.stringify(DEF));LOCAL={bioId:'',hiVoice:'',enVoice:'',lastPatch:0,lastMsg:0,devId:LOCAL.devId||'',devName:LOCAL.devName||''};await DB.set('state',S);await DB.set('resume',null);await saveLocal();location.reload()};
 }
 
 /* ---------- LIVE link to the parent's phone ---------- */
@@ -4641,18 +4557,18 @@ function showParentMsg(text){
   SFX.star();
   toast(`💌 ${AW().n} says: ${text}`,true,16000);
   const dev=/[\u0900-\u097F]/.test(text);
-  say(`${AW().h} ने कहा —`,dev?text:[text,'en']);
+  sayNow(`${AW().h} ने कहा —`,dev?text:[text,'en']);
 }
 function setPaused(p){
   if(p===LIVE.paused)return;
   LIVE.paused=p;
   let o=$('#pauseov');
   if(p){
-    stopVoice();
+    HOLDN++;HOLDCUT=0;stopVoice();
     if(!o){o=el('div','ov');o.id='pauseov';document.body.appendChild(o)}
     o.innerHTML=`<div class="ovc"><div class="pic">💤</div><div class="cap" style="font-size:38px">Break time!</div><div class="sub">${esc(AW().n)} paused the app. Come back later.</div></div>`;
     o.style.display='grid';
-  }else if(o){o.style.display='none';say(`${AW().h} ने app फिर से चालू कर दिया है!`)}
+  }else if(o){o.style.display='none';holdEndSay(`${AW().h} ने app फिर से चालू कर दिया है!`)}
 }
 async function onLive(j){
   LIVE.role=j.test?'test':'main';
@@ -4703,7 +4619,7 @@ async function askMummy(type,title,detail,onPin){
     const finish=async r=>{
       if(over)return;over=true;
       if(id!=null)delete LIVE.pending[id];
-      if(r.status==='approved'){const c=$('#askov .ovc');if(c)c.innerHTML=`<div class="pic pop">🎉</div><div class="cap" style="font-size:36px">${esc(AW().n)} said YES!</div>`;SFX.win();say(`${AW().h} ने हाँ कहा! शाबाश!`);await sleep(1700)}
+      if(r.status==='approved'){const c=$('#askov .ovc');if(c)c.innerHTML=`<div class="pic pop">🎉</div><div class="cap" style="font-size:36px">${esc(AW().n)} said YES!</div>`;SFX.win();say(`${AW().h} ने हाँ कहा! शाबाश!`);await rawSleep(1700)}
       hideAsk();res(r);
     };
     const cancel=()=>{callSync('cancel',id!=null?{id,cid}:{cid},8000).catch(()=>{});finish({status:'cancelled'})};

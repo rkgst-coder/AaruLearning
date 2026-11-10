@@ -1,7 +1,8 @@
 /* Hero Academy service worker — network-first so updates arrive, cache fallback for offline */
-const CACHE = 'hero-academy-v3.8.0';
+const CACHE = 'hero-academy-v3.8.1';
 const AUDIO = 'hero-audio-v1'; // survives app updates so downloaded voice clips are kept
 const ASSETS = ['./', './index.html', './parent.html', './manifest.webmanifest', './parent.webmanifest', './icon-192.png', './icon-512.png', './parent-192.png', './parent-512.png'];
+const NET_WAIT = 4000; // v3.8.1: on weak Wi-Fi do not wait for ever — after 4 s the saved copy opens (the fresh copy is still saved for next time)
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => Promise.all(ASSETS.map(a => c.add(a).catch(() => null)))).then(() => self.skipWaiting()));
@@ -26,9 +27,19 @@ self.addEventListener('fetch', e => {
     }))));
     return;
   }
-  e.respondWith(
-    fetch(e.request)
-      .then(r => { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)); return r; })
-      .catch(() => caches.match(e.request).then(r => r || caches.match('./index.html')))
-  );
+  const isPage = e.request.mode === 'navigate';
+  /* v3.8.1: only good answers are saved; only a page request may fall back to index.html (a missing .json or icon must fail, not turn into HTML) */
+  const net = fetch(e.request).then(r => {
+    if (r.ok) { const copy = r.clone(); caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {}); }
+    return r;
+  });
+  const saved = () => caches.match(e.request).then(r => r || (isPage ? caches.match('./index.html') : undefined));
+  e.respondWith(new Promise((resolve, reject) => {
+    let settled = false;
+    const done = r => { if (!settled && r) { settled = true; resolve(r); return true; } return false; };
+    const timer = setTimeout(() => saved().then(done), NET_WAIT);
+    net.then(r => { clearTimeout(timer); if (!r.ok && isPage) saved().then(c => done(c || r)); else done(r); })
+       .catch(() => { clearTimeout(timer); saved().then(r => { if (!done(r) && !settled) { settled = true; reject(new TypeError('offline and not saved')); } }); });
+  }));
+  e.waitUntil(net.catch(() => {}));
 });

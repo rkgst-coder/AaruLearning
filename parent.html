@@ -231,7 +231,7 @@ async function poll(force){
   try{
     const j=await api('pget',{sv:SV,force:!!force});
     NOW=j.now;HB=j.hb;CTL=j.ctl||CTL;REQS=j.reqs||[];PATCHES=j.patches||[];ERR='';
-    if(j.state){ST=j.state;SV=j.sv;try{localStorage.setItem('pa_state',JSON.stringify(ST));localStorage.setItem('pa_sv',SV)}catch(e){}ctlBuilt=false}
+    if(j.state){ST=j.state;SV=j.sv;try{localStorage.setItem('pa_state',JSON.stringify(ST));localStorage.setItem('pa_sv',SV)}catch(e){}if(!CTL_DIRTY)ctlBuilt=false}
     else SV=j.sv;
     checkNew();render();
   }catch(e){ERR=e.message;L('poll '+e.message);renderConn()}
@@ -394,6 +394,11 @@ function pReadRewards(){return [...document.querySelectorAll('#rwEd .edrow')].ma
 const BLOCKS=[['review','🔁 Yesterday’s sounds + spaced review'],['mood','😊 Feelings + hero word'],['letter','🔤 Letter sound'],['sight','👀 Sight words'],['blend','🔗 Blend the sounds'],['word','🧩 Build a word'],['move','🏃 Move break'],['count','🔢 Counting'],['numsense','🔟 Ten-frames & number sense'],['numstory','📖 Number story (weekly)'],['shapes','🔷 Shapes & colours'],['hands','🧱 Hands-on maths'],['opp','↔️ Opposites'],['pattern','🎨 Patterns'],['teach','🎓 You are the teacher'],['logic','🧭 Maze / colour & shape'],['trace','✏️ Finger tracing'],['paper','📒 Notebook time'],['time','📅 Days, months & seasons'],['body','🧍 Body, senses & helpers'],['whisper','🤫 Whisper, normal, LOUD'],['discover','🌍 Discover the world'],['sent','💬 Simple sentences'],['calm','🌬️ Feelings check-in & calm'],['story','💛 Feelings & habits'],['festival','🪔 Festival story'],['safety','🛡️ Safety basics'],['family','👪 My family'],['homew','🏠 Home words'],['ptime','🗣️ Your turn, my turn'],['gallery','🎨 My gallery (photo)'],['storytime','📖 Story time'],['values','🏡 Family values'],['varna','🇮🇳 Hindi varnamala'],['ordinals','🏁 First, second, third'],['sorting','🧺 Sort it out'],['puppet','🧸 Teach the puppet'],['movebreak','🕺 Movement break'],['nature','🌍 Nature & simple science'],['instr','👂 Listen and do'],['memory','🧠 Memory game'],['respect','🙏 Respect for elders'],['honesty','🤝 Honesty story'],['care','🏡 Looking after things'],['jar','🫙 Saving jar'],['scav','🔎 House scavenger hunt'],['showtell','🧸 Show and tell'],['rhymes','🎵 Rhymes with actions']];
 const HEROES=[['shivansh','Red flyer'],['aarav','Blue flying suit'],['chiku','Green vine swinger'],['vidu','Purple super hearing'],['snaya','Girl hero — kindness']];
 let ctlBuilt=false,BASE=null;
+/* v3.8.1: the tablet sends its progress after every activity; that used to rebuild this form and wipe whatever you were typing.
+   While you have unsent edits the form is now left alone until you press "Send changes". */
+let CTL_DIRTY=false;
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target&&e.target.closest&&e.target.closest('#ctlForm')&&!e.target.closest('#wAmt,#wNote'))CTL_DIRTY=true},true));
+document.addEventListener('click',e=>{if(e.target&&e.target.closest&&e.target.closest('#ctlForm [data-del],#habAdd,#rwAdd'))CTL_DIRTY=true},true);
 function renderCtl(){
   if(!$('#t-ctl').classList.contains('on'))return;
   const note=$('#ctlNote');
@@ -493,11 +498,11 @@ function applyCtl(){
       if(Object.keys(sub).length)set[k]=sub;
     }else if(a!==JSON.stringify(BASE&&BASE[k]))set[k]=nv[k];
   }
-  if(!Object.keys(set).length){toast('Nothing changed');return}
-  sendSet(set);
+  if(!Object.keys(set).length){CTL_DIRTY=false;toast('Nothing changed');return}
+  sendSet(set,null,true);
 }
-async function sendSet(set,msg){
-  try{await api('pset',{set});toast(msg||'Sent to the tablet ✔');ctlBuilt=false;await poll(true)}catch(e){toast('⚠️ '+e.message)}
+async function sendSet(set,msg,fromForm){
+  try{await api('pset',{set});toast(msg||'Sent to the tablet ✔');if(fromForm)CTL_DIRTY=false;if(!CTL_DIRTY)ctlBuilt=false;await poll(true)}catch(e){toast('⚠️ '+e.message)}
 }
 
 function weeklyReport(st){
@@ -548,7 +553,7 @@ document.querySelectorAll('nav [data-tab]').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('nav [data-tab]').forEach(x=>x.classList.toggle('on',x===b));
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.id==='t-'+b.dataset.tab));
   window.scrollTo(0,0);$('#alertBar').dataset.tab='';
-  if(b.dataset.tab==='ctl')ctlBuilt=false;
+  if(b.dataset.tab==='ctl'&&!CTL_DIRTY)ctlBuilt=false;
   render();
 });
 
